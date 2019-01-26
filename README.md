@@ -1,9 +1,10 @@
 
 # gold-bug
 
-A barebones Go app, which can easily be deployed to Heroku.
+A Web app written in Go to perform encipherment and decipherment of messages using old-fashioned field ciphers.
 
 This application supports the [Getting Started with Go on Heroku](https://devcenter.heroku.com/articles/getting-started-with-go) article - check it out.
+
 
 ## Running Locally
 
@@ -19,6 +20,7 @@ Your app should now be running on [localhost:5000](http://localhost:5000/).
 
 You should also install [govendor](https://github.com/kardianos/govendor) if you are going to add any dependencies to the sample app.
 
+
 ## Deploying to Heroku
 
 ```sh
@@ -32,8 +34,9 @@ or
 [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
 
 
-## Documentation
+## Todo
 
-For more information about using Go on Heroku, see these Dev Center articles:
-
-- [Go on Heroku](https://devcenter.heroku.com/categories/go)
+- Asset minification
+- Finalize /v1 API
+- Add more tests
+- Reduce code duplication
