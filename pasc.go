@@ -70,7 +70,7 @@ func MakeVigenereFamilyCipher(countersign, ptAlphabet, ctAlphabet, keyAlphabet s
 	// this cast is necessary to ensure that the index increases without gaps
 	for i, r := range []rune(keyAlphabet) {
 		ctAlphabet3 := wrapString(ctAlphabet, i)
-		tr.ciphers[r] = SimpleSubstitutionCipher{ptAlphabet, ctAlphabet3}
+		tr.ciphers[r] = makeSimpleSubstitutionCipher(ptAlphabet, ctAlphabet3)
 	}
 	return VigenereFamilyCipher{
 		TabulaRecta: tr,
@@ -93,7 +93,7 @@ func MakeDellaPortaReciprocalTable(countersign, ptAlphabet, ctAlphabet, keyAlpha
 	// this cast is necessary to ensure that the index increases without gaps
 	for i, r := range []rune(keyAlphabet) {
 		ctAlphabet3 := owrapString(ctAlphabet2, i/2)
-		tr.ciphers[r] = SimpleSubstitutionCipher{ptAlphabet, ctAlphabet3}
+		tr.ciphers[r] = makeSimpleSubstitutionCipher(ptAlphabet, ctAlphabet3)
 	}
 	return VigenereFamilyCipher{
 		TabulaRecta: tr,
@@ -145,8 +145,8 @@ func (c VigenereFamilyCipher) Decipher(s string, strict bool) string {
 	}, s)
 }
 
-// WrapString wraps a string a specified number of indices.
-// WrapString will error out if the provided offset is negative.
+// owrapString wraps two halves of a string in opposite directions, like gears turning outward.
+// owrapString will panic if the provided offset is negative.
 func owrapString(s string, i int) string {
 	// if we simply `return s[i:] + s[:i]`, we're operating on bytes, not runes
 	sRunes := []rune(s)

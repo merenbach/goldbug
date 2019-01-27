@@ -44,7 +44,7 @@ func TestSimpleSubstitutionCipher(t *testing.T) {
 		{"ABCDEFGHIJKLMNOPQRSTUVWXYZ", "DEFGHIJKLMNOPQRSTUVWXYZABC", "PT: ABCDEFGHIJKLMNOPQRSTUVWXYZ\nCT: DEFGHIJKLMNOPQRSTUVWXYZABC"},
 	}
 	for _, table := range tables {
-		c := SimpleSubstitutionCipher{table.pt, table.ct}
+		c := makeSimpleSubstitutionCipher(table.pt, table.ct)
 		if output := c.String(); output != table.expected {
 			t.Errorf("Tableau printout doesn't match for PT %q and CT %q. Received: %s; expected: %s", table.pt, table.ct, output, table.expected)
 		}

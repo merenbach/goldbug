@@ -28,6 +28,13 @@ type SimpleSubstitutionCipher struct {
 	ctAlphabet string
 }
 
+func makeSimpleSubstitutionCipher(ptAlphabet string, ctAlphabet string) SimpleSubstitutionCipher {
+	return SimpleSubstitutionCipher{
+		ptAlphabet: ptAlphabet,
+		ctAlphabet: ctAlphabet,
+	}
+}
+
 // MakeRuneMap creates a one-way, monoalphabetic substitution cipher table.
 func makeRuneMap(src, dst string) map[rune]rune {
 	out := make(map[rune]rune)
@@ -91,7 +98,7 @@ func (c SimpleSubstitutionCipher) decipherRune(r rune) rune {
 // NewKeywordCipher creates a new keyword cipher.
 func MakeKeywordCipher(alphabet, keyword string) SimpleSubstitutionCipher {
 	ctAlphabet := deduplicate(keyword + alphabet)
-	return SimpleSubstitutionCipher{alphabet, ctAlphabet}
+	return makeSimpleSubstitutionCipher(alphabet, ctAlphabet)
 }
 
 // NewAffineCipher creates a new affine cipher.
@@ -114,7 +121,7 @@ func MakeAffineCipher(ptAlphabet string, a, b int) SimpleSubstitutionCipher {
 	}
 	ctAlphabet := backpermute(ptAlphabet, lcg.Iterator())
 
-	return SimpleSubstitutionCipher{ptAlphabet, ctAlphabet}
+	return makeSimpleSubstitutionCipher(ptAlphabet, ctAlphabet)
 }
 
 // NewAtbashCipher creates a new Atbash cipher.
