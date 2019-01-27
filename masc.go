@@ -26,12 +26,16 @@ import (
 type SimpleSubstitutionCipher struct {
 	ptAlphabet string
 	ctAlphabet string
+	pt2ct      map[rune]rune
+	ct2pt      map[rune]rune
 }
 
 func makeSimpleSubstitutionCipher(ptAlphabet string, ctAlphabet string) SimpleSubstitutionCipher {
 	return SimpleSubstitutionCipher{
 		ptAlphabet: ptAlphabet,
 		ctAlphabet: ctAlphabet,
+		pt2ct:      makeRuneMap(ptAlphabet, ctAlphabet),
+		ct2pt:      makeRuneMap(ctAlphabet, ptAlphabet),
 	}
 }
 
@@ -53,9 +57,8 @@ func (c SimpleSubstitutionCipher) String() string {
 
 // Encipher a message from plaintext to ciphertext.
 func (c SimpleSubstitutionCipher) Encipher(s string, strict bool) string {
-	xtable := makeRuneMap(c.ptAlphabet, c.ctAlphabet)
 	return strings.Map(func(r rune) rune {
-		if o, ok := xtable[r]; ok {
+		if o, ok := c.pt2ct[r]; ok {
 			return o
 		} else if !strict {
 			return r
@@ -66,9 +69,8 @@ func (c SimpleSubstitutionCipher) Encipher(s string, strict bool) string {
 
 // Decipher a message from ciphertext to plaintext.
 func (c SimpleSubstitutionCipher) Decipher(s string, strict bool) string {
-	xtable := makeRuneMap(c.ctAlphabet, c.ptAlphabet)
 	return strings.Map(func(r rune) rune {
-		if o, ok := xtable[r]; ok {
+		if o, ok := c.ct2pt[r]; ok {
 			return o
 		} else if !strict {
 			return r
@@ -79,8 +81,7 @@ func (c SimpleSubstitutionCipher) Decipher(s string, strict bool) string {
 
 // EncipherRune transforms a rune from plaintext to ciphertext, returning (-1) if transformation fails.
 func (c SimpleSubstitutionCipher) encipherRune(r rune) rune {
-	xtable := makeRuneMap(c.ptAlphabet, c.ctAlphabet)
-	if o, ok := xtable[r]; ok {
+	if o, ok := c.pt2ct[r]; ok {
 		return o
 	}
 	return (-1)
@@ -88,8 +89,7 @@ func (c SimpleSubstitutionCipher) encipherRune(r rune) rune {
 
 // DecipherRune transforms a rune from ciphertext to plaintext, returning (-1) if transformation fails.
 func (c SimpleSubstitutionCipher) decipherRune(r rune) rune {
-	xtable := makeRuneMap(c.ctAlphabet, c.ptAlphabet)
-	if o, ok := xtable[r]; ok {
+	if o, ok := c.ct2pt[r]; ok {
 		return o
 	}
 	return (-1)
