@@ -40,6 +40,7 @@ func makeSimpleSubstitutionCipher(ptAlphabet string, ctAlphabet string) SimpleSu
 }
 
 // MakeRuneMap creates a one-way, monoalphabetic substitution cipher table.
+// TODO: pass in as runes? error out on duplicates?
 func makeRuneMap(src, dst string) map[rune]rune {
 	out := make(map[rune]rune)
 
@@ -51,14 +52,14 @@ func makeRuneMap(src, dst string) map[rune]rune {
 	return out
 }
 
-func (c SimpleSubstitutionCipher) String() string {
-	return fmt.Sprintf("PT: %s\nCT: %s", c.ptAlphabet, c.ctAlphabet)
+func (sc SimpleSubstitutionCipher) String() string {
+	return fmt.Sprintf("PT: %s\nCT: %s", sc.ptAlphabet, sc.ctAlphabet)
 }
 
 // Encipher a message from plaintext to ciphertext.
-func (c SimpleSubstitutionCipher) Encipher(s string, strict bool) string {
+func (sc SimpleSubstitutionCipher) Encipher(s string, strict bool) string {
 	return strings.Map(func(r rune) rune {
-		if o, ok := c.pt2ct[r]; ok {
+		if o, ok := sc.pt2ct[r]; ok {
 			return o
 		} else if !strict {
 			return r
@@ -68,9 +69,9 @@ func (c SimpleSubstitutionCipher) Encipher(s string, strict bool) string {
 }
 
 // Decipher a message from ciphertext to plaintext.
-func (c SimpleSubstitutionCipher) Decipher(s string, strict bool) string {
+func (sc SimpleSubstitutionCipher) Decipher(s string, strict bool) string {
 	return strings.Map(func(r rune) rune {
-		if o, ok := c.ct2pt[r]; ok {
+		if o, ok := sc.ct2pt[r]; ok {
 			return o
 		} else if !strict {
 			return r
@@ -80,16 +81,16 @@ func (c SimpleSubstitutionCipher) Decipher(s string, strict bool) string {
 }
 
 // EncipherRune transforms a rune from plaintext to ciphertext, returning (-1) if transformation fails.
-func (c SimpleSubstitutionCipher) encipherRune(r rune) rune {
-	if o, ok := c.pt2ct[r]; ok {
+func (sc SimpleSubstitutionCipher) encipherRune(r rune) rune {
+	if o, ok := sc.pt2ct[r]; ok {
 		return o
 	}
 	return (-1)
 }
 
 // DecipherRune transforms a rune from ciphertext to plaintext, returning (-1) if transformation fails.
-func (c SimpleSubstitutionCipher) decipherRune(r rune) rune {
-	if o, ok := c.ct2pt[r]; ok {
+func (sc SimpleSubstitutionCipher) decipherRune(r rune) rune {
+	if o, ok := sc.ct2pt[r]; ok {
 		return o
 	}
 	return (-1)
