@@ -59,41 +59,39 @@ func (sc SimpleSubstitutionCipher) String() string {
 // Encipher a message from plaintext to ciphertext.
 func (sc SimpleSubstitutionCipher) Encipher(s string, strict bool) string {
 	return strings.Map(func(r rune) rune {
-		if o, ok := sc.pt2ct[r]; ok {
-			return o
-		} else if !strict {
-			return r
-		}
-		return (-1)
+		o, _ := sc.encipherRune(r, strict)
+		return o
 	}, s)
 }
 
 // Decipher a message from ciphertext to plaintext.
 func (sc SimpleSubstitutionCipher) Decipher(s string, strict bool) string {
 	return strings.Map(func(r rune) rune {
-		if o, ok := sc.ct2pt[r]; ok {
-			return o
-		} else if !strict {
-			return r
-		}
-		return (-1)
+		o, _ := sc.decipherRune(r, strict)
+		return o
 	}, s)
 }
 
-// EncipherRune transforms a rune from plaintext to ciphertext, returning (-1) if transformation fails.
-func (sc SimpleSubstitutionCipher) encipherRune(r rune) rune {
+// EncipherRune transforms a rune from plaintext to ciphertext, returning (-1) if transformation fails and strict mode is false.
+// EncipherRune returns a second parameter, a boolean, to indicate if any transformation was possible.
+func (sc SimpleSubstitutionCipher) encipherRune(r rune, strict bool) (rune, bool) {
 	if o, ok := sc.pt2ct[r]; ok {
-		return o
+		return o, true
+	} else if !strict {
+		return r, false
 	}
-	return (-1)
+	return (-1), false
 }
 
-// DecipherRune transforms a rune from ciphertext to plaintext, returning (-1) if transformation fails.
-func (sc SimpleSubstitutionCipher) decipherRune(r rune) rune {
+// DecipherRune transforms a rune from ciphertext to plaintext, returning (-1) if transformation fails and strict mode is false.
+// DecipherRune returns a second parameter, a boolean, to indicate if any transformation was possible.
+func (sc SimpleSubstitutionCipher) decipherRune(r rune, strict bool) (rune, bool) {
 	if o, ok := sc.ct2pt[r]; ok {
-		return o
+		return o, true
+	} else if !strict {
+		return r, false
 	}
-	return (-1)
+	return (-1), false
 }
 
 // NewKeywordCipher creates a new keyword cipher.
