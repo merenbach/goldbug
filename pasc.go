@@ -108,7 +108,7 @@ func (c VigenereFamilyCipher) Encipher(s string, strict bool) string {
 	return strings.Map(func(r rune) rune {
 		k := keyRunes[transcodedCharCount%len(keyRunes)]
 		cipher := c.ciphers[k]
-		o, ok := cipher.encipherRune(r, strict)
+		o, ok := cipher.EncipherRune(r, strict)
 		if ok {
 			transcodedCharCount++
 			if c.Textautoclave {
@@ -128,7 +128,7 @@ func (c VigenereFamilyCipher) Decipher(s string, strict bool) string {
 	return strings.Map(func(r rune) rune {
 		k := keyRunes[transcodedCharCount%len(keyRunes)]
 		cipher := c.ciphers[k]
-		o, ok := cipher.decipherRune(r, strict)
+		o, ok := cipher.DecipherRune(r, strict)
 		if ok {
 			transcodedCharCount++
 			if c.Textautoclave {

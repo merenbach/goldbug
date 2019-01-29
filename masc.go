@@ -59,7 +59,7 @@ func (sc SimpleSubstitutionCipher) String() string {
 // Encipher a message from plaintext to ciphertext.
 func (sc SimpleSubstitutionCipher) Encipher(s string, strict bool) string {
 	return strings.Map(func(r rune) rune {
-		o, _ := sc.encipherRune(r, strict)
+		o, _ := sc.EncipherRune(r, strict)
 		return o
 	}, s)
 }
@@ -67,31 +67,43 @@ func (sc SimpleSubstitutionCipher) Encipher(s string, strict bool) string {
 // Decipher a message from ciphertext to plaintext.
 func (sc SimpleSubstitutionCipher) Decipher(s string, strict bool) string {
 	return strings.Map(func(r rune) rune {
-		o, _ := sc.decipherRune(r, strict)
+		o, _ := sc.DecipherRune(r, strict)
 		return o
 	}, s)
 }
 
-// EncipherRune transforms a rune from plaintext to ciphertext, returning (-1) if transformation fails and strict mode is false.
-// EncipherRune returns a second parameter, a boolean, to indicate if any transformation was possible.
-func (sc SimpleSubstitutionCipher) encipherRune(r rune, strict bool) (rune, bool) {
+// EncipherRune transforms a rune from plaintext to ciphertext, returning (-1, false) if transformation fails.
+func (sc SimpleSubstitutionCipher) encipherRune(r rune) (rune, bool) {
 	if o, ok := sc.pt2ct[r]; ok {
 		return o, true
-	} else if !strict {
-		return r, false
 	}
 	return (-1), false
 }
 
-// DecipherRune transforms a rune from ciphertext to plaintext, returning (-1) if transformation fails and strict mode is false.
-// DecipherRune returns a second parameter, a boolean, to indicate if any transformation was possible.
-func (sc SimpleSubstitutionCipher) decipherRune(r rune, strict bool) (rune, bool) {
+// DecipherRune transforms a rune from ciphertext to plaintext, returning (-1, false) if transformation fails.
+func (sc SimpleSubstitutionCipher) decipherRune(r rune) (rune, bool) {
 	if o, ok := sc.ct2pt[r]; ok {
 		return o, true
-	} else if !strict {
-		return r, false
 	}
 	return (-1), false
+}
+
+// EncipherRune transforms a rune from plaintext to ciphertext, returning (-1, false) if transformation fails and strict mode is false.
+// EncipherRune returns a second parameter, a boolean, to indicate if any transformation was possible.
+func (sc SimpleSubstitutionCipher) EncipherRune(r rune, strict bool) (rune, bool) {
+	if o, ok := sc.encipherRune(r); ok || strict {
+		return o, ok
+	}
+	return r, false
+}
+
+// DecipherRune transforms a rune from ciphertext to plaintext, returning (-1, false) if transformation fails and strict mode is false.
+// DecipherRune returns a second parameter, a boolean, to indicate if any transformation was possible.
+func (sc SimpleSubstitutionCipher) DecipherRune(r rune, strict bool) (rune, bool) {
+	if o, ok := sc.decipherRune(r); ok || strict {
+		return o, ok
+	}
+	return r, false
 }
 
 // NewKeywordCipher creates a new keyword cipher.
