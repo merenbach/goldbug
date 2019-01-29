@@ -103,7 +103,7 @@ func main() {
 				r.Alphabet = defaultAlphabet
 			}
 			c.JSON(http.StatusOK, gin.H{
-				"message": MakeRot13Cipher(r.Alphabet).Encipher(r.Message, r.Strict),
+				"message": NewRot13Cipher(r.Alphabet).Encipher(r.Message, r.Strict),
 			})
 		})
 		v1.POST("/decipher/rot13", func(c *gin.Context) {
@@ -117,7 +117,7 @@ func main() {
 				r.Alphabet = defaultAlphabet
 			}
 			c.JSON(http.StatusOK, gin.H{
-				"message": MakeRot13Cipher(r.Alphabet).Decipher(r.Message, r.Strict),
+				"message": NewRot13Cipher(r.Alphabet).Decipher(r.Message, r.Strict),
 			})
 		})
 
@@ -132,7 +132,7 @@ func main() {
 				r.Alphabet = defaultAlphabet
 			}
 			c.JSON(http.StatusOK, gin.H{
-				"message": MakeAtbashCipher(r.Alphabet).Encipher(r.Message, r.Strict),
+				"message": NewAtbashCipher(r.Alphabet).Encipher(r.Message, r.Strict),
 			})
 		})
 		v1.POST("/decipher/atbash", func(c *gin.Context) {
@@ -146,7 +146,7 @@ func main() {
 				r.Alphabet = defaultAlphabet
 			}
 			c.JSON(http.StatusOK, gin.H{
-				"message": MakeAtbashCipher(r.Alphabet).Decipher(r.Message, r.Strict),
+				"message": NewAtbashCipher(r.Alphabet).Decipher(r.Message, r.Strict),
 			})
 		})
 
@@ -161,7 +161,7 @@ func main() {
 				r.Alphabet = defaultAlphabet
 			}
 			c.JSON(http.StatusOK, gin.H{
-				"message": MakeCaesarCipher(r.Alphabet, r.Shift).Encipher(r.Message, r.Strict),
+				"message": NewCaesarCipher(r.Alphabet, r.Shift).Encipher(r.Message, r.Strict),
 			})
 		})
 		v1.POST("/decipher/caesar", func(c *gin.Context) {
@@ -175,7 +175,7 @@ func main() {
 				r.Alphabet = defaultAlphabet
 			}
 			c.JSON(http.StatusOK, gin.H{
-				"message": MakeCaesarCipher(r.Alphabet, r.Shift).Decipher(r.Message, r.Strict),
+				"message": NewCaesarCipher(r.Alphabet, r.Shift).Decipher(r.Message, r.Strict),
 			})
 		})
 
@@ -190,7 +190,7 @@ func main() {
 				r.Alphabet = defaultAlphabet
 			}
 			c.JSON(http.StatusOK, gin.H{
-				"message": MakeDecimationCipher(r.Alphabet, r.Multiplier).Encipher(r.Message, r.Strict),
+				"message": NewDecimationCipher(r.Alphabet, r.Multiplier).Encipher(r.Message, r.Strict),
 			})
 		})
 		v1.POST("/decipher/decimation", func(c *gin.Context) {
@@ -204,7 +204,7 @@ func main() {
 				r.Alphabet = defaultAlphabet
 			}
 			c.JSON(http.StatusOK, gin.H{
-				"message": MakeDecimationCipher(r.Alphabet, r.Multiplier).Decipher(r.Message, r.Strict),
+				"message": NewDecimationCipher(r.Alphabet, r.Multiplier).Decipher(r.Message, r.Strict),
 			})
 		})
 
@@ -219,7 +219,7 @@ func main() {
 				r.Alphabet = defaultAlphabet
 			}
 			c.JSON(http.StatusOK, gin.H{
-				"message": MakeAffineCipher(r.Alphabet, r.Multiplier, r.Shift).Encipher(r.Message, r.Strict),
+				"message": NewAffineCipher(r.Alphabet, r.Multiplier, r.Shift).Encipher(r.Message, r.Strict),
 			})
 		})
 		v1.POST("/decipher/affine", func(c *gin.Context) {
@@ -233,7 +233,7 @@ func main() {
 				r.Alphabet = defaultAlphabet
 			}
 			c.JSON(http.StatusOK, gin.H{
-				"message": MakeAffineCipher(r.Alphabet, r.Multiplier, r.Shift).Decipher(r.Message, r.Strict),
+				"message": NewAffineCipher(r.Alphabet, r.Multiplier, r.Shift).Decipher(r.Message, r.Strict),
 			})
 		})
 
@@ -248,7 +248,7 @@ func main() {
 				r.Alphabet = defaultAlphabet
 			}
 			c.JSON(http.StatusOK, gin.H{
-				"message": MakeKeywordCipher(r.Alphabet, r.Keyword).Encipher(r.Message, r.Strict),
+				"message": NewKeywordCipher(r.Alphabet, r.Keyword).Encipher(r.Message, r.Strict),
 			})
 		})
 		v1.POST("/decipher/keyword", func(c *gin.Context) {
@@ -262,7 +262,7 @@ func main() {
 				r.Alphabet = defaultAlphabet
 			}
 			c.JSON(http.StatusOK, gin.H{
-				"message": MakeKeywordCipher(r.Alphabet, r.Keyword).Decipher(r.Message, r.Strict),
+				"message": NewKeywordCipher(r.Alphabet, r.Keyword).Decipher(r.Message, r.Strict),
 			})
 		})
 
@@ -276,13 +276,13 @@ func main() {
 			if r.Alphabet == "" {
 				r.Alphabet = defaultAlphabet
 			}
-			var cipher VigenereFamilyCipher
+			var cipher *VigenereFamilyCipher
 			if !r.TextAutoclave && !r.KeyAutoclave {
-				cipher = MakeVigenereCipher(r.Countersign, r.Alphabet)
+				cipher = NewVigenereCipher(r.Countersign, r.Alphabet)
 			} else if r.TextAutoclave && !r.KeyAutoclave {
-				cipher = MakeVigenereTextAutoclaveCipher(r.Countersign, r.Alphabet)
+				cipher = NewVigenereTextAutoclaveCipher(r.Countersign, r.Alphabet)
 			} else if !r.TextAutoclave && r.KeyAutoclave {
-				cipher = MakeVigenereKeyAutoclaveCipher(r.Countersign, r.Alphabet)
+				cipher = NewVigenereKeyAutoclaveCipher(r.Countersign, r.Alphabet)
 			} else if r.TextAutoclave && r.KeyAutoclave {
 				c.JSON(http.StatusBadRequest, gin.H{
 					"error": "Text autoclave and key autoclave cannot be specified simultaneously.",
@@ -303,13 +303,13 @@ func main() {
 			if r.Alphabet == "" {
 				r.Alphabet = defaultAlphabet
 			}
-			var cipher VigenereFamilyCipher
+			var cipher *VigenereFamilyCipher
 			if !r.TextAutoclave && !r.KeyAutoclave {
-				cipher = MakeVigenereCipher(r.Countersign, r.Alphabet)
+				cipher = NewVigenereCipher(r.Countersign, r.Alphabet)
 			} else if r.TextAutoclave && !r.KeyAutoclave {
-				cipher = MakeVigenereTextAutoclaveCipher(r.Countersign, r.Alphabet)
+				cipher = NewVigenereTextAutoclaveCipher(r.Countersign, r.Alphabet)
 			} else if !r.TextAutoclave && r.KeyAutoclave {
-				cipher = MakeVigenereKeyAutoclaveCipher(r.Countersign, r.Alphabet)
+				cipher = NewVigenereKeyAutoclaveCipher(r.Countersign, r.Alphabet)
 			} else if r.TextAutoclave && r.KeyAutoclave {
 				c.JSON(http.StatusBadRequest, gin.H{
 					"error": "Text autoclave and key autoclave cannot be specified simultaneously.",
@@ -332,7 +332,7 @@ func main() {
 				r.Alphabet = defaultAlphabet
 			}
 			c.JSON(http.StatusOK, gin.H{
-				"message": MakeBeaufortCipher(r.Countersign, r.Alphabet).Encipher(r.Message, r.Strict),
+				"message": NewBeaufortCipher(r.Countersign, r.Alphabet).Encipher(r.Message, r.Strict),
 			})
 		})
 		v1.POST("/decipher/beaufort", func(c *gin.Context) {
@@ -346,7 +346,7 @@ func main() {
 				r.Alphabet = defaultAlphabet
 			}
 			c.JSON(http.StatusOK, gin.H{
-				"message": MakeBeaufortCipher(r.Countersign, r.Alphabet).Decipher(r.Message, r.Strict),
+				"message": NewBeaufortCipher(r.Countersign, r.Alphabet).Decipher(r.Message, r.Strict),
 			})
 		})
 
@@ -361,7 +361,7 @@ func main() {
 				r.Alphabet = defaultAlphabet
 			}
 			c.JSON(http.StatusOK, gin.H{
-				"message": MakeGronsfeldCipher(r.Countersign, r.Alphabet).Encipher(r.Message, r.Strict),
+				"message": NewGronsfeldCipher(r.Countersign, r.Alphabet).Encipher(r.Message, r.Strict),
 			})
 		})
 		v1.POST("/decipher/gronsfeld", func(c *gin.Context) {
@@ -375,7 +375,7 @@ func main() {
 				r.Alphabet = defaultAlphabet
 			}
 			c.JSON(http.StatusOK, gin.H{
-				"message": MakeGronsfeldCipher(r.Countersign, r.Alphabet).Decipher(r.Message, r.Strict),
+				"message": NewGronsfeldCipher(r.Countersign, r.Alphabet).Decipher(r.Message, r.Strict),
 			})
 		})
 
@@ -390,7 +390,7 @@ func main() {
 				r.Alphabet = defaultAlphabet
 			}
 			c.JSON(http.StatusOK, gin.H{
-				"message": MakeVariantBeaufortCipher(r.Countersign, r.Alphabet).Encipher(r.Message, r.Strict),
+				"message": NewVariantBeaufortCipher(r.Countersign, r.Alphabet).Encipher(r.Message, r.Strict),
 			})
 		})
 		v1.POST("/decipher/variantbeaufort", func(c *gin.Context) {
@@ -404,7 +404,7 @@ func main() {
 				r.Alphabet = defaultAlphabet
 			}
 			c.JSON(http.StatusOK, gin.H{
-				"message": MakeVariantBeaufortCipher(r.Countersign, r.Alphabet).Decipher(r.Message, r.Strict),
+				"message": NewVariantBeaufortCipher(r.Countersign, r.Alphabet).Decipher(r.Message, r.Strict),
 			})
 		})
 
@@ -419,7 +419,7 @@ func main() {
 				r.Alphabet = defaultAlphabet
 			}
 			c.JSON(http.StatusOK, gin.H{
-				"message": MakeDellaPortaCipher(r.Countersign, r.Alphabet).Encipher(r.Message, r.Strict),
+				"message": NewDellaPortaCipher(r.Countersign, r.Alphabet).Encipher(r.Message, r.Strict),
 			})
 		})
 		v1.POST("/decipher/dellaporta", func(c *gin.Context) {
@@ -433,7 +433,7 @@ func main() {
 				r.Alphabet = defaultAlphabet
 			}
 			c.JSON(http.StatusOK, gin.H{
-				"message": MakeDellaPortaCipher(r.Countersign, r.Alphabet).Decipher(r.Message, r.Strict),
+				"message": NewDellaPortaCipher(r.Countersign, r.Alphabet).Decipher(r.Message, r.Strict),
 			})
 		})
 
@@ -448,7 +448,7 @@ func main() {
 				r.Alphabet = defaultAlphabet
 			}
 			c.JSON(http.StatusOK, gin.H{
-				"message": MakeTrithemiusCipher(r.Alphabet).Encipher(r.Message, r.Strict),
+				"message": NewTrithemiusCipher(r.Alphabet).Encipher(r.Message, r.Strict),
 			})
 		})
 		v1.POST("/decipher/trithemius", func(c *gin.Context) {
@@ -462,7 +462,7 @@ func main() {
 				r.Alphabet = defaultAlphabet
 			}
 			c.JSON(http.StatusOK, gin.H{
-				"message": MakeTrithemiusCipher(r.Alphabet).Decipher(r.Message, r.Strict),
+				"message": NewTrithemiusCipher(r.Alphabet).Decipher(r.Message, r.Strict),
 			})
 		})
 	}
