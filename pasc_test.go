@@ -21,16 +21,16 @@ import (
 
 const defaultPolyalphabeticAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-func runPolyalphabeticEncipherTest(t *testing.T, plaintext string, ciphertext string, c *VigenereFamilyCipher, strict bool) {
-	encrypted := c.Encipher(plaintext, strict)
-	if string(encrypted) != ciphertext {
-		t.Errorf("ciphertext %q was incorrect; wanted %q", encrypted, ciphertext)
+func runPolyalphabeticEncipherTest(t *testing.T, input string, expected string, c *VigenereFamilyCipher, strict bool) {
+	output := c.Encipher(input, strict)
+	if string(output) != expected {
+		t.Errorf("ciphertext %q for input %q was incorrect; wanted %q", output, input, expected)
 	}
 }
-func runPolyalphabeticDecipherTest(t *testing.T, ciphertext string, plaintext string, c *VigenereFamilyCipher, strict bool) {
-	decrypted := c.Decipher(ciphertext, strict)
-	if string(decrypted) != plaintext {
-		t.Errorf("plaintext %q was incorrect; wanted: %q", decrypted, plaintext)
+func runPolyalphabeticDecipherTest(t *testing.T, input string, expected string, c *VigenereFamilyCipher, strict bool) {
+	output := c.Decipher(input, strict)
+	if string(output) != expected {
+		t.Errorf("plaintext %q for input %q was incorrect; wanted: %q", output, input, expected)
 	}
 }
 
@@ -48,8 +48,8 @@ func runPolyalphabeticDecipherTest(t *testing.T, ciphertext string, plaintext st
 func TestVigenereCipher(t *testing.T) {
 	encipherTables := []struct {
 		alphabet    string
-		plaintext   string
-		ciphertext  string
+		input       string
+		expected    string
 		countersign string
 		strict      bool
 	}{
@@ -67,8 +67,8 @@ func TestVigenereCipher(t *testing.T) {
 	}
 	decipherTables := []struct {
 		alphabet    string
-		plaintext   string
-		ciphertext  string
+		input       string
+		expected    string
 		countersign string
 		strict      bool
 	}{
@@ -87,19 +87,19 @@ func TestVigenereCipher(t *testing.T) {
 
 	for _, table := range encipherTables {
 		c := NewVigenereCipher(table.countersign, table.alphabet)
-		runPolyalphabeticEncipherTest(t, table.plaintext, table.ciphertext, c, table.strict)
+		runPolyalphabeticEncipherTest(t, table.input, table.expected, c, table.strict)
 	}
 	for _, table := range decipherTables {
 		c := NewVigenereCipher(table.countersign, table.alphabet)
-		runPolyalphabeticDecipherTest(t, table.plaintext, table.ciphertext, c, table.strict)
+		runPolyalphabeticDecipherTest(t, table.input, table.expected, c, table.strict)
 	}
 }
 
 func TestVigenereTextAutoclaveCipher(t *testing.T) {
 	encipherTables := []struct {
 		alphabet    string
-		plaintext   string
-		ciphertext  string
+		input       string
+		expected    string
 		countersign string
 		strict      bool
 	}{
@@ -114,8 +114,8 @@ func TestVigenereTextAutoclaveCipher(t *testing.T) {
 	}
 	decipherTables := []struct {
 		alphabet    string
-		plaintext   string
-		ciphertext  string
+		input       string
+		expected    string
 		countersign string
 		strict      bool
 	}{
@@ -131,19 +131,19 @@ func TestVigenereTextAutoclaveCipher(t *testing.T) {
 
 	for _, table := range encipherTables {
 		c := NewVigenereTextAutoclaveCipher(table.countersign, table.alphabet)
-		runPolyalphabeticEncipherTest(t, table.plaintext, table.ciphertext, c, table.strict)
+		runPolyalphabeticEncipherTest(t, table.input, table.expected, c, table.strict)
 	}
 	for _, table := range decipherTables {
 		c := NewVigenereTextAutoclaveCipher(table.countersign, table.alphabet)
-		runPolyalphabeticDecipherTest(t, table.plaintext, table.ciphertext, c, table.strict)
+		runPolyalphabeticDecipherTest(t, table.input, table.expected, c, table.strict)
 	}
 }
 
 func TestVigenereKeyAutoclaveCipher(t *testing.T) {
 	encipherTables := []struct {
 		alphabet    string
-		plaintext   string
-		ciphertext  string
+		input       string
+		expected    string
 		countersign string
 		strict      bool
 	}{
@@ -158,8 +158,8 @@ func TestVigenereKeyAutoclaveCipher(t *testing.T) {
 	}
 	decipherTables := []struct {
 		alphabet    string
-		plaintext   string
-		ciphertext  string
+		input       string
+		expected    string
 		countersign string
 		strict      bool
 	}{
@@ -175,19 +175,19 @@ func TestVigenereKeyAutoclaveCipher(t *testing.T) {
 
 	for _, table := range encipherTables {
 		c := NewVigenereKeyAutoclaveCipher(table.countersign, table.alphabet)
-		runPolyalphabeticEncipherTest(t, table.plaintext, table.ciphertext, c, table.strict)
+		runPolyalphabeticEncipherTest(t, table.input, table.expected, c, table.strict)
 	}
 	for _, table := range decipherTables {
 		c := NewVigenereKeyAutoclaveCipher(table.countersign, table.alphabet)
-		runPolyalphabeticDecipherTest(t, table.plaintext, table.ciphertext, c, table.strict)
+		runPolyalphabeticDecipherTest(t, table.input, table.expected, c, table.strict)
 	}
 }
 
 func TestBeaufortCipher(t *testing.T) {
 	encipherTables := []struct {
 		alphabet    string
-		plaintext   string
-		ciphertext  string
+		input       string
+		expected    string
 		countersign string
 		strict      bool
 	}{
@@ -200,8 +200,8 @@ func TestBeaufortCipher(t *testing.T) {
 	}
 	decipherTables := []struct {
 		alphabet    string
-		plaintext   string
-		ciphertext  string
+		input       string
+		expected    string
 		countersign string
 		strict      bool
 	}{
@@ -215,20 +215,20 @@ func TestBeaufortCipher(t *testing.T) {
 
 	for _, table := range encipherTables {
 		c := NewBeaufortCipher(table.countersign, table.alphabet)
-		runPolyalphabeticEncipherTest(t, table.plaintext, table.ciphertext, c, table.strict)
+		runPolyalphabeticEncipherTest(t, table.input, table.expected, c, table.strict)
 	}
 
 	for _, table := range decipherTables {
 		c := NewBeaufortCipher(table.countersign, table.alphabet)
-		runPolyalphabeticDecipherTest(t, table.plaintext, table.ciphertext, c, table.strict)
+		runPolyalphabeticDecipherTest(t, table.input, table.expected, c, table.strict)
 	}
 }
 
 func TestGronsfeldCipher(t *testing.T) {
 	encipherTables := []struct {
 		alphabet    string
-		plaintext   string
-		ciphertext  string
+		input       string
+		expected    string
 		countersign string
 		strict      bool
 	}{
@@ -241,8 +241,8 @@ func TestGronsfeldCipher(t *testing.T) {
 	}
 	decipherTables := []struct {
 		alphabet    string
-		plaintext   string
-		ciphertext  string
+		input       string
+		expected    string
 		countersign string
 		strict      bool
 	}{
@@ -256,29 +256,29 @@ func TestGronsfeldCipher(t *testing.T) {
 
 	for _, table := range encipherTables {
 		c := NewGronsfeldCipher(table.countersign, table.alphabet)
-		runPolyalphabeticEncipherTest(t, table.plaintext, table.ciphertext, c, table.strict)
+		runPolyalphabeticEncipherTest(t, table.input, table.expected, c, table.strict)
 	}
 	for _, table := range decipherTables {
 		c := NewGronsfeldCipher(table.countersign, table.alphabet)
-		runPolyalphabeticDecipherTest(t, table.plaintext, table.ciphertext, c, table.strict)
+		runPolyalphabeticDecipherTest(t, table.input, table.expected, c, table.strict)
 	}
 }
 
 func TestTrithemiusCipher(t *testing.T) {
 	encipherTables := []struct {
-		alphabet   string
-		plaintext  string
-		ciphertext string
-		strict     bool
+		alphabet string
+		input    string
+		expected string
+		strict   bool
 	}{
 		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "HFNOS, BUYTM!", false},
 		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "HFNOSBUYTM", true},
 	}
 	decipherTables := []struct {
-		alphabet   string
-		plaintext  string
-		ciphertext string
-		strict     bool
+		alphabet string
+		input    string
+		expected string
+		strict   bool
 	}{
 		{defaultPolyalphabeticAlphabet, "HFNOS, BUYTM!", "HELLO, WORLD!", false},
 		{defaultPolyalphabeticAlphabet, "HFNOS, BUYTM!", "HELLOWORLD", true},
@@ -286,19 +286,19 @@ func TestTrithemiusCipher(t *testing.T) {
 
 	for _, table := range encipherTables {
 		c := NewTrithemiusCipher(table.alphabet)
-		runPolyalphabeticEncipherTest(t, table.plaintext, table.ciphertext, c, table.strict)
+		runPolyalphabeticEncipherTest(t, table.input, table.expected, c, table.strict)
 	}
 	for _, table := range decipherTables {
 		c := NewTrithemiusCipher(table.alphabet)
-		runPolyalphabeticDecipherTest(t, table.plaintext, table.ciphertext, c, table.strict)
+		runPolyalphabeticDecipherTest(t, table.input, table.expected, c, table.strict)
 	}
 }
 
 func TestVariantBeaufortCipher(t *testing.T) {
 	encipherTables := []struct {
 		alphabet    string
-		plaintext   string
-		ciphertext  string
+		input       string
+		expected    string
 		countersign string
 		strict      bool
 	}{
@@ -313,8 +313,8 @@ func TestVariantBeaufortCipher(t *testing.T) {
 	}
 	decipherTables := []struct {
 		alphabet    string
-		plaintext   string
-		ciphertext  string
+		input       string
+		expected    string
 		countersign string
 		strict      bool
 	}{
@@ -330,19 +330,19 @@ func TestVariantBeaufortCipher(t *testing.T) {
 
 	for _, table := range encipherTables {
 		c := NewVariantBeaufortCipher(table.countersign, table.alphabet)
-		runPolyalphabeticEncipherTest(t, table.plaintext, table.ciphertext, c, table.strict)
+		runPolyalphabeticEncipherTest(t, table.input, table.expected, c, table.strict)
 	}
 	for _, table := range decipherTables {
 		c := NewVariantBeaufortCipher(table.countersign, table.alphabet)
-		runPolyalphabeticDecipherTest(t, table.plaintext, table.ciphertext, c, table.strict)
+		runPolyalphabeticDecipherTest(t, table.input, table.expected, c, table.strict)
 	}
 }
 
 func TestDellaPortaCipher(t *testing.T) {
 	encipherTables := []struct {
 		alphabet    string
-		plaintext   string
-		ciphertext  string
+		input       string
+		expected    string
 		countersign string
 		strict      bool
 	}{
@@ -355,8 +355,8 @@ func TestDellaPortaCipher(t *testing.T) {
 	}
 	decipherTables := []struct {
 		alphabet    string
-		plaintext   string
-		ciphertext  string
+		input       string
+		expected    string
 		countersign string
 		strict      bool
 	}{
@@ -369,11 +369,11 @@ func TestDellaPortaCipher(t *testing.T) {
 	}
 	for _, table := range encipherTables {
 		c := NewDellaPortaCipher(table.countersign, table.alphabet)
-		runPolyalphabeticEncipherTest(t, table.plaintext, table.ciphertext, c, table.strict)
+		runPolyalphabeticEncipherTest(t, table.input, table.expected, c, table.strict)
 	}
 	for _, table := range decipherTables {
 		c := NewDellaPortaCipher(table.countersign, table.alphabet)
-		runPolyalphabeticDecipherTest(t, table.plaintext, table.ciphertext, c, table.strict)
+		runPolyalphabeticDecipherTest(t, table.input, table.expected, c, table.strict)
 	}
 }
 

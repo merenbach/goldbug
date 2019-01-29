@@ -20,17 +20,17 @@ import (
 
 const defaultMonoalphabeticAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-func runMonoalphabeticEncipherTest(t *testing.T, plaintext, ciphertext string, c *SimpleSubstitutionCipher, strict bool) {
-	encrypted := c.Encipher(plaintext, strict)
-	if string(encrypted) != ciphertext {
-		t.Errorf("ciphertext %q was incorrect; wanted %q", encrypted, ciphertext)
+func runMonoalphabeticEncipherTest(t *testing.T, input string, expected string, c *SimpleSubstitutionCipher, strict bool) {
+	output := c.Encipher(input, strict)
+	if string(output) != expected {
+		t.Errorf("ciphertext %q for input %q was incorrect; wanted %q", output, input, expected)
 	}
 }
 
-func runMonoalphabeticDecipherTest(t *testing.T, ciphertext string, plaintext string, c *SimpleSubstitutionCipher, strict bool) {
-	decrypted := c.Decipher(ciphertext, strict)
-	if string(decrypted) != plaintext {
-		t.Errorf("plaintext %q was incorrect; wanted: %q", decrypted, plaintext)
+func runMonoalphabeticDecipherTest(t *testing.T, input string, expected string, c *SimpleSubstitutionCipher, strict bool) {
+	output := c.Decipher(input, strict)
+	if string(output) != expected {
+		t.Errorf("plaintext %q for input %q was incorrect; wanted: %q", output, input, expected)
 	}
 }
 
@@ -62,11 +62,11 @@ func TestSimpleSubstitutionCipher(t *testing.T) {
 
 func TestKeywordCipher(t *testing.T) {
 	encipherTables := []struct {
-		alphabet   string
-		plaintext  string
-		ciphertext string
-		keyword    string
-		strict     bool
+		alphabet string
+		input    string
+		expected string
+		keyword  string
+		strict   bool
 	}{
 		{defaultMonoalphabeticAlphabet, "HELLO, WORLD!", "CRHHL, WLQHG!", "KANGAROO", false},
 		{defaultMonoalphabeticAlphabet, "HELLO, WORLD!", "CRHHLWLQHG", "KANGAROO", true},
@@ -74,11 +74,11 @@ func TestKeywordCipher(t *testing.T) {
 		{defaultMonoalphabeticAlphabet, "HELLO, WORLD!", "GDKKNWNRKC", "Q", true},
 	}
 	decipherTables := []struct {
-		alphabet   string
-		plaintext  string
-		ciphertext string
-		keyword    string
-		strict     bool
+		alphabet string
+		input    string
+		expected string
+		keyword  string
+		strict   bool
 	}{
 		{defaultMonoalphabeticAlphabet, "CRHHL, WLQHG!", "HELLO, WORLD!", "KANGAROO", false},
 		{defaultMonoalphabeticAlphabet, "CRHHL, WLQHG!", "HELLOWORLD", "KANGAROO", true},
@@ -88,22 +88,22 @@ func TestKeywordCipher(t *testing.T) {
 
 	for _, table := range encipherTables {
 		c := NewKeywordCipher(table.alphabet, table.keyword)
-		runMonoalphabeticEncipherTest(t, table.plaintext, table.ciphertext, c, table.strict)
+		runMonoalphabeticEncipherTest(t, table.input, table.expected, c, table.strict)
 	}
 	for _, table := range decipherTables {
 		c := NewKeywordCipher(table.alphabet, table.keyword)
-		runMonoalphabeticDecipherTest(t, table.plaintext, table.ciphertext, c, table.strict)
+		runMonoalphabeticDecipherTest(t, table.input, table.expected, c, table.strict)
 	}
 }
 
 func TestAffineCipher(t *testing.T) {
 	encipherTables := []struct {
-		alphabet   string
-		plaintext  string
-		ciphertext string
-		a          int
-		b          int
-		strict     bool
+		alphabet string
+		input    string
+		expected string
+		a        int
+		b        int
+		strict   bool
 	}{
 		{defaultMonoalphabeticAlphabet, "HELLO, WORLD!", "AFCCX, BXSCY!", 7, 3, false},
 		{defaultMonoalphabeticAlphabet, "HELLO, WORLD!", "AFCCXBXSCY", 7, 3, true},
@@ -111,12 +111,12 @@ func TestAffineCipher(t *testing.T) {
 		{defaultMonoalphabeticAlphabet, "AFFINE CIPHER", "IHHWVCSWFRCP", 5, 8, true},
 	}
 	decipherTables := []struct {
-		alphabet   string
-		plaintext  string
-		ciphertext string
-		a          int
-		b          int
-		strict     bool
+		alphabet string
+		input    string
+		expected string
+		a        int
+		b        int
+		strict   bool
 	}{
 		{defaultMonoalphabeticAlphabet, "AFCCX, BXSCY!", "HELLO, WORLD!", 7, 3, false},
 		{defaultMonoalphabeticAlphabet, "AFCCX, BXSCY!", "HELLOWORLD", 7, 3, true},
@@ -126,20 +126,20 @@ func TestAffineCipher(t *testing.T) {
 
 	for _, table := range encipherTables {
 		c := NewAffineCipher(table.alphabet, table.a, table.b)
-		runMonoalphabeticEncipherTest(t, table.plaintext, table.ciphertext, c, table.strict)
+		runMonoalphabeticEncipherTest(t, table.input, table.expected, c, table.strict)
 	}
 	for _, table := range decipherTables {
 		c := NewAffineCipher(table.alphabet, table.a, table.b)
-		runMonoalphabeticDecipherTest(t, table.plaintext, table.ciphertext, c, table.strict)
+		runMonoalphabeticDecipherTest(t, table.input, table.expected, c, table.strict)
 	}
 }
 
 func TestAtbashCipher(t *testing.T) {
 	encipherTables := []struct {
-		alphabet   string
-		plaintext  string
-		ciphertext string
-		strict     bool
+		alphabet string
+		input    string
+		expected string
+		strict   bool
 	}{
 		{defaultMonoalphabeticAlphabet, "HELLO, WORLD!", "SVOOL, DLIOW!", false},
 		{defaultMonoalphabeticAlphabet, "HELLO, WORLD!", "SVOOLDLIOW", true},
@@ -147,10 +147,10 @@ func TestAtbashCipher(t *testing.T) {
 		{defaultMonoalphabeticAlphabet, "ATBASH CIPHER", "ZGYZHSXRKSVI", true},
 	}
 	decipherTables := []struct {
-		alphabet   string
-		plaintext  string
-		ciphertext string
-		strict     bool
+		alphabet string
+		input    string
+		expected string
+		strict   bool
 	}{
 		{defaultMonoalphabeticAlphabet, "SVOOL, DLIOW!", "HELLO, WORLD!", false},
 		{defaultMonoalphabeticAlphabet, "SVOOL, DLIOW!", "HELLOWORLD", true},
@@ -160,21 +160,21 @@ func TestAtbashCipher(t *testing.T) {
 
 	for _, table := range encipherTables {
 		c := NewAtbashCipher(table.alphabet)
-		runMonoalphabeticEncipherTest(t, table.plaintext, table.ciphertext, c, table.strict)
+		runMonoalphabeticEncipherTest(t, table.input, table.expected, c, table.strict)
 	}
 	for _, table := range decipherTables {
 		c := NewAtbashCipher(table.alphabet)
-		runMonoalphabeticDecipherTest(t, table.plaintext, table.ciphertext, c, table.strict)
+		runMonoalphabeticDecipherTest(t, table.input, table.expected, c, table.strict)
 	}
 }
 
 func TestCaesarCipher(t *testing.T) {
 	encipherTables := []struct {
-		alphabet   string
-		plaintext  string
-		ciphertext string
-		b          int
-		strict     bool
+		alphabet string
+		input    string
+		expected string
+		b        int
+		strict   bool
 	}{
 		{defaultMonoalphabeticAlphabet, "HELLO, WORLD!", "HELLO, WORLD!", 26, false},
 		{defaultMonoalphabeticAlphabet, "HELLO, WORLD!", "HELLOWORLD", 26, true},
@@ -184,11 +184,11 @@ func TestCaesarCipher(t *testing.T) {
 		{defaultMonoalphabeticAlphabet, "HELLO, WORLD!", "YVCCFNFICU", 17, true},
 	}
 	decipherTables := []struct {
-		alphabet   string
-		plaintext  string
-		ciphertext string
-		b          int
-		strict     bool
+		alphabet string
+		input    string
+		expected string
+		b        int
+		strict   bool
 	}{
 		{defaultMonoalphabeticAlphabet, "HELLO, WORLD!", "HELLO, WORLD!", 26, false},
 		{defaultMonoalphabeticAlphabet, "HELLO, WORLD!", "HELLOWORLD", 26, true},
@@ -200,21 +200,21 @@ func TestCaesarCipher(t *testing.T) {
 
 	for _, table := range encipherTables {
 		c := NewCaesarCipher(table.alphabet, table.b)
-		runMonoalphabeticEncipherTest(t, table.plaintext, table.ciphertext, c, table.strict)
+		runMonoalphabeticEncipherTest(t, table.input, table.expected, c, table.strict)
 	}
 	for _, table := range decipherTables {
 		c := NewCaesarCipher(table.alphabet, table.b)
-		runMonoalphabeticDecipherTest(t, table.plaintext, table.ciphertext, c, table.strict)
+		runMonoalphabeticDecipherTest(t, table.input, table.expected, c, table.strict)
 	}
 }
 
 func TestDecimationCipher(t *testing.T) {
 	encipherTables := []struct {
-		alphabet   string
-		plaintext  string
-		ciphertext string
-		a          int
-		strict     bool
+		alphabet string
+		input    string
+		expected string
+		a        int
+		strict   bool
 	}{
 		{defaultMonoalphabeticAlphabet, "HELLO, WORLD!", "HELLO, WORLD!", 1, false},
 		{defaultMonoalphabeticAlphabet, "HELLO, WORLD!", "HELLOWORLD", 1, true},
@@ -224,11 +224,11 @@ func TestDecimationCipher(t *testing.T) {
 		{defaultMonoalphabeticAlphabet, "HELLO, WORLD!", "TWPPMEMJPX", 25, true},
 	}
 	decipherTables := []struct {
-		alphabet   string
-		plaintext  string
-		ciphertext string
-		a          int
-		strict     bool
+		alphabet string
+		input    string
+		expected string
+		a        int
+		strict   bool
 	}{
 		{defaultMonoalphabeticAlphabet, "HELLO, WORLD!", "HELLO, WORLD!", 1, false},
 		{defaultMonoalphabeticAlphabet, "HELLO, WORLD!", "HELLOWORLD", 1, true},
@@ -240,20 +240,20 @@ func TestDecimationCipher(t *testing.T) {
 
 	for _, table := range encipherTables {
 		c := NewDecimationCipher(table.alphabet, table.a)
-		runMonoalphabeticEncipherTest(t, table.plaintext, table.ciphertext, c, table.strict)
+		runMonoalphabeticEncipherTest(t, table.input, table.expected, c, table.strict)
 	}
 	for _, table := range decipherTables {
 		c := NewDecimationCipher(table.alphabet, table.a)
-		runMonoalphabeticDecipherTest(t, table.plaintext, table.ciphertext, c, table.strict)
+		runMonoalphabeticDecipherTest(t, table.input, table.expected, c, table.strict)
 	}
 }
 
 func TestRot13Cipher(t *testing.T) {
 	encipherTables := []struct {
-		alphabet   string
-		plaintext  string
-		ciphertext string
-		strict     bool
+		alphabet string
+		input    string
+		expected string
+		strict   bool
 	}{
 		{defaultMonoalphabeticAlphabet, "HELLO, WORLD!", "URYYB, JBEYQ!", false},
 		{defaultMonoalphabeticAlphabet, "HELLO, WORLD!", "URYYBJBEYQ", true},
@@ -261,10 +261,10 @@ func TestRot13Cipher(t *testing.T) {
 		{defaultMonoalphabeticAlphabet, "URYYB, JBEYQ!", "HELLOWORLD", true},
 	}
 	decipherTables := []struct {
-		alphabet   string
-		plaintext  string
-		ciphertext string
-		strict     bool
+		alphabet string
+		input    string
+		expected string
+		strict   bool
 	}{
 		{defaultMonoalphabeticAlphabet, "HELLO, WORLD!", "URYYB, JBEYQ!", false},
 		{defaultMonoalphabeticAlphabet, "HELLO, WORLD!", "URYYBJBEYQ", true},
@@ -274,10 +274,10 @@ func TestRot13Cipher(t *testing.T) {
 
 	for _, table := range encipherTables {
 		c := NewRot13Cipher(table.alphabet)
-		runMonoalphabeticEncipherTest(t, table.plaintext, table.ciphertext, c, table.strict)
+		runMonoalphabeticEncipherTest(t, table.input, table.expected, c, table.strict)
 	}
 	for _, table := range decipherTables {
 		c := NewRot13Cipher(table.alphabet)
-		runMonoalphabeticDecipherTest(t, table.plaintext, table.ciphertext, c, table.strict)
+		runMonoalphabeticDecipherTest(t, table.input, table.expected, c, table.strict)
 	}
 }
