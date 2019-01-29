@@ -21,19 +21,32 @@ import (
 
 const defaultPolyalphabeticAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-func runPolyalphabeticReciprocalTests(t *testing.T, plaintext, ciphertext string, c VigenereFamilyCipher, strict bool) {
+func runPolyalphabeticEncipherTest(t *testing.T, plaintext string, ciphertext string, c VigenereFamilyCipher, strict bool) {
 	encrypted := c.Encipher(plaintext, strict)
-	decrypted := c.Decipher(ciphertext, strict)
 	if string(encrypted) != ciphertext {
 		t.Errorf("ciphertext %q was incorrect; wanted %q", encrypted, ciphertext)
 	}
+}
+func runPolyalphabeticDecipherTest(t *testing.T, ciphertext string, plaintext string, c VigenereFamilyCipher, strict bool) {
+	decrypted := c.Decipher(ciphertext, strict)
 	if string(decrypted) != plaintext {
 		t.Errorf("plaintext %q was incorrect; wanted: %q", decrypted, plaintext)
 	}
 }
 
+// func runPolyalphabeticReciprocalTests(t *testing.T, plaintext, ciphertext string, c VigenereFamilyCipher, strict bool) {
+// 	encrypted := c.Encipher(plaintext, strict)
+// 	decrypted := c.Decipher(ciphertext, strict)
+// 	if string(encrypted) != ciphertext {
+// 		t.Errorf("ciphertext %q was incorrect; wanted %q", encrypted, ciphertext)
+// 	}
+// 	if string(decrypted) != plaintext {
+// 		t.Errorf("plaintext %q was incorrect; wanted: %q", decrypted, plaintext)
+// 	}
+// }
+
 func TestVigenereCipher(t *testing.T) {
-	tables := []struct {
+	encipherTables := []struct {
 		alphabet    string
 		plaintext   string
 		ciphertext  string
@@ -42,59 +55,136 @@ func TestVigenereCipher(t *testing.T) {
 	}{
 		{"", "", "", "", false},
 		{defaultPolyalphabeticAlphabet, "", "", "OCEANOGRAPHYWHAT", false},
+		{defaultPolyalphabeticAlphabet, "", "", "OCEANOGRAPHYWHAT", true},
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "HELLO, WORLD!", "A", false},
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "HELLOWORLD", "A", true},
 		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "VGPLB, KUILS!", "OCEANOGRAPHYWHAT", false},
-		// {defaultPolyalphabeticAlphabet, "LJOOF, WFEOI!", "HELLO, WORLD!", "KANGAROO", false},
-		// {defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "CRHHLWLQHG", "KANGROOO", true},
-		// {defaultPolyalphabeticAlphabet, "LJOOF, WFEOI!", "HELLOWORLD", "KANGAROO", true},
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "VGPLBKUILS", "OCEANOGRAPHYWHAT", true},
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "XUBBE, MEHBT!", "Q", false},
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "XUBBEMEHBT", "Q", true},
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "REYRO, NCFVD!", "KANGAROO", false},
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "REYRONCFVD", "KANGAROO", true},
 	}
-	for _, table := range tables {
+	decipherTables := []struct {
+		alphabet    string
+		plaintext   string
+		ciphertext  string
+		countersign string
+		strict      bool
+	}{
+		{"", "", "", "", false},
+		{defaultPolyalphabeticAlphabet, "", "", "OCEANOGRAPHYWHAT", false},
+		{defaultPolyalphabeticAlphabet, "", "", "OCEANOGRAPHYWHAT", true},
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "HELLO, WORLD!", "A", false},
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "HELLOWORLD", "A", true},
+		{defaultPolyalphabeticAlphabet, "VGPLB, KUILS!", "HELLO, WORLD!", "OCEANOGRAPHYWHAT", false},
+		{defaultPolyalphabeticAlphabet, "VGPLB, KUILS!", "HELLOWORLD", "OCEANOGRAPHYWHAT", true},
+		{defaultPolyalphabeticAlphabet, "XUBBE, MEHBT!", "HELLO, WORLD!", "Q", false},
+		{defaultPolyalphabeticAlphabet, "XUBBE, MEHBT!", "HELLOWORLD", "Q", true},
+		{defaultPolyalphabeticAlphabet, "REYRO, NCFVD!", "HELLO, WORLD!", "KANGAROO", false},
+		{defaultPolyalphabeticAlphabet, "REYRO, NCFVD!", "HELLOWORLD", "KANGAROO", true},
+	}
+
+	for _, table := range encipherTables {
 		c := MakeVigenereCipher(table.countersign, table.alphabet)
-		runPolyalphabeticReciprocalTests(t, table.plaintext, table.ciphertext, c, table.strict)
+		runPolyalphabeticEncipherTest(t, table.plaintext, table.ciphertext, c, table.strict)
+	}
+	for _, table := range decipherTables {
+		c := MakeVigenereCipher(table.countersign, table.alphabet)
+		runPolyalphabeticDecipherTest(t, table.plaintext, table.ciphertext, c, table.strict)
 	}
 }
 
 func TestVigenereTextAutoclaveCipher(t *testing.T) {
-	tables := []struct {
+	encipherTables := []struct {
 		alphabet    string
 		plaintext   string
 		ciphertext  string
 		countersign string
 		strict      bool
 	}{
-		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "VGPLB, DSCWR!", "OCEANOGRAPHYWHAT"[:5], false},
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "VGPLB, KUILS!", "OCEANOGRAPHYWHAT", false},
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "VGPLBKUILS", "OCEANOGRAPHYWHAT", true},
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "HLPWZ, KKFCO!", "A", false},
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "HLPWZKKFCO", "A", true},
 		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "XLPWZ, KKFCO!", "Q", false},
-		// {defaultPolyalphabeticAlphabet, "LJOOF, WFEOI!", "HELLO, WORLD!", "KANGAROO", false},
-		// {defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "CRHHLWLQHG", "KANGROOO", true},
-		// {defaultPolyalphabeticAlphabet, "LJOOF, WFEOI!", "HELLOWORLD", "KANGAROO", true},
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "XLPWZKKFCO", "Q", true},
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "REYRO, NCFSH!", "KANGAROO", false},
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "REYRONCFSH", "KANGAROO", true},
 	}
-	for _, table := range tables {
+	decipherTables := []struct {
+		alphabet    string
+		plaintext   string
+		ciphertext  string
+		countersign string
+		strict      bool
+	}{
+		{defaultPolyalphabeticAlphabet, "VGPLB, KUILS!", "HELLO, WORLD!", "OCEANOGRAPHYWHAT", false},
+		{defaultPolyalphabeticAlphabet, "VGPLB, KUILS!", "HELLOWORLD", "OCEANOGRAPHYWHAT", true},
+		{defaultPolyalphabeticAlphabet, "HLPWZ, KKFCO!", "HELLO, WORLD!", "A", false},
+		{defaultPolyalphabeticAlphabet, "HLPWZ, KKFCO!", "HELLOWORLD", "A", true},
+		{defaultPolyalphabeticAlphabet, "XLPWZ, KKFCO!", "HELLO, WORLD!", "Q", false},
+		{defaultPolyalphabeticAlphabet, "XLPWZ, KKFCO!", "HELLOWORLD", "Q", true},
+		{defaultPolyalphabeticAlphabet, "REYRO, NCFSH!", "HELLO, WORLD!", "KANGAROO", false},
+		{defaultPolyalphabeticAlphabet, "REYRO, NCFSH!", "HELLOWORLD", "KANGAROO", true},
+	}
+
+	for _, table := range encipherTables {
 		c := MakeVigenereTextAutoclaveCipher(table.countersign, table.alphabet)
-		runPolyalphabeticReciprocalTests(t, table.plaintext, table.ciphertext, c, table.strict)
+		runPolyalphabeticEncipherTest(t, table.plaintext, table.ciphertext, c, table.strict)
+	}
+	for _, table := range decipherTables {
+		c := MakeVigenereTextAutoclaveCipher(table.countersign, table.alphabet)
+		runPolyalphabeticDecipherTest(t, table.plaintext, table.ciphertext, c, table.strict)
 	}
 }
 
 func TestVigenereKeyAutoclaveCipher(t *testing.T) {
-	tables := []struct {
+	encipherTables := []struct {
 		alphabet    string
 		plaintext   string
 		ciphertext  string
 		countersign string
 		strict      bool
 	}{
-		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "VGPLB, RUGWE!", "OCEANOGRAPHYWHAT"[:5], false},
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "VGPLB, KUILS!", "OCEANOGRAPHYWHAT", false},
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "VGPLBKUILS", "OCEANOGRAPHYWHAT", true},
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "HLWHV, RFWHK!", "A", false},
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "HLWHVRFWHK", "A", true},
 		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "XBMXL, HVMXA!", "Q", false},
-		// {defaultPolyalphabeticAlphabet, "LJOOF, WFEOI!", "HELLO, WORLD!", "KANGAROO", false},
-		// {defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "CRHHLWLQHG", "KANGROOO", true},
-		// {defaultPolyalphabeticAlphabet, "LJOOF, WFEOI!", "HELLOWORLD", "KANGAROO", true},
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "XBMXLHVMXA", "Q", true},
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "REYRO, NCFCH!", "KANGAROO", false},
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "REYRONCFCH", "KANGAROO", true},
 	}
-	for _, table := range tables {
+	decipherTables := []struct {
+		alphabet    string
+		plaintext   string
+		ciphertext  string
+		countersign string
+		strict      bool
+	}{
+		{defaultPolyalphabeticAlphabet, "VGPLB, KUILS!", "HELLO, WORLD!", "OCEANOGRAPHYWHAT", false},
+		{defaultPolyalphabeticAlphabet, "VGPLB, KUILS!", "HELLOWORLD", "OCEANOGRAPHYWHAT", true},
+		{defaultPolyalphabeticAlphabet, "HLWHV, RFWHK!", "HELLO, WORLD!", "A", false},
+		{defaultPolyalphabeticAlphabet, "HLWHV, RFWHK!", "HELLOWORLD", "A", true},
+		{defaultPolyalphabeticAlphabet, "XBMXL, HVMXA!", "HELLO, WORLD!", "Q", false},
+		{defaultPolyalphabeticAlphabet, "XBMXL, HVMXA!", "HELLOWORLD", "Q", true},
+		{defaultPolyalphabeticAlphabet, "REYRO, NCFCH!", "HELLO, WORLD!", "KANGAROO", false},
+		{defaultPolyalphabeticAlphabet, "REYRO, NCFCH!", "HELLOWORLD", "KANGAROO", true},
+	}
+
+	for _, table := range encipherTables {
 		c := MakeVigenereKeyAutoclaveCipher(table.countersign, table.alphabet)
-		runPolyalphabeticReciprocalTests(t, table.plaintext, table.ciphertext, c, table.strict)
+		runPolyalphabeticEncipherTest(t, table.plaintext, table.ciphertext, c, table.strict)
+	}
+	for _, table := range decipherTables {
+		c := MakeVigenereKeyAutoclaveCipher(table.countersign, table.alphabet)
+		runPolyalphabeticDecipherTest(t, table.plaintext, table.ciphertext, c, table.strict)
 	}
 }
 
 func TestBeaufortCipher(t *testing.T) {
-	tables := []struct {
+	encipherTables := []struct {
 		alphabet    string
 		plaintext   string
 		ciphertext  string
@@ -102,55 +192,110 @@ func TestBeaufortCipher(t *testing.T) {
 		strict      bool
 	}{
 		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "HYTPZ, SSAPM!", "OCEANOGRAPHYWHAT", false},
-		// {defaultPolyalphabeticAlphabet, "LJOOF, WFEOI!", "HELLO, WORLD!", "KANGAROO", false},
-		// {defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "CRHHLWLQHG", "KANGROOO", true},
-		// {defaultPolyalphabeticAlphabet, "LJOOF, WFEOI!", "HELLOWORLD", "KANGAROO", true},
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "HYTPZSSAPM", "OCEANOGRAPHYWHAT", true},
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "JMFFC, UCZFN!", "Q", false},
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "JMFFCUCZFN", "Q", true},
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "DWCVM, VAXZX!", "KANGAROO", false},
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "DWCVMVAXZX", "KANGAROO", true},
 	}
-	for _, table := range tables {
-		c := MakeBeaufortCipher(table.countersign, table.alphabet)
-		runPolyalphabeticReciprocalTests(t, table.plaintext, table.ciphertext, c, table.strict)
-	}
-}
-
-func TestGronsfeldCipher(t *testing.T) {
-	tables := []struct {
+	decipherTables := []struct {
 		alphabet    string
 		plaintext   string
 		ciphertext  string
 		countersign string
 		strict      bool
 	}{
-		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "JHMOQ, YRSOF!", "23132", false},
-		// {defaultPolyalphabeticAlphabet, "LJOOF, WFEOI!", "HELLO, WORLD!", "KANGAROO", false},
-		// {defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "CRHHLWLQHG", "KANGROOO", true},
-		// {defaultPolyalphabeticAlphabet, "LJOOF, WFEOI!", "HELLOWORLD", "KANGAROO", true},
+		{defaultPolyalphabeticAlphabet, "HYTPZ, SSAPM!", "HELLO, WORLD!", "OCEANOGRAPHYWHAT", false},
+		{defaultPolyalphabeticAlphabet, "HYTPZ, SSAPM!", "HELLOWORLD", "OCEANOGRAPHYWHAT", true},
+		{defaultPolyalphabeticAlphabet, "JMFFC, UCZFN!", "HELLO, WORLD!", "Q", false},
+		{defaultPolyalphabeticAlphabet, "JMFFC, UCZFN!", "HELLOWORLD", "Q", true},
+		{defaultPolyalphabeticAlphabet, "DWCVM, VAXZX!", "HELLO, WORLD!", "KANGAROO", false},
+		{defaultPolyalphabeticAlphabet, "DWCVM, VAXZX!", "HELLOWORLD", "KANGAROO", true},
 	}
-	for _, table := range tables {
+
+	for _, table := range encipherTables {
+		c := MakeBeaufortCipher(table.countersign, table.alphabet)
+		runPolyalphabeticEncipherTest(t, table.plaintext, table.ciphertext, c, table.strict)
+	}
+
+	for _, table := range decipherTables {
+		c := MakeBeaufortCipher(table.countersign, table.alphabet)
+		runPolyalphabeticDecipherTest(t, table.plaintext, table.ciphertext, c, table.strict)
+	}
+}
+
+func TestGronsfeldCipher(t *testing.T) {
+	encipherTables := []struct {
+		alphabet    string
+		plaintext   string
+		ciphertext  string
+		countersign string
+		strict      bool
+	}{
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "HELLO, WORLD!", "0", false},
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "HELLOWORLD", "0", true},
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "JHMOQ, YRSOF!", "23132", false},
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "JHMOQYRSOF", "23132", true},
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "KMUNX, WPRNG!", "389290102394957", false},
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "KMUNXWPRNG", "389290102394957", true},
+	}
+	decipherTables := []struct {
+		alphabet    string
+		plaintext   string
+		ciphertext  string
+		countersign string
+		strict      bool
+	}{
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "HELLO, WORLD!", "0", false},
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "HELLOWORLD", "0", true},
+		{defaultPolyalphabeticAlphabet, "JHMOQ, YRSOF!", "HELLO, WORLD!", "23132", false},
+		{defaultPolyalphabeticAlphabet, "JHMOQ, YRSOF!", "HELLOWORLD", "23132", true},
+		{defaultPolyalphabeticAlphabet, "KMUNX, WPRNG!", "HELLO, WORLD!", "389290102394957", false},
+		{defaultPolyalphabeticAlphabet, "KMUNX, WPRNG!", "HELLOWORLD", "389290102394957", true},
+	}
+
+	for _, table := range encipherTables {
 		c := MakeGronsfeldCipher(table.countersign, table.alphabet)
-		runPolyalphabeticReciprocalTests(t, table.plaintext, table.ciphertext, c, table.strict)
+		runPolyalphabeticEncipherTest(t, table.plaintext, table.ciphertext, c, table.strict)
+	}
+	for _, table := range decipherTables {
+		c := MakeGronsfeldCipher(table.countersign, table.alphabet)
+		runPolyalphabeticDecipherTest(t, table.plaintext, table.ciphertext, c, table.strict)
 	}
 }
 
 func TestTrithemiusCipher(t *testing.T) {
-	tables := []struct {
+	encipherTables := []struct {
 		alphabet   string
 		plaintext  string
 		ciphertext string
 		strict     bool
 	}{
 		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "HFNOS, BUYTM!", false},
-		// {defaultPolyalphabeticAlphabet, "LJOOF, WFEOI!", "HELLO, WORLD!", "KANGAROO", false},
-		// {defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "CRHHLWLQHG", "KANGROOO", true},
-		// {defaultPolyalphabeticAlphabet, "LJOOF, WFEOI!", "HELLOWORLD", "KANGAROO", true},
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "HFNOSBUYTM", true},
 	}
-	for _, table := range tables {
+	decipherTables := []struct {
+		alphabet   string
+		plaintext  string
+		ciphertext string
+		strict     bool
+	}{
+		{defaultPolyalphabeticAlphabet, "HFNOS, BUYTM!", "HELLO, WORLD!", false},
+		{defaultPolyalphabeticAlphabet, "HFNOS, BUYTM!", "HELLOWORLD", true},
+	}
+
+	for _, table := range encipherTables {
 		c := MakeTrithemiusCipher(table.alphabet)
-		runPolyalphabeticReciprocalTests(t, table.plaintext, table.ciphertext, c, table.strict)
+		runPolyalphabeticEncipherTest(t, table.plaintext, table.ciphertext, c, table.strict)
+	}
+	for _, table := range decipherTables {
+		c := MakeTrithemiusCipher(table.alphabet)
+		runPolyalphabeticDecipherTest(t, table.plaintext, table.ciphertext, c, table.strict)
 	}
 }
 
 func TestVariantBeaufortCipher(t *testing.T) {
-	tables := []struct {
+	encipherTables := []struct {
 		alphabet    string
 		plaintext   string
 		ciphertext  string
@@ -158,18 +303,43 @@ func TestVariantBeaufortCipher(t *testing.T) {
 		strict      bool
 	}{
 		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "TCHLB, IIALO!", "OCEANOGRAPHYWHAT", false},
-		// {defaultPolyalphabeticAlphabet, "LJOOF, WFEOI!", "HELLO, WORLD!", "KANGAROO", false},
-		// {defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "CRHHLWLQHG", "KANGROOO", true},
-		// {defaultPolyalphabeticAlphabet, "LJOOF, WFEOI!", "HELLOWORLD", "KANGAROO", true},
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "TCHLBIIALO", "OCEANOGRAPHYWHAT", true},
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "HELLO, WORLD!", "A", false},
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "HELLOWORLD", "A", true},
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "ROVVY, GYBVN!", "Q", false},
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "ROVVYGYBVN", "Q", true},
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "XEYFO, FADBD!", "KANGAROO", false},
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "XEYFOFADBD", "KANGAROO", true},
 	}
-	for _, table := range tables {
+	decipherTables := []struct {
+		alphabet    string
+		plaintext   string
+		ciphertext  string
+		countersign string
+		strict      bool
+	}{
+		{defaultPolyalphabeticAlphabet, "TCHLB, IIALO!", "HELLO, WORLD!", "OCEANOGRAPHYWHAT", false},
+		{defaultPolyalphabeticAlphabet, "TCHLB, IIALO!", "HELLOWORLD", "OCEANOGRAPHYWHAT", true},
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "HELLO, WORLD!", "A", false},
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "HELLOWORLD", "A", true},
+		{defaultPolyalphabeticAlphabet, "ROVVY, GYBVN!", "HELLO, WORLD!", "Q", false},
+		{defaultPolyalphabeticAlphabet, "ROVVY, GYBVN!", "HELLOWORLD", "Q", true},
+		{defaultPolyalphabeticAlphabet, "XEYFO, FADBD!", "HELLO, WORLD!", "KANGAROO", false},
+		{defaultPolyalphabeticAlphabet, "XEYFO, FADBD!", "HELLOWORLD", "KANGAROO", true},
+	}
+
+	for _, table := range encipherTables {
 		c := MakeVariantBeaufortCipher(table.countersign, table.alphabet)
-		runPolyalphabeticReciprocalTests(t, table.plaintext, table.ciphertext, c, table.strict)
+		runPolyalphabeticEncipherTest(t, table.plaintext, table.ciphertext, c, table.strict)
+	}
+	for _, table := range decipherTables {
+		c := MakeVariantBeaufortCipher(table.countersign, table.alphabet)
+		runPolyalphabeticDecipherTest(t, table.plaintext, table.ciphertext, c, table.strict)
 	}
 }
 
 func TestDellaPortaCipher(t *testing.T) {
-	tables := []struct {
+	encipherTables := []struct {
 		alphabet    string
 		plaintext   string
 		ciphertext  string
@@ -177,13 +347,33 @@ func TestDellaPortaCipher(t *testing.T) {
 		strict      bool
 	}{
 		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "OSNYI, CLJYX!", "OCEANOGRAPHYWHAT", false},
-		// {defaultPolyalphabeticAlphabet, "LJOOF, WFEOI!", "HELLO, WORLD!", "KANGAROO", false},
-		// {defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "CRHHLWLQHG", "KANGROOO", true},
-		// {defaultPolyalphabeticAlphabet, "LJOOF, WFEOI!", "HELLOWORLD", "KANGAROO", true},
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "OSNYICLJYX", "OCEANOGRAPHYWHAT", true},
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "PZTTG, BGJTY!", "Q", false},
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "PZTTGBGJTY", "Q", true},
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "ZRROB, BHKQQ!", "KANGAROO", false},
+		{defaultPolyalphabeticAlphabet, "HELLO, WORLD!", "ZRROBBHKQQ", "KANGAROO", true},
 	}
-	for _, table := range tables {
+	decipherTables := []struct {
+		alphabet    string
+		plaintext   string
+		ciphertext  string
+		countersign string
+		strict      bool
+	}{
+		{defaultPolyalphabeticAlphabet, "OSNYI, CLJYX!", "HELLO, WORLD!", "OCEANOGRAPHYWHAT", false},
+		{defaultPolyalphabeticAlphabet, "OSNYI, CLJYX!", "HELLOWORLD", "OCEANOGRAPHYWHAT", true},
+		{defaultPolyalphabeticAlphabet, "PZTTG, BGJTY!", "HELLO, WORLD!", "Q", false},
+		{defaultPolyalphabeticAlphabet, "PZTTG, BGJTY!", "HELLOWORLD", "Q", true},
+		{defaultPolyalphabeticAlphabet, "ZRROB, BHKQQ!", "HELLO, WORLD!", "KANGAROO", false},
+		{defaultPolyalphabeticAlphabet, "ZRROB, BHKQQ!", "HELLOWORLD", "KANGAROO", true},
+	}
+	for _, table := range encipherTables {
 		c := MakeDellaPortaCipher(table.countersign, table.alphabet)
-		runPolyalphabeticReciprocalTests(t, table.plaintext, table.ciphertext, c, table.strict)
+		runPolyalphabeticEncipherTest(t, table.plaintext, table.ciphertext, c, table.strict)
+	}
+	for _, table := range decipherTables {
+		c := MakeDellaPortaCipher(table.countersign, table.alphabet)
+		runPolyalphabeticDecipherTest(t, table.plaintext, table.ciphertext, c, table.strict)
 	}
 }
 
