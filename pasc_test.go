@@ -367,6 +367,7 @@ func TestDellaPortaCipher(t *testing.T) {
 		{defaultPolyalphabeticAlphabet, "ZRROB, BHKQQ!", "HELLO, WORLD!", "KANGAROO", false},
 		{defaultPolyalphabeticAlphabet, "ZRROB, BHKQQ!", "HELLOWORLD", "KANGAROO", true},
 	}
+
 	for _, table := range encipherTables {
 		c := NewDellaPortaCipher(table.countersign, table.alphabet)
 		runPolyalphabeticEncipherTest(t, table.input, table.expected, c, table.strict)
