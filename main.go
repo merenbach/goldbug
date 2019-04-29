@@ -102,8 +102,13 @@ func main() {
 			if r.Alphabet == "" {
 				r.Alphabet = defaultAlphabet
 			}
+			cipher, err := NewRot13Cipher(r.Alphabet)
+			if err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+				return
+			}
 			c.JSON(http.StatusOK, gin.H{
-				"message": NewRot13Cipher(r.Alphabet).Encipher(r.Message, r.Strict),
+				"message": cipher.Encipher(r.Message, r.Strict),
 			})
 		})
 		v1.POST("/decipher/rot13", func(c *gin.Context) {
@@ -116,8 +121,13 @@ func main() {
 			if r.Alphabet == "" {
 				r.Alphabet = defaultAlphabet
 			}
+			cipher, err := NewRot13Cipher(r.Alphabet)
+			if err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+				return
+			}
 			c.JSON(http.StatusOK, gin.H{
-				"message": NewRot13Cipher(r.Alphabet).Decipher(r.Message, r.Strict),
+				"message": cipher.Decipher(r.Message, r.Strict),
 			})
 		})
 
@@ -131,8 +141,13 @@ func main() {
 			if r.Alphabet == "" {
 				r.Alphabet = defaultAlphabet
 			}
+			cipher, err := NewAtbashCipher(r.Alphabet)
+			if err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+				return
+			}
 			c.JSON(http.StatusOK, gin.H{
-				"message": NewAtbashCipher(r.Alphabet).Encipher(r.Message, r.Strict),
+				"message": cipher.Encipher(r.Message, r.Strict),
 			})
 		})
 		v1.POST("/decipher/atbash", func(c *gin.Context) {
@@ -145,8 +160,13 @@ func main() {
 			if r.Alphabet == "" {
 				r.Alphabet = defaultAlphabet
 			}
+			cipher, err := NewAtbashCipher(r.Alphabet)
+			if err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+				return
+			}
 			c.JSON(http.StatusOK, gin.H{
-				"message": NewAtbashCipher(r.Alphabet).Decipher(r.Message, r.Strict),
+				"message": cipher.Decipher(r.Message, r.Strict),
 			})
 		})
 
@@ -160,8 +180,13 @@ func main() {
 			if r.Alphabet == "" {
 				r.Alphabet = defaultAlphabet
 			}
+			cipher, err := NewCaesarCipher(r.Alphabet, r.Shift)
+			if err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+				return
+			}
 			c.JSON(http.StatusOK, gin.H{
-				"message": NewCaesarCipher(r.Alphabet, r.Shift).Encipher(r.Message, r.Strict),
+				"message": cipher.Encipher(r.Message, r.Strict),
 			})
 		})
 		v1.POST("/decipher/caesar", func(c *gin.Context) {
@@ -174,8 +199,13 @@ func main() {
 			if r.Alphabet == "" {
 				r.Alphabet = defaultAlphabet
 			}
+			cipher, err := NewCaesarCipher(r.Alphabet, r.Shift)
+			if err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+				return
+			}
 			c.JSON(http.StatusOK, gin.H{
-				"message": NewCaesarCipher(r.Alphabet, r.Shift).Decipher(r.Message, r.Strict),
+				"message": cipher.Decipher(r.Message, r.Strict),
 			})
 		})
 
@@ -189,8 +219,13 @@ func main() {
 			if r.Alphabet == "" {
 				r.Alphabet = defaultAlphabet
 			}
+			cipher, err := NewDecimationCipher(r.Alphabet, r.Multiplier)
+			if err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+				return
+			}
 			c.JSON(http.StatusOK, gin.H{
-				"message": NewDecimationCipher(r.Alphabet, r.Multiplier).Encipher(r.Message, r.Strict),
+				"message": cipher.Encipher(r.Message, r.Strict),
 			})
 		})
 		v1.POST("/decipher/decimation", func(c *gin.Context) {
@@ -203,8 +238,13 @@ func main() {
 			if r.Alphabet == "" {
 				r.Alphabet = defaultAlphabet
 			}
+			cipher, err := NewDecimationCipher(r.Alphabet, r.Multiplier)
+			if err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+				return
+			}
 			c.JSON(http.StatusOK, gin.H{
-				"message": NewDecimationCipher(r.Alphabet, r.Multiplier).Decipher(r.Message, r.Strict),
+				"message": cipher.Decipher(r.Message, r.Strict),
 			})
 		})
 
@@ -218,8 +258,13 @@ func main() {
 			if r.Alphabet == "" {
 				r.Alphabet = defaultAlphabet
 			}
+			cipher, err := NewAffineCipher(r.Alphabet, r.Multiplier, r.Shift)
+			if err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+				return
+			}
 			c.JSON(http.StatusOK, gin.H{
-				"message": NewAffineCipher(r.Alphabet, r.Multiplier, r.Shift).Encipher(r.Message, r.Strict),
+				"message": cipher.Encipher(r.Message, r.Strict),
 			})
 		})
 		v1.POST("/decipher/affine", func(c *gin.Context) {
@@ -232,8 +277,13 @@ func main() {
 			if r.Alphabet == "" {
 				r.Alphabet = defaultAlphabet
 			}
+			cipher, err := NewAffineCipher(r.Alphabet, r.Multiplier, r.Shift)
+			if err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+				return
+			}
 			c.JSON(http.StatusOK, gin.H{
-				"message": NewAffineCipher(r.Alphabet, r.Multiplier, r.Shift).Decipher(r.Message, r.Strict),
+				"message": cipher.Decipher(r.Message, r.Strict),
 			})
 		})
 

@@ -125,11 +125,17 @@ func TestAffineCipher(t *testing.T) {
 	}
 
 	for _, table := range encipherTables {
-		c := NewAffineCipher(table.alphabet, table.a, table.b)
+		c, err := NewAffineCipher(table.alphabet, table.a, table.b)
+		if err != nil {
+			t.Fatal(err)
+		}
 		runMonoalphabeticEncipherTest(t, table.input, table.expected, c, table.strict)
 	}
 	for _, table := range decipherTables {
-		c := NewAffineCipher(table.alphabet, table.a, table.b)
+		c, err := NewAffineCipher(table.alphabet, table.a, table.b)
+		if err != nil {
+			t.Fatal(err)
+		}
 		runMonoalphabeticDecipherTest(t, table.input, table.expected, c, table.strict)
 	}
 }
@@ -159,11 +165,17 @@ func TestAtbashCipher(t *testing.T) {
 	}
 
 	for _, table := range encipherTables {
-		c := NewAtbashCipher(table.alphabet)
+		c, err := NewAtbashCipher(table.alphabet)
+		if err != nil {
+			t.Fatal(err)
+		}
 		runMonoalphabeticEncipherTest(t, table.input, table.expected, c, table.strict)
 	}
 	for _, table := range decipherTables {
-		c := NewAtbashCipher(table.alphabet)
+		c, err := NewAtbashCipher(table.alphabet)
+		if err != nil {
+			t.Fatal(err)
+		}
 		runMonoalphabeticDecipherTest(t, table.input, table.expected, c, table.strict)
 	}
 }
@@ -199,11 +211,17 @@ func TestCaesarCipher(t *testing.T) {
 	}
 
 	for _, table := range encipherTables {
-		c := NewCaesarCipher(table.alphabet, table.b)
+		c, err := NewCaesarCipher(table.alphabet, table.b)
+		if err != nil {
+			t.Fatal(err)
+		}
 		runMonoalphabeticEncipherTest(t, table.input, table.expected, c, table.strict)
 	}
 	for _, table := range decipherTables {
-		c := NewCaesarCipher(table.alphabet, table.b)
+		c, err := NewCaesarCipher(table.alphabet, table.b)
+		if err != nil {
+			t.Fatal(err)
+		}
 		runMonoalphabeticDecipherTest(t, table.input, table.expected, c, table.strict)
 	}
 }
@@ -239,11 +257,17 @@ func TestDecimationCipher(t *testing.T) {
 	}
 
 	for _, table := range encipherTables {
-		c := NewDecimationCipher(table.alphabet, table.a)
+		c, err := NewDecimationCipher(table.alphabet, table.a)
+		if err != nil {
+			t.Fatal(err)
+		}
 		runMonoalphabeticEncipherTest(t, table.input, table.expected, c, table.strict)
 	}
 	for _, table := range decipherTables {
-		c := NewDecimationCipher(table.alphabet, table.a)
+		c, err := NewDecimationCipher(table.alphabet, table.a)
+		if err != nil {
+			t.Fatal(err)
+		}
 		runMonoalphabeticDecipherTest(t, table.input, table.expected, c, table.strict)
 	}
 }
@@ -273,11 +297,17 @@ func TestRot13Cipher(t *testing.T) {
 	}
 
 	for _, table := range encipherTables {
-		c := NewRot13Cipher(table.alphabet)
+		c, err := NewRot13Cipher(table.alphabet)
+		if err != nil {
+			t.Fatal(err)
+		}
 		runMonoalphabeticEncipherTest(t, table.input, table.expected, c, table.strict)
 	}
 	for _, table := range decipherTables {
-		c := NewRot13Cipher(table.alphabet)
+		c, err := NewRot13Cipher(table.alphabet)
+		if err != nil {
+			t.Fatal(err)
+		}
 		runMonoalphabeticDecipherTest(t, table.input, table.expected, c, table.strict)
 	}
 }

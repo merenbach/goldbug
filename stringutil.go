@@ -22,14 +22,18 @@ import (
 
 // Backpermute transforms a string based on a generator function.
 // Backpermute will panic if the transform function returns any invalid string index values.
-func backpermute(s string, g func() uint) string {
+func backpermute(s string, g func() uint) (string, error) {
 	var out strings.Builder
 	asRunes := []rune(s)
 	for range asRunes {
 		newRune := asRunes[g()]
-		out.WriteRune(newRune)
+		_, err := out.WriteRune(newRune)
+		if err != nil {
+			return "", err
+		}
+
 	}
-	return out.String()
+	return out.String(), nil
 }
 
 // Deduplicate removes recurrences for runes from a string, preserving order of first appearance.

@@ -29,7 +29,12 @@ func TestBackpermute(t *testing.T) {
 		{"eeeee", "hello", func() uint { return 1 }},
 	}
 	for _, table := range tables {
-		if out := backpermute(table.s, table.f); out != table.expected {
+		out, err := backpermute(table.s, table.f)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if out != table.expected {
 			t.Errorf("For backpermutation of %q with function %s, expected output %q, but got %q instead", table.s, reflect.ValueOf(table.f), table.expected, out)
 		}
 	}

@@ -114,7 +114,7 @@ func NewKeywordCipher(alphabet, keyword string) *SimpleSubstitutionCipher {
 }
 
 // NewAffineCipher creates a new affine cipher.
-func NewAffineCipher(ptAlphabet string, a, b int) *SimpleSubstitutionCipher {
+func NewAffineCipher(ptAlphabet string, a, b int) (*SimpleSubstitutionCipher, error) {
 	m := utf8.RuneCountInString(ptAlphabet)
 
 	// TODO: consider using Hull-Dobell satisfaction to determine if `a` is valid (must be coprime with `m`)
@@ -131,27 +131,30 @@ func NewAffineCipher(ptAlphabet string, a, b int) *SimpleSubstitutionCipher {
 		Increment:  uint(a),
 		Seed:       uint(b),
 	}
-	ctAlphabet := backpermute(ptAlphabet, lcg.Iterator())
+	ctAlphabet, err := backpermute(ptAlphabet, lcg.Iterator())
+	if err != nil {
+		return nil, err
+	}
 
-	return NewSimpleSubstitutionCipher(ptAlphabet, ctAlphabet)
+	return NewSimpleSubstitutionCipher(ptAlphabet, ctAlphabet), nil
 }
 
 // NewAtbashCipher creates a new Atbash cipher.
-func NewAtbashCipher(ptAlphabet string) *SimpleSubstitutionCipher {
+func NewAtbashCipher(ptAlphabet string) (*SimpleSubstitutionCipher, error) {
 	return NewAffineCipher(ptAlphabet, -1, -1)
 }
 
 // NewCaesarCipher creates a new Caesar cipher.
-func NewCaesarCipher(ptAlphabet string, b int) *SimpleSubstitutionCipher {
+func NewCaesarCipher(ptAlphabet string, b int) (*SimpleSubstitutionCipher, error) {
 	return NewAffineCipher(ptAlphabet, 1, b)
 }
 
 // NewDecimationCipher creates a new decimation cipher.
-func NewDecimationCipher(ptAlphabet string, a int) *SimpleSubstitutionCipher {
+func NewDecimationCipher(ptAlphabet string, a int) (*SimpleSubstitutionCipher, error) {
 	return NewAffineCipher(ptAlphabet, a, 0)
 }
 
 // NewRot13Cipher creates a new Rot13 (Caesar shift of 13) cipher.
-func NewRot13Cipher(ptAlphabet string) *SimpleSubstitutionCipher {
+func NewRot13Cipher(ptAlphabet string) (*SimpleSubstitutionCipher, error) {
 	return NewCaesarCipher(ptAlphabet, 13)
 }

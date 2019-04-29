@@ -32,19 +32,32 @@ type TabulaRecta struct {
 
 func (tr TabulaRecta) String() string {
 	var out strings.Builder
+	var err error
 	formatForPrinting := func(s string) string {
 		spl := strings.Split(s, "")
 		return strings.Join(spl, " ")
 	}
-	out.WriteString("    " + formatForPrinting(tr.ptAlphabet) + "\n  +")
+	_, err = out.WriteString("    " + formatForPrinting(tr.ptAlphabet) + "\n  +")
+	if err != nil {
+		return ""
+	}
 	for range tr.ptAlphabet {
-		out.WriteRune('-')
-		out.WriteRune('-')
+		_, err = out.WriteRune('-')
+		if err != nil {
+			return ""
+		}
+		_, err = out.WriteRune('-')
+		if err != nil {
+			return ""
+		}
 	}
 	for _, r := range tr.keyAlphabet {
 		c := tr.ciphers[r]
 		ctAlpha := fmt.Sprintf("\n%c | %s", r, formatForPrinting(c.ctAlphabet))
-		out.WriteString(ctAlpha)
+		_, err = out.WriteString(ctAlpha)
+		if err != nil {
+			return ""
+		}
 	}
 	return out.String()
 }
