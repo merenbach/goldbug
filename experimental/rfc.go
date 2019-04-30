@@ -15,7 +15,7 @@ func abs(n int) int {
 	return n
 }
 
-func mirrorSequence(min, max int) []int {
+func mirrorSequenceUnit(min, max int) []int {
 	delta := max - min
 
 	nn := make([]int, 2*delta)
@@ -26,13 +26,24 @@ func mirrorSequence(min, max int) []int {
 }
 
 func deltaSeqDiffs(min, max, rounds int) []int {
-	ms := mirrorSequence(min, max)
+	ms := mirrorSequenceUnit(min, max)
 
 	nn := make([]int, rounds)
 	for i := 0; i < rounds; i++ {
 		nn[i] = ms[i%len(ms)]
 	}
 	return nn
+}
+
+func deltaSeqDiffFunc(min, max int) func() int {
+	ms := mirrorSequenceUnit(min, max)
+
+	i := 0
+	return func() int {
+		n := ms[i%len(ms)]
+		i++
+		return n
+	}
 }
 
 func crescendoPyramidalSubsequence(min, max int) []int {
@@ -107,6 +118,8 @@ func rfcDecode(s string, rails int) string {
 
 func main() {
 	rails := 3
+	p := deltaSeqDiffFunc(3, 8)
+	fmt.Println("hey1:", p(), p(), p(), p(), p(), p(), p(), p(), p(), p(), p(), p(), p(), p(), p(), p(), p(), p(), p())
 	fmt.Println("hey!!!", deltaSeqDiffs(2, 6, 100))
 	fmt.Println("hey!!!", abs(0))
 	fmt.Println("hey!!!", abs(1), abs(2), abs(3), abs(5), abs(8), abs(13), abs(21))
