@@ -72,6 +72,14 @@ func mirrorSequenceUnit(start, pivot int, count int) []int {
 	return nn
 }
 
+// func counter(seed int) func() int {
+// 	return func() int {
+// 		prev := seed
+// 		seed++
+// 		return prev
+// 	}
+// }
+
 func mirrorSequenceWithOffset(start, pivot, offset int) func() int {
 	// r is the range, but we can't use that word
 	r := abs(pivot - start)
