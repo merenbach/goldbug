@@ -71,21 +71,32 @@ func mirrorSequenceGen(start, pivot int) func() int {
 
 	var i int
 
+	if pivot < start {
+		i = r
+		pivot = start
+		// pivot, start = start, pivot
+	}
+
+	if r == 0 {
+		period = 1
+	}
+
 	return func() int {
-		n := i
+		n := i % period
 		i++
-
-		if pivot > start {
-			return pivot - abs(r-n%period)
-			// return start + abs(r-(n+r)%period)
-		} else if pivot < start {
-			return pivot + abs(r-n%period)
-			// return start - abs(r-(n+r)%period)
-		}
-
-		return pivot
+		return pivot - abs(r-n)
+		// return pivot - abs(r-n%period)
+		// return start + abs(r-(n+r)%period)
 	}
 }
+
+/*if pivot > start {
+	return pivot - abs(r-n%period)
+	// return start + abs(r-(n+r)%period)
+} else if pivot < start {
+	return pivot + abs(r-n%period)
+	// return start - abs(r-(n+r)%period)
+}*/
 
 // func crescendoPyramidalSubsequence(min, max int) []int {
 // 	fmt.Println("diffs := ", deltaSeqDiffs(min, max, max-min))
