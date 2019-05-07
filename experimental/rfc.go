@@ -29,6 +29,14 @@ func abs(n int) int {
 	return n
 }
 
+// Max returns the larger of two integers.
+func max(a, b int) int {
+	if a < b {
+		return b
+	}
+	return a
+}
+
 // func ms2() {
 // 	start := 3
 // 	stop := 8
@@ -64,30 +72,27 @@ func mirrorSequenceUnit(start, pivot int, count int) []int {
 	return nn
 }
 
-func mirrorSequenceGen(start, pivot int) func() int {
+func mirrorSequenceWithOffset(start, pivot, offset int) func() int {
 	// r is the range, but we can't use that word
 	r := abs(pivot - start)
-	period := 2 * r
-
-	var i int
 
 	if pivot < start {
-		i = r
-		pivot = start
-		// pivot, start = start, pivot
+		return mirrorSequenceWithOffset(pivot, start, r+offset)
 	}
 
-	if r == 0 {
-		period = 1
-	}
+	period := max(1, 2*r)
 
 	return func() int {
-		n := i % period
-		i++
+		n := offset % period
+		offset++
 		return pivot - abs(r-n)
 		// return pivot - abs(r-n%period)
 		// return start + abs(r-(n+r)%period)
 	}
+}
+
+func mirrorSequence(start, pivot int) func() int {
+	return mirrorSequenceWithOffset(start, pivot, 0)
 }
 
 /*if pivot > start {
@@ -170,7 +175,7 @@ func rfcDecode(s string, rails int) string {
 
 func main() {
 	// ms2()
-	f := mirrorSequenceGen(1, 5)
+	f := mirrorSequence(1, 5)
 	fmt.Println("SEQ:", f(), f(), f(), f(), f(), f(), f(), f(), f(), f(), f(), f(), f(), f(), f(), f(), f(), f(), f(), f(), f(), f(), f(), f(), f(), f())
 
 	x := mirrorSequenceUnit(1, 5, 15)

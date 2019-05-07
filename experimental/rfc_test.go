@@ -138,7 +138,7 @@ func TestMirrorSequenceGen(t *testing.T) {
 		},
 	}
 	for _, table := range tables {
-		gen := mirrorSequenceGen(table.start, table.pivot)
+		gen := mirrorSequence(table.start, table.pivot)
 		out := make([]int, table.count)
 		for i := range out {
 			out[i] = gen()
