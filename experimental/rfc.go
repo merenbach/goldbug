@@ -99,6 +99,32 @@ func mirrorSequenceWithOffset(start, pivot, offset int) func() int {
 	}
 }
 
+// func mirrorSequenceWithOffset(start, pivot, offset int) func() int {
+// 	// r is the range, but we can't use that word
+// 	r := abs(pivot - start)
+
+// 	if pivot < start {
+// 		return mirrorSequenceWithOffset(pivot, start, r+offset)
+// 	}
+
+// 	period := max(1, 2*r)
+// 	out := make([]int, period)
+
+// 	for i := range out {
+// 		out[i] = pivot - abs(r-i)
+// 	}
+// 	fmt.Println(out)
+
+// 	return func() int {
+// 		n := offset % len(out)
+// 		offset++
+// 		return out[n]
+// 		// return pivot - abs(r-n)
+// 		// return pivot - abs(r-n%period)
+// 		// return start + abs(r-(n+r)%period)
+// 	}
+// }
+
 func mirrorSequence(start, pivot int) func() int {
 	return mirrorSequenceWithOffset(start, pivot, 0)
 }
