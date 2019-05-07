@@ -5,15 +5,15 @@ import (
 )
 
 // Sign returns the sign of an integer.
-func sign(n int) int {
-	switch {
-	case n > 0:
-		return 1
-	case n < 0:
-		return -1
-	}
-	return 0
-}
+// func sign(n int) int {
+// 	switch {
+// 	case n > 0:
+// 		return 1
+// 	case n < 0:
+// 		return -1
+// 	}
+// 	return 0
+// }
 
 // Abs returns the absolute value of an integer.
 func abs(n int) int {
