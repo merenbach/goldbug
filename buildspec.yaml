@@ -1,0 +1,60 @@
+version: 0.2
+
+env:
+  variables:
+    # This S3 bucket will be used to store the packaged Lambda deployment bundle.
+    # Make sure to provide a valid S3 bucket name (it must exist already).
+    # The AWS CodeBuild IAM role must allow write access to it.
+    # S3_BUCKET: "<comes from CodePipeline environment>"
+    # KMS_KEY: "<comes from CodePipeline environment>"
+    PACKAGE: "github.com/merenbach/gold-bug"
+
+phases:
+  install:
+    runtime-versions:
+      golang: "1.13"
+
+    commands:
+      # Print all environment variables (handy for AWS CodeBuild logs)
+      - "env | sort"
+
+      # AWS Codebuild Go images use /go for the $GOPATH so let's copy our
+      # application source code into that directory structure.
+      - 'mkdir -v -p "/go/src/$(dirname ${PACKAGE})"'
+      - 'ln -v -s "${CODEBUILD_SRC_DIR}" "/go/src/${PACKAGE}"'
+
+      # Install golint
+      - "go get -u golang.org/x/lint/golint"
+
+  pre_build:
+    commands:
+      # Make sure we're in the project directory within our GOPATH
+      - 'cd "/go/src/${PACKAGE}"'
+
+      # Fetch all dependencies
+      - "go get -t ./..."
+
+      # Ensure code passes all lint tests
+      - "golint -set_exit_status ./..."
+
+      # Check the Go code for common problems with 'go vet'
+      - "go vet ./..."
+
+      # Run all tests included with our application
+      - "go test ./..."
+
+  build:
+    commands:
+      # Build our go application
+      - "go build -ldflags='-s -w' -o gold-bug cmd/gold-bug/main.go"
+      - "go build -ldflags='-s -w' -o preTrafficHook cmd/pretraffichook/main.go"
+
+  post_build:
+    commands:
+      # Package our application with AWS SAM
+      - 'aws cloudformation package --kms-key-id "${KMS_KEY}" --template-file template.yaml --s3-bucket "${S3_BUCKET}" --output-template-file packaged.yaml'
+
+artifacts:
+  files:
+    - "packaged.yaml"
+  # "discard-paths": true

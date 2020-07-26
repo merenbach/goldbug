@@ -1,0 +1,889 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Build and deploy pipeline"
+
+Parameters:
+  GitHubOwner:
+    Type: "String"
+    Default: "merenbach"
+    Description: "The GitHub organization"
+  RepositoryName:
+    Type: "String"
+    Description: "The GitHub repository"
+  BranchName:
+    Type: "String"
+    Default: "master"
+    Description: "The GitHub branch to trigger the pipeline"
+  GitHubOAuthToken:
+    Type: "String"
+    NoEcho: true
+  AlarmEmail:
+    Type: "String"
+    Description: "Recipient for CloudWatch alarms"
+  NotifyPipelineStatusChanges:
+    Type: "String"
+    Default: "true"
+    AllowedValues:
+      - "true"
+      - "false"
+    Description: "True to notify on pipeline status changes, false otherwise"
+  Generator:
+    Type: "String"
+    Default: "Gredunza"
+    Description: "Stack creation tooling"
+  TemplateConfigurationFile:
+    Type: "String"
+    Default: ""
+    Description: "Optional deployment template configuration file inside config directory"
+  LogRetentionMode:
+    Type: "String"
+    Default: "GOVERNANCE"
+    Description: "How strict a retention policy to use for pipeline logs"
+    AllowedValues:
+      - "COMPLIANCE"
+      - "GOVERNANCE"
+  LogRetentionDays:
+    Type: "Number"
+    Default: "731"
+    Description: "How long to retain pipeline logs"
+  BuildArtifactRetentionDays:
+    Type: "Number"
+    Default: "180"
+    Description: "How long to retain build artifacts"
+  IamPath:
+    Type: "String"
+    Default: "/deployment/"
+    Description: "A path for IAM resources"
+  BuildImage:
+    Type: "String"
+    Default: "aws/codebuild/standard:2.0"
+    AllowedValues:
+      - "aws/codebuild/amazonlinux2-x86_64-standard:1.0"
+      - "aws/codebuild/standard:2.0"
+      - "aws/codebuild/windows-base:1.0"
+      - "aws/codebuild/windows-base:2.0"
+    Description: "Build image for CodeBuild"
+  BuildComputeType:
+    Type: "String"
+    Default: "BUILD_GENERAL1_SMALL"
+    AllowedValues:
+      - "BUILD_GENERAL1_SMALL"
+      - "BUILD_GENERAL1_MEDIUM"
+      - "BUILD_GENERAL1_LARGE"
+    Description: "Build compute type for CodeBuild"
+
+Conditions:
+  NoConfigTemplate:
+    "Fn::Equals":
+      - Ref: "TemplateConfigurationFile"
+      - ""
+  ShouldEmailPipelineStatusChanges:
+    "Fn::Equals":
+      - Ref: "NotifyPipelineStatusChanges"
+      - "true"
+
+Resources:
+  # TODO: Can we support rotation?
+  GitHubSecret:
+    Type: "AWS::SecretsManager::Secret"
+    Properties:
+      Description: "GitHub access"
+      GenerateSecretString:
+        ExcludeLowercase: false
+        ExcludeNumbers: false
+        ExcludePunctuation: true
+        ExcludeUppercase: false
+        IncludeSpace: false
+        PasswordLength: 64
+        RequireEachIncludedType: true
+      KmsKeyId:
+        Ref: "DeploymentMasterKey"
+      Tags:
+        - Key: "Generator"
+          Value:
+            Ref: "Generator"
+
+  DeploymentMasterKey:
+    Type: "AWS::KMS::Key"
+    Properties:
+      Description:
+        "Fn::Sub": "${AWS::StackName}-${AWS::Region} master key for build artifacts"
+      Enabled: true
+      KeyPolicy:
+        Version: "2012-10-17"
+        Id: "key-default-1"
+        Statement:
+          - Sid: "Enable IAM User Permissions"
+            Effect: "Allow"
+            Principal:
+              AWS:
+                "Fn::Sub": "arn:aws:iam::${AWS::AccountId}:root"
+            Action: "kms:*"
+            Resource: "*"
+          - Sid: "Allow access for Key User (SNS Service Principal)"
+            Effect: "Allow"
+            Principal:
+              Service:
+                - "cloudwatch.amazonaws.com"
+                - "events.amazonaws.com"
+            Action:
+              - "kms:GenerateDataKey*"
+              - "kms:Decrypt"
+            Resource: "*"
+          - Sid: "Allow access for Key User (CodePipeline)"
+            Effect: "Allow"
+            Principal:
+              Service:
+                - "codepipeline.amazonaws.com"
+            Action:
+              - "kms:*"
+            Resource: "*"
+      Tags:
+        - Key: "Generator"
+          Value:
+            Ref: "Generator"
+        - Key: "StackId"
+          Value:
+            Ref: "AWS::StackId"
+        - Key: "StackName"
+          Value:
+            Ref: "AWS::StackName"
+
+  CodeBuildLogGroup:
+    Type: "AWS::Logs::LogGroup"
+    Properties:
+      RetentionInDays: 1
+
+  CodeBuild:
+    Type: "AWS::CodeBuild::Project"
+    Properties:
+      Description:
+        "Fn::Sub": "Project for ${AWS::StackName}"
+      EncryptionKey:
+        "Fn::GetAtt":
+          - "DeploymentMasterKey"
+          - "Arn"
+      ServiceRole:
+        "Fn::GetAtt":
+          - "CodeBuildServiceRole"
+          - "Arn"
+      Artifacts:
+        Type: "CODEPIPELINE"
+      Environment:
+        Type: "LINUX_CONTAINER"
+        ComputeType:
+          Ref: "BuildComputeType"
+        Image:
+          Ref: "BuildImage"
+        EnvironmentVariables:
+          - Name: "S3_BUCKET"
+            Value:
+              Ref: "artifacts"
+          - Name: "KMS_KEY"
+            Value:
+              Ref: "DeploymentMasterKey"
+      Source:
+        Type: "CODEPIPELINE"
+      TimeoutInMinutes: 10
+      LogsConfig:
+        CloudWatchLogs:
+          GroupName:
+            Ref: "CodeBuildLogGroup"
+          Status: "ENABLED"
+        S3Logs:
+          EncryptionDisabled: false
+          Location:
+            "Fn::Sub": "${logs}/build-log"
+          Status: "ENABLED"
+      Tags:
+        - Key: "Generator"
+          Value:
+            Ref: "Generator"
+        - Key: "StackId"
+          Value:
+            Ref: "AWS::StackId"
+        - Key: "StackName"
+          Value:
+            Ref: "AWS::StackName"
+
+  logs:
+    Type: "AWS::S3::Bucket"
+    DeletionPolicy: "Retain"
+    Properties:
+      AccessControl: "LogDeliveryWrite"
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: "aws:kms"
+              KMSMasterKeyID:
+                Ref: "DeploymentMasterKey"
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: "Enabled"
+      ObjectLockEnabled: true
+      ObjectLockConfiguration:
+        ObjectLockEnabled: "Enabled"
+        Rule:
+          DefaultRetention:
+            Mode:
+              Ref: "LogRetentionMode"
+            Days:
+              Ref: "LogRetentionDays"
+      LifecycleConfiguration:
+        Rules:
+          - Status: "Enabled"
+            AbortIncompleteMultipartUpload:
+              DaysAfterInitiation: 7
+            ExpirationInDays:
+              Ref: "LogRetentionDays"
+            NoncurrentVersionExpirationInDays: 1
+            Transitions:
+              - StorageClass: "INTELLIGENT_TIERING"
+                TransitionInDays: 1
+  logsPolicy:
+    Type: "AWS::S3::BucketPolicy"
+    Properties:
+      Bucket:
+        Ref: "logs"
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: "DenyUnEncryptedObjectUploads"
+            Effect: "Deny"
+            Principal: "*"
+            Action: "s3:PutObject"
+            Resource:
+              "Fn::Join":
+                - ""
+                - - "Fn::GetAtt":
+                      - "logs"
+                      - "Arn"
+                  - "/*"
+            Condition:
+              "ForAnyValue:StringNotEquals":
+                "s3:x-amz-server-side-encryption": "aws:kms"
+                "s3:x-amz-server-side-encryption-aws-kms-key-id":
+                  Ref: "DeploymentMasterKey"
+          - Sid: "DenyInsecureConnections"
+            Effect: "Deny"
+            Principal: "*"
+            Action: "s3:*"
+            Resource:
+              "Fn::Join":
+                - ""
+                - - "Fn::GetAtt":
+                      - "logs"
+                      - "Arn"
+                  - "/*"
+            Condition:
+              Bool:
+                "aws:SecureTransport": false
+
+  artifacts:
+    Type: "AWS::S3::Bucket"
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: "aws:kms"
+              KMSMasterKeyID:
+                Ref: "DeploymentMasterKey"
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      LoggingConfiguration:
+        DestinationBucketName:
+          Ref: "logs"
+        LogFilePrefix: "artifact-logs/"
+      VersioningConfiguration:
+        Status: "Enabled"
+      LifecycleConfiguration:
+        Rules:
+          - Status: "Enabled"
+            AbortIncompleteMultipartUpload:
+              DaysAfterInitiation: 7
+            ExpirationInDays:
+              Ref: "BuildArtifactRetentionDays"
+            NoncurrentVersionExpirationInDays: 1
+            Transitions:
+              - StorageClass: "INTELLIGENT_TIERING"
+                TransitionInDays: 1
+      Tags:
+        - Key: "Generator"
+          Value:
+            Ref: "Generator"
+  artifactsPolicy:
+    Type: "AWS::S3::BucketPolicy"
+    Properties:
+      Bucket:
+        Ref: "artifacts"
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: "DenyUnEncryptedObjectUploads"
+            Effect: "Deny"
+            Principal: "*"
+            Action: "s3:PutObject"
+            Resource:
+              "Fn::Join":
+                - ""
+                - - "Fn::GetAtt":
+                      - "artifacts"
+                      - "Arn"
+                  - "/*"
+            Condition:
+              "ForAnyValue:StringNotEquals":
+                "s3:x-amz-server-side-encryption": "aws:kms"
+                "s3:x-amz-server-side-encryption-aws-kms-key-id":
+                  Ref: "DeploymentMasterKey"
+          - Sid: "DenyInsecureConnections"
+            Effect: "Deny"
+            Principal: "*"
+            Action: "s3:*"
+            Resource:
+              "Fn::Join":
+                - ""
+                - - "Fn::GetAtt":
+                      - "artifacts"
+                      - "Arn"
+                  - "/*"
+            Condition:
+              Bool:
+                "aws:SecureTransport": false
+
+  ServiceRolePermissionsBoundary:
+    Type: "AWS::IAM::ManagedPolicy"
+    Properties:
+      Description: "Strict policy for deployment user"
+      Path:
+        Ref: "IamPath"
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: "AllowIfInsideCurrentRegion"
+            Effect: "Allow"
+            Action: "*"
+            Resource: "*"
+            Condition:
+              StringEquals:
+                "aws:RequestedRegion":
+                  Ref: "AWS::Region"
+          - Sid: "AllowIam"
+            Effect: "Allow"
+            Action:
+              - "iam:PassRole"
+              - "iam:GetRole"
+              - "iam:CreateRole"
+              - "iam:DeleteRole"
+              - "iam:GetRolePolicy"
+              - "iam:PutRolePolicy"
+              - "iam:AttachRolePolicy"
+              - "iam:DeleteRolePolicy"
+              - "iam:DetachRolePolicy"
+            Resource: "*"
+          # - Sid: "DenyOutsideCurrentRegion"
+          #   Effect: "Deny"
+          #   NotAction:
+          #     - "cloudfront:*"
+          #     - "iam:*"
+          #     - "route53:*"
+          #     - "support:*"
+          #   Resource: "*"
+          #   Condition:
+          #     StringNotEquals:
+          #       "aws:RequestedRegion":
+          #         Ref: "AWS::Region"
+
+  CloudFormationServiceRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service: "cloudformation.amazonaws.com"
+            Action: "sts:AssumeRole"
+      Path:
+        Ref: "IamPath"
+      PermissionsBoundary:
+        Ref: "ServiceRolePermissionsBoundary"
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/PowerUserAccess"
+      Policies:
+        - PolicyName: "AWS-CodePipeline-Service-3"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              # Allow administration and maintenance of CFN-created keys
+              - Effect: "Allow"
+                Action: "kms:*"
+                Resource: "*"
+
+              - Effect: "Allow"
+                Action:
+                  - "lambda:*"
+                  - "cloudformation:CreateChangeSet"
+                  - "iam:GetRole"
+                  - "iam:CreateRole"
+                  - "iam:DeleteRole"
+                  - "iam:GetRolePolicy"
+                  - "iam:PutRolePolicy"
+                  - "iam:AttachRolePolicy"
+                  - "iam:DeleteRolePolicy"
+                  - "iam:DetachRolePolicy"
+                  - "iam:PassRole"
+                Resource: "*"
+
+              - Effect: "Allow"
+                Action:
+                  - "s3:GetBucketVersioning"
+                Resource:
+                  "Fn::Join":
+                    - ""
+                    - - "Fn::GetAtt":
+                          - "artifacts"
+                          - "Arn"
+                      - "/*"
+
+              # Be explicit rather than implicit here, despite full access provided above
+              - Effect: "Allow"
+                Action:
+                  - "s3:GetObject"
+                  - "s3:GetObjectVersion"
+                Resource:
+                  "Fn::Join":
+                    - ""
+                    - - "Fn::GetAtt":
+                          - "artifacts"
+                          - "Arn"
+                      - "/*"
+
+              - Effect: "Allow"
+                Action:
+                  - "kms:Encrypt"
+                  - "kms:Decrypt"
+                  - "kms:ReEncrypt*"
+                  - "kms:GenerateDataKey*"
+                  - "kms:DescribeKey"
+                Resource:
+                  "Fn::GetAtt":
+                    - "DeploymentMasterKey"
+                    - "Arn"
+      Tags:
+        - Key: "Generator"
+          Value:
+            Ref: "Generator"
+        - Key: "StackId"
+          Value:
+            Ref: "AWS::StackId"
+        - Key: "StackName"
+          Value:
+            Ref: "AWS::StackName"
+
+  CodePipelineServiceRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service: "codepipeline.amazonaws.com"
+            Action: "sts:AssumeRole"
+      Path:
+        Ref: "IamPath"
+      PermissionsBoundary:
+        Ref: "ServiceRolePermissionsBoundary"
+      Policies:
+        - PolicyName: "AWS-CodePipeline-Service-3"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "cloudformation:CreateStack"
+                  - "cloudformation:DeleteStack"
+                  - "cloudformation:DescribeStacks"
+                  - "cloudformation:UpdateStack"
+                  - "cloudformation:CreateChangeSet"
+                  - "cloudformation:DeleteChangeSet"
+                  - "cloudformation:DescribeChangeSet"
+                  - "cloudformation:ExecuteChangeSet"
+                  - "cloudformation:SetStackPolicy"
+                  - "cloudformation:ValidateTemplate"
+                Resource: "*"
+
+              # - Effect: "Allow"
+              #   Action:
+              #     - "codedeploy:CreateDeployment"
+              #     - "codedeploy:GetApplication"
+              #     - "codedeploy:GetApplicationRevision"
+              #     - "codedeploy:GetDeployment"
+              #     - "codedeploy:GetDeploymentConfig"
+              #     - "codedeploy:RegisterApplicationRevision"
+              #   Resource: "*"
+
+              - Effect: "Allow"
+                Action: "iam:PassRole"
+                Resource: "*"
+                Condition:
+                  "StringEqualsIfExists":
+                    "iam:PassedToService":
+                      - "cloudformation.amazonaws.com"
+                      - "elasticbeanstalk.amazonaws.com"
+
+              # - Effect: "Allow"
+              #   Action:
+              #     - "codecommit:CancelUploadArchive"
+              #     - "codecommit:GetBranch"
+              #     - "codecommit:GetCommit"
+              #     - "codecommit:GetUploadArchiveStatus"
+              #     - "codecommit:UploadArchive"
+              #   Resource: "*"
+
+              - Effect: "Allow"
+                Action:
+                  - "codebuild:BatchGetBuilds"
+                  - "codebuild:StartBuild"
+                Resource: "*"
+
+              - Effect: "Allow"
+                Action:
+                  - "lambda:InvokeFunction"
+                  - "lambda:ListFunctions"
+                Resource: "*"
+
+              - Effect: "Allow"
+                Action:
+                  - "s3:GetObject*"
+                  - "s3:PutObject*"
+                Resource:
+                  "Fn::Join":
+                    - ""
+                    - - "Fn::GetAtt":
+                          - "artifacts"
+                          - "Arn"
+                      - "/*"
+
+              - Effect: "Allow"
+                Action:
+                  - "kms:Encrypt"
+                  - "kms:Decrypt"
+                  - "kms:ReEncrypt*"
+                  - "kms:GenerateDataKey*"
+                  - "kms:DescribeKey"
+                Resource:
+                  "Fn::GetAtt":
+                    - "DeploymentMasterKey"
+                    - "Arn"
+      Tags:
+        - Key: "Generator"
+          Value:
+            Ref: "Generator"
+        - Key: "StackId"
+          Value:
+            Ref: "AWS::StackId"
+        - Key: "StackName"
+          Value:
+            Ref: "AWS::StackName"
+
+  CodeBuildServiceRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service: "codebuild.amazonaws.com"
+            Action: "sts:AssumeRole"
+      Path:
+        Ref: "IamPath"
+      PermissionsBoundary:
+        Ref: "ServiceRolePermissionsBoundary"
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/AWSCodeBuildDeveloperAccess"
+      Policies:
+        - PolicyName:
+            "Fn::Sub": "code-build"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "s3:GetObject"
+                  - "s3:GetObjectVersion"
+                  - "s3:PutObject"
+                Resource:
+                  "Fn::Join":
+                    - ""
+                    - - "Fn::GetAtt":
+                          - "artifacts"
+                          - "Arn"
+                      - "/*"
+
+              # TODO: is this necessary?
+              - Effect: "Allow"
+                Action:
+                  - "s3:PutObject"
+                Resource:
+                  "Fn::Join":
+                    - ""
+                    - - "Fn::GetAtt":
+                          - "logs"
+                          - "Arn"
+                      - "/*"
+
+              - Effect: "Allow"
+                Action:
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                Resource: "*"
+
+              - Effect: "Allow"
+                Action: "iam:PassRole"
+                Resource: "*"
+
+              - Effect: "Allow"
+                Action:
+                  - "kms:Encrypt"
+                  - "kms:Decrypt"
+                  - "kms:ReEncrypt*"
+                  - "kms:GenerateDataKey*"
+                  - "kms:DescribeKey"
+                Resource:
+                  "Fn::GetAtt":
+                    - "DeploymentMasterKey"
+                    - "Arn"
+      Tags:
+        - Key: "Generator"
+          Value:
+            Ref: "Generator"
+        - Key: "StackId"
+          Value:
+            Ref: "AWS::StackId"
+        - Key: "StackName"
+          Value:
+            Ref: "AWS::StackName"
+
+  AlarmNotificationTopic:
+    Type: "AWS::SNS::Topic"
+    Properties:
+      KmsMasterKeyId:
+        Ref: "DeploymentMasterKey"
+      Subscription:
+        - Endpoint:
+            Ref: "AlarmEmail"
+          Protocol: "email"
+
+  AlarmNotificationTopicPolicy:
+    Type: "AWS::SNS::TopicPolicy"
+    Properties:
+      Topics:
+        - Ref: "AlarmNotificationTopic"
+      PolicyDocument:
+        # Id: MyTopicPolicy
+        Version: "2012-10-17"
+        Statement:
+          - Sid: "AllowCodePipelineAlerts"
+            Effect: "Allow"
+            Principal:
+              Service: "events.amazonaws.com"
+            Action: "sns:Publish"
+            Resource:
+              Ref: "AlarmNotificationTopic"
+          - Sid: "AllowCodeBuildAlerts"
+            Effect: "Allow"
+            Principal:
+              AWS: "*"
+            Action: "sns:Publish"
+            Resource:
+              Ref: "AlarmNotificationTopic"
+            Condition:
+              StringEquals:
+                "AWS:SourceOwner":
+                  Ref: "AWS::AccountId"
+
+  BuildFailureAlarm:
+    Type: "AWS::CloudWatch::Alarm"
+    Properties:
+      ActionsEnabled: true
+      AlarmActions:
+        - Ref: "AlarmNotificationTopic"
+      AlarmDescription: "Alarm if CodeBuild errors out too many times"
+      Namespace: "AWS/CodeBuild"
+      MetricName: "FailedBuilds"
+      ComparisonOperator: "GreaterThanOrEqualToThreshold"
+      Dimensions:
+        - Name: "ProjectName"
+          Value:
+            Ref: "CodeBuild"
+      DatapointsToAlarm: 1
+      EvaluationPeriods: 1
+      Period: 60
+      Statistic: "Sum"
+      Threshold: 1
+      TreatMissingData: "notBreaching"
+
+  AppPipelineAlertConfig:
+    Type: "AWS::Events::Rule"
+    Condition: "ShouldEmailPipelineStatusChanges"
+    Properties:
+      Description:
+        "Fn::Sub": "${AWS::StackName}"
+      EventPattern:
+        source:
+          - "aws.codepipeline"
+        detail-type:
+          - "CodePipeline Pipeline Execution State Change"
+        detail:
+          pipeline:
+            - Ref: "AppPipeline"
+      State: "ENABLED"
+      Targets:
+        - Arn:
+            Ref: "AlarmNotificationTopic"
+          Id:
+            Ref: "AWS::StackName"
+          InputTransformer:
+            InputTemplate: '"The pipeline <pipeline> from account <account> has <state> at <at>."'
+            InputPathsMap:
+              pipeline: "$.detail.pipeline"
+              state: "$.detail.state"
+              at: "$.time"
+              account: "$.account"
+
+  AppPipelineWebhook:
+    Type: "AWS::CodePipeline::Webhook"
+    Properties:
+      Authentication: "GITHUB_HMAC"
+      AuthenticationConfiguration:
+        SecretToken:
+          "Fn::Sub": "{{resolve:secretsmanager:${GitHubSecret}}}"
+      Filters:
+        - JsonPath: "$.ref"
+          MatchEquals: "refs/heads/{Branch}"
+      TargetPipeline:
+        Ref: "AppPipeline"
+      TargetAction: "SourceAction"
+      TargetPipelineVersion:
+        "Fn::GetAtt":
+          - "AppPipeline"
+          - "Version"
+      RegisterWithThirdParty: true
+
+  AppPipeline:
+    Type: "AWS::CodePipeline::Pipeline"
+    Properties:
+      # Name: "s3-events-pipeline"
+      RoleArn:
+        "Fn::GetAtt":
+          - "CodePipelineServiceRole"
+          - "Arn"
+      Stages:
+        - Name: "Source"
+          Actions:
+            - Name: "SourceAction"
+              ActionTypeId:
+                Category: "Source"
+                Owner: "ThirdParty"
+                Version: 1
+                Provider: "GitHub"
+              OutputArtifacts:
+                - Name: "SourceArtifact"
+              Namespace: "SourceVariables"
+              Configuration:
+                Owner:
+                  Ref: "GitHubOwner"
+                Repo:
+                  Ref: "RepositoryName"
+                Branch:
+                  Ref: "BranchName"
+                OAuthToken:
+                  Ref: "GitHubOAuthToken"
+                PollForSourceChanges: false
+              Region:
+                Ref: "AWS::Region"
+              RunOrder: 1
+        - Name: "Build"
+          Actions:
+            - Name: "BuildAction"
+              InputArtifacts:
+                - Name: "SourceArtifact"
+              OutputArtifacts:
+                - Name: "BuildArtifact"
+              ActionTypeId:
+                Category: "Build"
+                Owner: "AWS"
+                Version: 1
+                Provider: "CodeBuild"
+              Configuration:
+                ProjectName:
+                  Ref: "CodeBuild"
+              Region:
+                Ref: "AWS::Region"
+              RunOrder: 1
+        - Name: "Deploy"
+          Actions:
+            - Name: "DeployAction"
+              InputArtifacts:
+                - Name: "SourceArtifact"
+                - Name: "BuildArtifact"
+              ActionTypeId:
+                Category: "Deploy"
+                Owner: "AWS"
+                Version: 1
+                Provider: "CloudFormation"
+              Configuration:
+                ActionMode: "CREATE_UPDATE"
+                StackName:
+                  "Fn::Sub": "${AWS::StackName}-sam"
+                Capabilities: "CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND"
+                TemplateConfiguration:
+                  "Fn::If":
+                    - "NoConfigTemplate"
+                    - Ref: "AWS::NoValue"
+                    - "Fn::Sub": "SourceArtifact::${TemplateConfigurationFile}"
+                TemplatePath: "BuildArtifact::packaged.yaml"
+                RoleArn:
+                  "Fn::GetAtt":
+                    - "CloudFormationServiceRole"
+                    - "Arn"
+              Region:
+                Ref: "AWS::Region"
+              RunOrder: 1
+      ArtifactStore:
+        Type: "S3"
+        Location:
+          Ref: "artifacts"
+        EncryptionKey:
+          Type: "KMS"
+          Id:
+            Ref: "DeploymentMasterKey"
+      Tags:
+        - Key: "Generator"
+          Value:
+            Ref: "Generator"
+        - Key: "StackId"
+          Value:
+            Ref: "AWS::StackId"
+        - Key: "StackName"
+          Value:
+            Ref: "AWS::StackName"
+
+Outputs:
+  LogBucket:
+    Description: "S3 bucket name for build logs"
+    Value:
+      Ref: "logs"
+  GitHubSecret:
+    Description: "Secrets Manager ARN for webhook secret"
+    Value:
+      Ref: "GitHubSecret"

@@ -1,0 +1,177 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: "AWS::Serverless-2016-10-31"
+Description: "A SAM template for Lambda Safe Deployments"
+
+# https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Runtime: "go1.x"
+
+Parameters:
+  Email:
+    Type: "String"
+    Default: "andrew@merenbach.com"
+    Description: "Recipient for CloudWatch alarms"
+  LambdaLogRetentionDays:
+    Type: "Number"
+    Default: "30"
+    Description: "How long to keep Lambda logs"
+  StageName:
+    Type: "String"
+    Default: "Prod"
+    Description: "The name of a stage to use in API Gateway instances"
+  CipherStackTimeout:
+    Type: "Number"
+    Default: 5
+    Description: "Nested stack timeout"
+
+Resources:
+  AlarmNotificationTopic:
+    Type: "AWS::SNS::Topic"
+    Properties:
+      Subscription:
+        - Endpoint:
+            Ref: "Email"
+          Protocol: "email"
+
+  MyApi:
+    Type: "AWS::Serverless::Api"
+    Properties:
+      StageName:
+        Ref: "StageName"
+
+  preTrafficHookLogs:
+    Type: "AWS::Logs::LogGroup"
+    Properties:
+      LogGroupName:
+        "Fn::Sub": "/aws/lambda/${preTrafficHook}"
+      RetentionInDays:
+        Ref: "LambdaLogRetentionDays"
+  preTrafficHook:
+    Type: "AWS::Serverless::Function"
+    Properties:
+      Handler: "preTrafficHook"
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: "Allow"
+              Action:
+                - "codedeploy:PutLifecycleEventHookExecutionStatus"
+              Resource:
+                "Fn::Sub": "arn:aws:codedeploy:${AWS::Region}:${AWS::AccountId}:deploymentgroup:${ServerlessDeploymentApplication}/*"
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: "Allow"
+              Action:
+                - "lambda:InvokeFunction"
+              Resource:
+                Ref: "lambdaGoldBug.Version"
+        # - LambdaInvokePolicy:
+        #     FunctionName:
+        #       Ref: "lambdaGoldBug.Version"
+      # FunctionName: 'CodeDeployHook_preTrafficHook'
+      FunctionName:
+        "Fn::Sub": "CodeDeployHook_${AWS::StackName}-preTrafficHook"
+      DeploymentPreference:
+        Enabled: false
+      Timeout: 5
+      Environment:
+        Variables:
+          NewVersion:
+            Ref: "lambdaGoldBug.Version"
+
+  lambdaGoldBug:
+    Type: "AWS::Serverless::Function"
+    Properties:
+      Handler: "gold-bug"
+      MemorySize: 128
+      AutoPublishAlias: "live"
+      DeploymentPreference:
+        Type: "AllAtOnce"
+        Hooks:
+          PreTraffic:
+            Ref: "preTrafficHook"
+      Timeout: 5
+      Events:
+        Default:
+          Type: "Api"
+          Properties:
+            Path: "/{cipher}"
+            Method: "post"
+            RestApiId:
+              Ref: "MyApi"
+            RequestParameters:
+              - "method.request.path.cipher":
+                  Required: true
+                  Caching: false
+
+  lambdaGoldBugLogs:
+    Type: "AWS::Logs::LogGroup"
+    Properties:
+      LogGroupName:
+        "Fn::Sub": "/aws/lambda/${lambdaGoldBug}"
+      RetentionInDays:
+        Ref: "LambdaLogRetentionDays"
+  lambdaGoldBugAlarm:
+    Type: "AWS::CloudWatch::Alarm"
+    Properties:
+      AlarmActions:
+        - Ref: "AlarmNotificationTopic"
+      AlarmDescription: "Alarm if lambda errors out too many times"
+      Namespace: "AWS/Lambda"
+      MetricName: "Errors"
+      ComparisonOperator: "GreaterThanOrEqualToThreshold"
+      Dimensions:
+        - Name: "FunctionName"
+          Value:
+            Ref: "lambdaGoldBug"
+      DatapointsToAlarm: 1
+      EvaluationPeriods: 1
+      Period: 60
+      Statistic: "Sum"
+      Threshold: 1
+      TreatMissingData: "notBreaching"
+
+  # MyDomainName:
+  #   Type: "AWS::ApiGateway::DomainName"
+  #   Properties:
+  #     DomainName:
+  #       Ref: "Domain"
+  #     EndpointConfiguration:
+  #       Types:
+  #         - "REGIONAL"
+  #     RegionalCertificateArn:
+  #       Ref: "Certificate"
+  # MyBasePathMapping:
+  #   Type: "AWS::ApiGateway::BasePathMapping"
+  #   Properties:
+  #     # BasePath: "/"
+  #     DomainName:
+  #       Ref: "MyDomainName"
+  #     RestApiId:
+  #       Ref: "MyApi"
+  #     Stage:
+  #       Ref: "MyApi.Stage"
+
+  UsagePlan:
+    Type: "AWS::ApiGateway::UsagePlan"
+    Properties:
+      ApiStages:
+        - ApiId:
+            Ref: "MyApi"
+          Stage:
+            Ref: "MyApi.Stage"
+      # Description: String
+      Quota:
+        Limit: 1000
+        Period: "DAY"
+      Throttle:
+        BurstLimit: 200
+        RateLimit: 100
+      # UsagePlanName: String
+
+Outputs:
+  ApiEndpoint:
+    Description: "The API endpoint at which the app is accessible"
+    Value:
+      "Fn::Sub": "https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/${MyApi.Stage}/"
