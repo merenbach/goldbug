@@ -15,7 +15,6 @@
 package railfence
 
 import (
-	"strings"
 	"unicode/utf8"
 )
 
@@ -25,26 +24,18 @@ type Cipher struct {
 }
 
 // Encipher a message.
-func (c *Cipher) Encipher(s string) string {
-	if c.Rails == 1 {
-		return s
-	}
-
+func (c *Cipher) encipher(s string) *grid {
 	cc := make(grid, utf8.RuneCountInString(s))
 	cc.renumber(c.Rails)
 
 	cc.fill(s)
 	cc.sortByRow()
 
-	return cc.String()
+	return &cc
 }
 
 // Decipher a message.
-func (c *Cipher) Decipher(s string) string {
-	if c.Rails == 1 {
-		return s
-	}
-
+func (c *Cipher) decipher(s string) *grid {
 	cc := make(grid, utf8.RuneCountInString(s))
 	cc.renumber(c.Rails)
 
@@ -52,44 +43,37 @@ func (c *Cipher) Decipher(s string) string {
 	cc.fill(s)
 	cc.sortByCol()
 
-	return cc.String()
+	return &cc
 }
 
-// // Cycle length for cipher.
-// func (c *Cipher) Cycle() int {
-// 	return 2 * (c.Rails - 1)
-// }
-
-// Tableau output for this cipher.
-func (c *Cipher) Tableau(s string) string {
+// Encipher a message.
+func (c *Cipher) Encipher(s string) string {
 	if c.Rails == 1 {
 		return s
 	}
+	return c.encipher(s).contents()
+}
 
-	cc := make(grid, utf8.RuneCountInString(s))
-	cc.renumber(c.Rails)
-
-	cc.fill(s)
-	cc.sortByRow()
-
-	var currentRow int
-	var currentCol int
-
-	var out strings.Builder
-	for _, c := range cc {
-		if c.Row > currentRow {
-			currentRow = c.Row
-			currentCol = 0
-			out.WriteRune('\n')
-		}
-
-		for c.Col > currentCol {
-			out.WriteRune(' ')
-			currentCol++
-		}
-		currentCol++
-
-		out.WriteRune(c.Rune)
+// Decipher a message.
+func (c *Cipher) Decipher(s string) string {
+	if c.Rails == 1 {
+		return s
 	}
-	return out.String()
+	return c.decipher(s).contents()
+}
+
+// EnciphermentGrid returns the output tableau upon encipherment.
+func (c *Cipher) EnciphermentGrid(s string) string {
+	if c.Rails == 1 {
+		return s
+	}
+	return c.encipher(s).printable()
+}
+
+// DeciphermentGrid returns the output tableau upon encipherment.
+func (c *Cipher) DeciphermentGrid(s string) string {
+	if c.Rails == 1 {
+		return s
+	}
+	return c.decipher(s).printable()
 }
