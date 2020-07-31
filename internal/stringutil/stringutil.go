@@ -16,13 +16,9 @@ package stringutil
 
 import (
 	"errors"
-	"fmt"
-	"log"
 	"sort"
 	"strings"
 	"unicode/utf8"
-
-	"github.com/merenbach/gold-bug/internal/prng"
 )
 
 // // Backpermute transforms a string based on a generator function.
@@ -39,26 +35,6 @@ import (
 // 	}
 // 	return out.String(), nil
 // }
-
-// Backpermute a rune slice based on a generator function.
-// Backpermute will return [E E O H L O] for inputs [H E L L O] and [1 1 4 0 2 4]
-// Backpermute will panic if the transform function returns any invalid string index values.
-func backpermute(rr []rune, ii []int) ([]rune, error) {
-	out := make([]rune, len(ii))
-
-	for n, i := range ii {
-		if i < 0 || i >= len(rr) {
-			return nil, fmt.Errorf("Index %d out of interval [0, %d)", i, len(rr))
-		}
-		out[n] = rr[i]
-	}
-
-	// for n, i := range out {
-	// 	out[n] = rr[ii[n]]
-	// }
-
-	return out, nil
-}
 
 // Deduplicate removes recurrences for runes from a string, preserving order of first appearance.
 func Deduplicate(s string) string {
@@ -128,44 +104,8 @@ func groupString(s string, size int, padding rune) []string {
 func WrapString(s string, i int) string {
 	// if we simply `return s[i:] + s[:i]`, we're operating on bytes, not runes
 	rr := []rune(s)
-	return string(rr[i:]) + string(rr[:i])
-}
-
-// Affine transform on a string
-func Affine(s string, multiply int, add int) (string, error) {
-	m := utf8.RuneCountInString(s)
-
-	// TODO: consider using Hull-Dobell satisfaction to determine if `a` is valid (must be coprime with `m`)
-	for multiply < 0 {
-		multiply += m
-	}
-	for add < 0 {
-		add += m
-	}
-
-	lcg := &prng.LCG{
-		Modulus:    m,
-		Multiplier: 1,
-		Increment:  multiply,
-		Seed:       add,
-	}
-	iter, err := lcg.Iterator()
-	if err != nil {
-		log.Println("Couldn't create LCG")
-		return "", err
-	}
-
-	positions := make([]int, m)
-	for i := range positions {
-		positions[i] = iter()
-	}
-
-	out, err := backpermute([]rune(s), positions)
-	if err != nil {
-		return "", err
-	}
-
-	return string(out), nil
+	return string(append(rr[i:], rr[:i]...))
+	// return string(rr[i:]) + string(rr[:i])
 }
 
 // MakeTranslationTable creates a translation table with source and destination runes, plus optional set of runes to delete.

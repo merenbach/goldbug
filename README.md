@@ -19,3 +19,11 @@ Instantiate your deployment pipeline as follows, adapting as necessary the param
             GitHubOAuthToken='YOUR_PAT_HERE'
 
  The first deployment should trigger automatically. If it does not, simply push to the branch to kick off the deployment process.
+
+## TODO
+
+* Recombine pkg contents into masc/pasc packages again since there is interdependence?
+* MASC casing preservation/normalization?
+* Account for decimation/affine/atbash mod/mod-inv issues regarding alphabet length, key values--add coprime tests
+* Add shift and directionality to Trithemius?
+* Nulls for rail fence?

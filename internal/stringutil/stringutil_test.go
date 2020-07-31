@@ -20,41 +20,6 @@ import (
 	"testing"
 )
 
-func TestBackpermute(t *testing.T) {
-	successTables := []struct {
-		expected string
-		s        string
-		ii       []int
-	}{
-		{"eh", "hello", []int{1, 0}},
-	}
-
-	failTables := []struct {
-		s  string
-		ii []int
-	}{
-		{"hello", []int{1, 0, -1}},
-		{"hello", []int{1, 0, 5}},
-	}
-
-	for _, table := range successTables {
-		out, err := backpermute([]rune(table.s), table.ii)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		if string(out) != table.expected {
-			t.Errorf("For backpermutation of %q with slice %v, expected output %q, but got %q instead", table.s, table.ii, table.expected, out)
-		}
-	}
-
-	for _, table := range failTables {
-		if _, err := backpermute([]rune(table.s), table.ii); err == nil {
-			t.Errorf("Expected backpermutation of %q with slice %v to fail", table.s, table.ii)
-		}
-	}
-}
-
 func TestDeduplicate(t *testing.T) {
 	table := map[string]string{
 		"hello":       "helo",
@@ -80,6 +45,19 @@ func TestIntersect(t *testing.T) {
 	for _, table := range tables {
 		if o := intersect(table[0], table[1]); o != table[2] {
 			t.Errorf("Intersection of string %q with charset %q was %q; expected %q", table[0], table[1], o, table[2])
+		}
+	}
+}
+
+func TestReverse(t *testing.T) {
+	table := map[string]string{
+		"hello": "olleh",
+		"world": "dlrow",
+	}
+
+	for k, v := range table {
+		if o := Reverse(k); o != v {
+			t.Errorf("Reverse of string %q was %q; expected %q", k, o, v)
 		}
 	}
 }

@@ -1,0 +1,27 @@
+[
+    {
+        "Input": 0,
+        "Output": 0,
+        "Rows": 3
+    },
+    {
+        "Input": 1,
+        "Output": 1,
+        "Rows": 3
+    },
+    {
+        "Input": 2,
+        "Output": 2,
+        "Rows": 3
+    },
+    {
+        "Input": 3,
+        "Output": 1,
+        "Rows": 3
+    },
+    {
+        "Input": 4,
+        "Output": 0,
+        "Rows": 3
+    }
+]

@@ -1,0 +1,14 @@
+[
+    {
+        "Alphabet": "",
+        "Input": "HELLO, WORLD!",
+        "Output": "HFNOS, BUYTM!",
+        "Strict": false
+    },
+    {
+        "Alphabet": "",
+        "Input": "HELLO, WORLD!",
+        "Output": "HFNOSBUYTM",
+        "Strict": true
+    }
+]

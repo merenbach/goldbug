@@ -1,4 +1,4 @@
-// Copyright 2019 Andrew Merenbach
+// Copyright 2020 Andrew Merenbach
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,68 +12,69 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package railfence
+package scytale
 
 import (
 	"unicode/utf8"
+
+	"github.com/merenbach/goldbug/internal/grid"
 )
 
-// A Cipher implements the rail fence (or zig-zag) cipher.
+// A Cipher implements the scytale (or skytale) cipher.
 type Cipher struct {
-	Rails int
+	Turns int
 }
 
-// Encipher a message.
-func (c *Cipher) encipher(s string) *grid {
-	cc := make(grid, utf8.RuneCountInString(s))
-	cc.renumber(c.Rails)
-
-	cc.fill(s)
-	cc.sortByRow()
-
-	return &cc
-}
-
-// Decipher a message.
-func (c *Cipher) decipher(s string) *grid {
-	cc := make(grid, utf8.RuneCountInString(s))
-	cc.renumber(c.Rails)
-
-	cc.sortByRow()
-	cc.fill(s)
-	cc.sortByCol()
-
-	return &cc
+// Makegrid creates a grid and numbers its cells.
+func (c *Cipher) makegrid(n int) grid.Grid {
+	g := make(grid.Grid, n)
+	for i := range g {
+		g[i].Col = i % c.Turns
+		g[i].Row = i / c.Turns
+	}
+	return g
 }
 
 // Encipher a message.
 func (c *Cipher) Encipher(s string) string {
-	if c.Rails == 1 {
+	if c.Turns == 1 {
 		return s
 	}
-	return c.encipher(s).contents()
+
+	g := c.makegrid(utf8.RuneCountInString(s))
+	g.FillByCol(s)
+	return g.Contents()
 }
 
 // Decipher a message.
 func (c *Cipher) Decipher(s string) string {
-	if c.Rails == 1 {
+	if c.Turns == 1 {
 		return s
 	}
-	return c.decipher(s).contents()
+
+	g := c.makegrid(utf8.RuneCountInString(s))
+	g.FillByRow(s)
+	return g.Contents()
 }
 
 // EnciphermentGrid returns the output tableau upon encipherment.
 func (c *Cipher) EnciphermentGrid(s string) string {
-	if c.Rails == 1 {
+	if c.Turns == 1 {
 		return s
 	}
-	return c.encipher(s).printable()
+
+	g := c.makegrid(utf8.RuneCountInString(s))
+	g.FillByCol(s)
+	return g.Printable()
 }
 
 // DeciphermentGrid returns the output tableau upon encipherment.
 func (c *Cipher) DeciphermentGrid(s string) string {
-	if c.Rails == 1 {
+	if c.Turns == 1 {
 		return s
 	}
-	return c.decipher(s).printable()
+
+	g := c.makegrid(utf8.RuneCountInString(s))
+	g.FillByRow(s)
+	return g.Printable()
 }

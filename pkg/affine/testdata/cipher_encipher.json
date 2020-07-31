@@ -1,0 +1,34 @@
+[
+    {
+        "Alphabet": "",
+        "Input": "HELLO, WORLD!",
+        "Output": "AFCCX, BXSCY!",
+        "Slope": 7,
+        "Intercept": 3,
+        "Strict": false
+    },
+    {
+        "Alphabet": "",
+        "Input": "HELLO, WORLD!",
+        "Output": "AFCCXBXSCY",
+        "Slope": 7,
+        "Intercept": 3,
+        "Strict": true
+    },
+    {
+        "Alphabet": "",
+        "Input": "AFFINE CIPHER",
+        "Output": "IHHWVC SWFRCP",
+        "Slope": 5,
+        "Intercept": 8,
+        "Strict": false
+    },
+    {
+        "Alphabet": "",
+        "Input": "AFFINE CIPHER",
+        "Output": "IHHWVCSWFRCP",
+        "Slope": 5,
+        "Intercept": 8,
+        "Strict": true
+    }
+]

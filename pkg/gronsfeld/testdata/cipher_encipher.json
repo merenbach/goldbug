@@ -1,0 +1,44 @@
+[
+    {
+        "Alphabet": "",
+        "Input": "HELLO, WORLD!",
+        "Output": "HELLO, WORLD!",
+        "Key": "0",
+        "Strict": false
+    },
+    {
+        "Alphabet": "",
+        "Input": "HELLO, WORLD!",
+        "Output": "HELLOWORLD",
+        "Key": "0",
+        "Strict": true
+    },
+    {
+        "Alphabet": "",
+        "Input": "HELLO, WORLD!",
+        "Output": "JHMOQ, YRSOF!",
+        "Key": "23132",
+        "Strict": false
+    },
+    {
+        "Alphabet": "",
+        "Input": "HELLO, WORLD!",
+        "Output": "JHMOQYRSOF",
+        "Key": "23132",
+        "Strict": true
+    },
+    {
+        "Alphabet": "",
+        "Input": "HELLO, WORLD!",
+        "Output": "KMUNX, WPRNG!",
+        "Key": "389290102394957",
+        "Strict": false
+    },
+    {
+        "Alphabet": "",
+        "Input": "HELLO, WORLD!",
+        "Output": "KMUNXWPRNG",
+        "Key": "389290102394957",
+        "Strict": true
+    }
+]

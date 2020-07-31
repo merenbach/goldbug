@@ -1,0 +1,50 @@
+[
+    {
+        "Alphabet": "",
+        "Input": "HELLO, WORLD!",
+        "Output": "SVOOL, DLIOW!",
+        "Strict": false
+    },
+    {
+        "Alphabet": "",
+        "Input": "HELLO, WORLD!",
+        "Output": "SVOOLDLIOW",
+        "Strict": true
+    },
+    {
+        "Alphabet": "",
+        "Input": "ATBASH CIPHER",
+        "Output": "ZGYZHS XRKSVI",
+        "Strict": false
+    },
+    {
+        "Alphabet": "",
+        "Input": "ATBASHCIPHER",
+        "Output": "ZGYZHSXRKSVI",
+        "Strict": true
+    },
+    {
+        "Alphabet": "0123456789",
+        "Input": "A12345A",
+        "Output": "A87654A",
+        "Strict": false
+    },
+    {
+        "Alphabet": "0123456789",
+        "Input": "A12345A",
+        "Output": "87654",
+        "Strict": true
+    },
+    {
+        "Alphabet": "12345",
+        "Input": "A12345A",
+        "Output": "A54321A",
+        "Strict": false
+    },
+    {
+        "Alphabet": "12345",
+        "Input": "A12345A",
+        "Output": "54321",
+        "Strict": true
+    }
+]

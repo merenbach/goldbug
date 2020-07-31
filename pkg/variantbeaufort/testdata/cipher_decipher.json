@@ -1,0 +1,58 @@
+[
+    {
+        "Alphabet": "",
+        "Input": "TCHLB, IIALO!",
+        "Output": "HELLO, WORLD!",
+        "Key": "OCEANOGRAPHYWHAT",
+        "Strict": false
+    },
+    {
+        "Alphabet": "",
+        "Input": "TCHLB, IIALO!",
+        "Output": "HELLOWORLD",
+        "Key": "OCEANOGRAPHYWHAT",
+        "Strict": true
+    },
+    {
+        "Alphabet": "",
+        "Input": "HELLO, WORLD!",
+        "Output": "HELLO, WORLD!",
+        "Key": "A",
+        "Strict": false
+    },
+    {
+        "Alphabet": "",
+        "Input": "HELLO, WORLD!",
+        "Output": "HELLOWORLD",
+        "Key": "A",
+        "Strict": true
+    },
+    {
+        "Alphabet": "",
+        "Input": "ROVVY, GYBVN!",
+        "Output": "HELLO, WORLD!",
+        "Key": "Q",
+        "Strict": false
+    },
+    {
+        "Alphabet": "",
+        "Input": "ROVVY, GYBVN!",
+        "Output": "HELLOWORLD",
+        "Key": "Q",
+        "Strict": true
+    },
+    {
+        "Alphabet": "",
+        "Input": "XEYFO, FADBD!",
+        "Output": "HELLO, WORLD!",
+        "Key": "KANGAROO",
+        "Strict": false
+    },
+    {
+        "Alphabet": "",
+        "Input": "XEYFO, FADBD!",
+        "Output": "HELLOWORLD",
+        "Key": "KANGAROO",
+        "Strict": true
+    }
+]

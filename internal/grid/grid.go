@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package railfence
+package grid
 
 import (
 	"sort"
@@ -26,12 +26,26 @@ type cell struct {
 	Rune rune
 }
 
-// A grid is a slice of cells.
-type grid []cell
+// A Grid is a slice of cells.
+type Grid []cell
+
+// FillByRow populates cell contents by row.
+func (g Grid) FillByRow(s string) {
+	g.sortByCol()
+	g.fill(s)
+	g.sortByRow()
+}
+
+// FillByCol populates cell contents by column.
+func (g Grid) FillByCol(s string) {
+	g.sortByRow()
+	g.fill(s)
+	g.sortByCol()
+}
 
 // Printable version of this grid.
-func (g grid) printable() string {
-	g2 := make(grid, len(g))
+func (g Grid) Printable() string {
+	g2 := make(Grid, len(g))
 	copy(g2, g)
 
 	g2.sortByRow()
@@ -60,7 +74,7 @@ func (g grid) printable() string {
 }
 
 // Contents of this grid.
-func (g grid) contents() string {
+func (g Grid) Contents() string {
 	var b strings.Builder
 	for _, c := range g {
 		b.WriteRune(c.Rune)
@@ -69,26 +83,15 @@ func (g grid) contents() string {
 }
 
 // Fill a grid with runes.
-func (g grid) fill(s string) {
+func (g Grid) fill(s string) {
 	for i, r := range []rune(s)[:len(g)] {
 		g[i].Rune = r
 	}
 }
 
-// Renumber a grid with the given rail count.
-func (g grid) renumber(k int) {
-	k--
-	for i := range g {
-		g[i].Col = i
-
-		// Cycle length is 2*(rails - 1), or 2*k
-		g[i].Row = k - abs(k-i%(2*k))
-	}
-}
-
 // SortByRow sorts a grid by row.
-func (g grid) sortByRow() {
-	// SliceStable works here with the assumption that cells are sorted by default by column.
+func (g Grid) sortByRow() {
+	// SliceStable works here with the assumption that cells are already sorted by column.
 	// A stable slice isn't required so much as having column values being used as a tiebreaker.
 	// One functional equivalent (in this context) that works with sort.Slice() would be:
 	//
@@ -100,8 +103,14 @@ func (g grid) sortByRow() {
 }
 
 // SortByCol sorts a grid by column.
-func (g grid) sortByCol() {
-	sort.Slice(g, func(i, j int) bool {
+func (g Grid) sortByCol() {
+	// SliceStable works here with the assumption that cells are already sorted by row.
+	// A stable slice isn't required so much as having row values being used as a tiebreaker.
+	// One functional equivalent (in this context) that works with sort.Slice() would be:
+	//
+	//    return (g[i].Col == g[j].Col && g[i].Row < g[j].Row) || g[i].Col < g[j].Col
+	//
+	sort.SliceStable(g, func(i, j int) bool {
 		return g[i].Col < g[j].Col
 	})
 }

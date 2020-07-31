@@ -17,8 +17,11 @@ package masc
 import (
 	"fmt"
 
-	"github.com/merenbach/gold-bug/internal/stringutil"
+	"github.com/merenbach/goldbug/internal/stringutil"
 )
+
+// Alphabet to use by default for substitution ciphers
+const Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 // TODO: worth translating on the fly and memoizing to allow creation with bare struct?
 //       but how would we allow struct updates to propagate to the memoized data?

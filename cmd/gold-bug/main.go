@@ -23,7 +23,7 @@ import (
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/merenbach/gold-bug/internal/api"
+	"github.com/merenbach/goldbug/internal/api"
 )
 
 // Request is of type APIGatewayProxyResponse since we're leveraging the

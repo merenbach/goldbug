@@ -1,0 +1,22 @@
+[
+    {
+        "Input": "HELLO, WORLD!",
+        "Output": "URYYB, JBEYQ!",
+        "Strict": false
+    },
+    {
+        "Input": "HELLO, WORLD!",
+        "Output": "URYYBJBEYQ",
+        "Strict": true
+    },
+    {
+        "Input": "URYYB, JBEYQ!",
+        "Output": "HELLO, WORLD!",
+        "Strict": false
+    },
+    {
+        "Input": "URYYB, JBEYQ!",
+        "Output": "HELLOWORLD",
+        "Strict": true
+    }
+]

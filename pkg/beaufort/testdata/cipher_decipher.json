@@ -1,0 +1,44 @@
+[
+    {
+        "Alphabet": "",
+        "Input": "HYTPZ, SSAPM!",
+        "Output": "HELLO, WORLD!",
+        "Key": "OCEANOGRAPHYWHAT",
+        "Strict": false
+    },
+    {
+        "Alphabet": "",
+        "Input": "HYTPZ, SSAPM!",
+        "Output": "HELLOWORLD",
+        "Key": "OCEANOGRAPHYWHAT",
+        "Strict": true
+    },
+    {
+        "Alphabet": "",
+        "Input": "JMFFC, UCZFN!",
+        "Output": "HELLO, WORLD!",
+        "Key": "Q",
+        "Strict": false
+    },
+    {
+        "Alphabet": "",
+        "Input": "JMFFC, UCZFN!",
+        "Output": "HELLOWORLD",
+        "Key": "Q",
+        "Strict": true
+    },
+    {
+        "Alphabet": "",
+        "Input": "DWCVM, VAXZX!",
+        "Output": "HELLO, WORLD!",
+        "Key": "KANGAROO",
+        "Strict": false
+    },
+    {
+        "Alphabet": "",
+        "Input": "DWCVM, VAXZX!",
+        "Output": "HELLOWORLD",
+        "Key": "KANGAROO",
+        "Strict": true
+    }
+]

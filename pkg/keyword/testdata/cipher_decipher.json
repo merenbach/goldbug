@@ -1,0 +1,30 @@
+[
+    {
+        "Alphabet": "",
+        "Input": "CRHHL, WLQHG!",
+        "Output": "HELLO, WORLD!",
+        "Keyword": "KANGAROO",
+        "Strict": false
+    },
+    {
+        "Alphabet": "",
+        "Input": "CRHHL, WLQHG!",
+        "Output": "HELLOWORLD",
+        "Keyword": "KANGAROO",
+        "Strict": true
+    },
+    {
+        "Alphabet": "",
+        "Input": "HELLO, WORLD!",
+        "Output": "HELLO, WORLD!",
+        "Keyword": "ABC",
+        "Strict": false
+    },
+    {
+        "Alphabet": "",
+        "Input": "HELLO, WORLD!",
+        "Output": "HELLOWORLD",
+        "Keyword": "ABC",
+        "Strict": true
+    }
+]

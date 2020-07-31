@@ -19,7 +19,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/merenbach/gold-bug/internal/stringutil"
+	"github.com/merenbach/goldbug/internal/stringutil"
 )
 
 // TabulaRecta holds a tabula recta.

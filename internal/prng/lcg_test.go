@@ -73,7 +73,6 @@ func TestLCG(t *testing.T) {
 
 	var lcg LCG
 	for _, table := range tables {
-		lcg.Reset()
 		lcg.Modulus = table.m
 		lcg.Multiplier = table.a
 		lcg.Increment = table.c
@@ -88,72 +87,10 @@ func TestLCG(t *testing.T) {
 			}
 		}
 
-		for idx, e := range table.expected {
-			if f := lcg.Next(); e != f {
-				t.Errorf("expected item %d from LCG %+v to equal %d, but got %d instead", idx, lcg, e, f)
-			}
-		}
-
-		if lcg.Counter() != len(table.expected) {
-			t.Errorf("Expected %d outputs, but LCG counter is at %d", len(table.expected), lcg.Counter())
-		}
-	}
-}
-
-func TestLCGCopy(t *testing.T) {
-	tables := []struct {
-		m    int
-		a    int
-		c    int
-		seed int
-	}{
-		{
-			m:    100,
-			a:    17,
-			c:    43,
-			seed: 27,
-		},
-		{
-			m:    64,
-			a:    13,
-			c:    0,
-			seed: 1,
-		},
-		{
-			m:    64,
-			a:    13,
-			c:    0,
-			seed: 2,
-		},
-		{
-			m:    64,
-			a:    13,
-			c:    0,
-			seed: 3,
-		},
-		{
-			m:    64,
-			a:    13,
-			c:    0,
-			seed: 4,
-		},
-	}
-
-	for _, table := range tables {
-		lcg := &LCG{
-			Modulus:    table.m,
-			Multiplier: table.a,
-			Increment:  table.c,
-			Seed:       table.seed,
-		}
-
-		_ = lcg.Next()
-
-		cp := lcg.Copy()
-		_ = cp.Next()
-
-		if !reflect.DeepEqual(lcg, cp) {
-			t.Errorf("Expected %+v to be equal to %+v, but it was not", lcg, cp)
+		if out, err := lcg.Slice(len(table.expected)); err != nil {
+			t.Error("Error:", err)
+		} else if !reflect.DeepEqual(out, table.expected) {
+			t.Errorf("expected LCG %+v to produce values %+v, but got %+v instead", lcg, table.expected, out)
 		}
 	}
 }

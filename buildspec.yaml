@@ -46,7 +46,7 @@ phases:
   build:
     commands:
       # Build our go application
-      - "go build -ldflags='-s -w' -o gold-bug cmd/gold-bug/main.go"
+      - "go build -ldflags='-s -w' -o gold-bug cmd/goldbug/main.go"
       - "go build -ldflags='-s -w' -o preTrafficHook cmd/pretraffichook/main.go"
 
   post_build:

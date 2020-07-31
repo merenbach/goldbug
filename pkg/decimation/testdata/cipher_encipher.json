@@ -1,0 +1,72 @@
+[
+    {
+        "Alphabet": "",
+        "Input": "HELLO, WORLD!",
+        "Output": "HELLO, WORLD!",
+        "Multiplier": 1,
+        "Strict": false
+    },
+    {
+        "Alphabet": "",
+        "Input": "HELLO, WORLD!",
+        "Output": "HELLOWORLD",
+        "Multiplier": 1,
+        "Strict": true
+    },
+    {
+        "Alphabet": "",
+        "Input": "HELLO, WORLD!",
+        "Output": "XCZZU, YUPZV!",
+        "Multiplier": 7,
+        "Strict": false
+    },
+    {
+        "Alphabet": "",
+        "Input": "HELLO, WORLD!",
+        "Output": "XCZZUYUPZV",
+        "Multiplier": 7,
+        "Strict": true
+    },
+    {
+        "Alphabet": "",
+        "Input": "HELLO, WORLD!",
+        "Output": "TWPPM, EMJPX!",
+        "Multiplier": 25,
+        "Strict": false
+    },
+    {
+        "Alphabet": "",
+        "Input": "HELLO, WORLD!",
+        "Output": "TWPPMEMJPX",
+        "Multiplier": 25,
+        "Strict": true
+    },
+    {
+        "Alphabet": "0123456789",
+        "Input": "A12345A",
+        "Output": "A36925A",
+        "Multiplier": 3,
+        "Strict": false
+    },
+    {
+        "Alphabet": "0123456789",
+        "Input": "A12345A",
+        "Output": "36925",
+        "Multiplier": 3,
+        "Strict": true
+    },
+    {
+        "Alphabet": "12345",
+        "Input": "A12345A",
+        "Output": "A14253A",
+        "Multiplier": 3,
+        "Strict": false
+    },
+    {
+        "Alphabet": "12345",
+        "Input": "A12345A",
+        "Output": "14253",
+        "Multiplier": 3,
+        "Strict": true
+    }
+]

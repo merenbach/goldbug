@@ -17,7 +17,7 @@ package prng
 import (
 	"errors"
 
-	"github.com/merenbach/gold-bug/internal/mathutil"
+	"github.com/merenbach/goldbug/internal/mathutil"
 )
 
 // An LCG is a linear congruential generator.
@@ -28,9 +28,6 @@ type LCG struct {
 	Multiplier int // a
 	Increment  int // c
 	Seed       int // X_0
-
-	counter int
-	state   int
 }
 
 // // Lehmer RNG validation.
@@ -49,28 +46,6 @@ func (g *LCG) Copy() *LCG {
 	}
 }
 
-// Reset the state of the generator.
-func (g *LCG) Reset() {
-	g.counter = 0
-}
-
-// Counter of how many numbers have been generated.
-func (g *LCG) Counter() int {
-	return g.counter
-}
-
-// Next item in the generator.
-func (g *LCG) Next() int {
-	if g.counter == 0 {
-		g.state = g.Seed % g.Modulus
-	}
-
-	g.counter++
-	prev := g.state
-	g.state = (g.state*g.Multiplier + g.Increment) % g.Modulus
-	return prev
-}
-
 // HullDobell tests for compliance with the Hull-Dobell theorem.
 // The error parameter, if set, will contain the first-found failing constraint.
 // When c != 0, this test passing means that the cycle is equal to g.multiplier.
@@ -87,7 +62,7 @@ func (g *LCG) HullDobell() error {
 	}
 }
 
-// Iterator returns a linear congruential generator (LCG) function.
+// Iterator across LCG values.
 func (g *LCG) Iterator() (func() int, error) {
 	if g.Modulus == 0 {
 		return nil, errors.New("modulus must be greater than zero")
@@ -102,4 +77,20 @@ func (g *LCG) Iterator() (func() int, error) {
 		state = (state*g.Multiplier + g.Increment) % g.Modulus
 		return prev
 	}, nil
+}
+
+// Slice of LCG values.
+func (g *LCG) Slice(n int) ([]int, error) {
+	iter, err := g.Iterator()
+	if err != nil {
+		return nil, err
+	}
+
+	out := make([]int, n)
+	for i := range out {
+		out[i] = iter()
+		// state = (state*g.Multiplier + g.Increment) % g.Modulus
+	}
+
+	return out, nil
 }

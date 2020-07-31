@@ -21,16 +21,12 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/merenbach/gold-bug/internal/stringutil"
-	"github.com/merenbach/gold-bug/internal/tabularecta"
+	"github.com/merenbach/goldbug/internal/stringutil"
+	"github.com/merenbach/goldbug/internal/tabularecta"
 )
 
-// DefaultAlphabet is the default character set for polyalphabetic substitution ciphers
-const defaultAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-
-// DefaultDigits holds the default digit character set for the Gronsfeld cipher
-// TODO: allow overrides?
-const defaultDigits = "0123456789"
+// Alphabet to use by default for substitution ciphers
+const Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 // A VigenereFamilyCipher represents a cipher in the Vigenere family.
 type VigenereFamilyCipher struct {
@@ -163,55 +159,4 @@ func owrapString(s string, i int) string {
 	}
 	u, v := sRunes[:len(sRunes)/2], sRunes[len(sRunes)/2:]
 	return stringutil.WrapString(string(u), i) + stringutil.WrapString(string(v), len(v)-i)
-}
-
-// NewVigenereCipher creates a new Vigenere cipher.
-func NewVigenereCipher(countersign string, alphabet string) (*VigenereFamilyCipher, error) {
-	if alphabet == "" {
-		alphabet = defaultAlphabet
-	}
-	return NewVigenereFamilyCipher(countersign, alphabet, alphabet, alphabet)
-}
-
-// NewBeaufortCipher creates a new Beaufort cipher.
-func NewBeaufortCipher(countersign string, alphabet string) (*VigenereFamilyCipher, error) {
-	if alphabet == "" {
-		alphabet = defaultAlphabet
-	}
-	revAlphabet := stringutil.Reverse(alphabet)
-	return NewVigenereFamilyCipher(countersign, alphabet, revAlphabet, revAlphabet)
-}
-
-// NewGronsfeldCipher creates a new Gronsfeld cipher.
-func NewGronsfeldCipher(countersign string, alphabet string) (*VigenereFamilyCipher, error) {
-	if alphabet == "" {
-		alphabet = defaultAlphabet
-	}
-	return NewVigenereFamilyCipher(countersign, alphabet, alphabet, defaultDigits)
-}
-
-// NewVariantBeaufortCipher creates a new Vigenere cipher.
-func NewVariantBeaufortCipher(countersign string, alphabet string) (*VigenereFamilyCipher, error) {
-	if alphabet == "" {
-		alphabet = defaultAlphabet
-	}
-	revAlphabet := stringutil.Reverse(alphabet)
-	return NewVigenereFamilyCipher(countersign, revAlphabet, revAlphabet, alphabet)
-}
-
-// NewTrithemiusCipher creates a new Trithemius cipher.
-// NewTrithemiusCipher considers this simply the Vigenere cipher with the countersign equal to the alphabet.
-func NewTrithemiusCipher(alphabet string) (*VigenereFamilyCipher, error) {
-	if alphabet == "" {
-		alphabet = defaultAlphabet
-	}
-	return NewVigenereCipher(alphabet, alphabet)
-}
-
-// NewDellaPortaCipher creates a new DellaPorta cipher.
-func NewDellaPortaCipher(countersign string, alphabet string) (*VigenereFamilyCipher, error) {
-	if alphabet == "" {
-		alphabet = defaultAlphabet
-	}
-	return NewDellaPortaReciprocalTable(countersign, alphabet, alphabet, alphabet)
 }

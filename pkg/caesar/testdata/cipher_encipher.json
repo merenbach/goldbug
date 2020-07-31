@@ -1,0 +1,86 @@
+[
+    {
+        "Alphabet": "",
+        "Input": "HELLO, WORLD!",
+        "Output": "HELLO, WORLD!",
+        "Shift": 0,
+        "Strict": false
+    },
+    {
+        "Alphabet": "",
+        "Input": "HELLO, WORLD!",
+        "Output": "HELLOWORLD",
+        "Shift": 0,
+        "Strict": true
+    },
+    {
+        "Alphabet": "",
+        "Input": "HELLO, WORLD!",
+        "Output": "HELLO, WORLD!",
+        "Shift": 26,
+        "Strict": false
+    },
+    {
+        "Alphabet": "",
+        "Input": "HELLO, WORLD!",
+        "Output": "HELLOWORLD",
+        "Shift": 26,
+        "Strict": true
+    },
+    {
+        "Alphabet": "",
+        "Input": "HELLO, WORLD!",
+        "Output": "KHOOR, ZRUOG!",
+        "Shift": 3,
+        "Strict": false
+    },
+    {
+        "Alphabet": "",
+        "Input": "HELLO, WORLD!",
+        "Output": "KHOORZRUOG",
+        "Shift": 3,
+        "Strict": true
+    },
+    {
+        "Alphabet": "",
+        "Input": "HELLO, WORLD!",
+        "Output": "YVCCF, NFICU!",
+        "Shift": 43,
+        "Strict": false
+    },
+    {
+        "Alphabet": "",
+        "Input": "HELLO, WORLD!",
+        "Output": "YVCCFNFICU",
+        "Shift": 43,
+        "Strict": true
+    },
+    {
+        "Alphabet": "0123456789",
+        "Input": "A12345A",
+        "Output": "A45678A",
+        "Shift": 3,
+        "Strict": false
+    },
+    {
+        "Alphabet": "0123456789",
+        "Input": "A12345A",
+        "Output": "45678",
+        "Shift": 3,
+        "Strict": true
+    },
+    {
+        "Alphabet": "12345",
+        "Input": "A12345A",
+        "Output": "A45123A",
+        "Shift": 3,
+        "Strict": false
+    },
+    {
+        "Alphabet": "12345",
+        "Input": "A12345A",
+        "Output": "45123",
+        "Shift": 3,
+        "Strict": true
+    }
+]

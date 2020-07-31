@@ -51,7 +51,7 @@ func ModInv(a int, m int) int {
 	return x % m
 }
 
-// Coprime tests if two numbers `a` and `b` are relatively prime.
+// Coprime numbers are also called relatively prime.
 // The order of the parameters does not matter.
 func Coprime(a int, b int) bool {
 	return gcd(a, b) == 1

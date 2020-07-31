@@ -17,7 +17,7 @@ package tabularecta
 import (
 	"testing"
 
-	"github.com/merenbach/gold-bug/internal/stringutil"
+	"github.com/merenbach/goldbug/internal/stringutil"
 )
 
 func TestTabulaRecta(t *testing.T) {

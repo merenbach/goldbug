@@ -18,8 +18,18 @@ import (
 	"encoding/json"
 	"errors"
 
-	"github.com/merenbach/gold-bug/internal/masc"
-	"github.com/merenbach/gold-bug/internal/pasc"
+	"github.com/merenbach/goldbug/pkg/affine"
+	"github.com/merenbach/goldbug/pkg/atbash"
+	"github.com/merenbach/goldbug/pkg/beaufort"
+	"github.com/merenbach/goldbug/pkg/caesar"
+	"github.com/merenbach/goldbug/pkg/decimation"
+	"github.com/merenbach/goldbug/pkg/dellaporta"
+	"github.com/merenbach/goldbug/pkg/gronsfeld"
+	"github.com/merenbach/goldbug/pkg/keyword"
+	"github.com/merenbach/goldbug/pkg/rot13"
+	"github.com/merenbach/goldbug/pkg/trithemius"
+	"github.com/merenbach/goldbug/pkg/variantbeaufort"
+	"github.com/merenbach/goldbug/pkg/vigenere"
 )
 
 // MascBaseConfig is a base configuration for a monoalphabetic substitution cipher operation
@@ -47,16 +57,17 @@ func Affine(s string) (string, error) {
 		return "", err
 	}
 
-	c, err := masc.NewAffineCipher(payload.Alphabet, payload.Multiplier, payload.Shift)
-	if err != nil {
-		return "", err
+	c := affine.Cipher{
+		Alphabet:  payload.Alphabet,
+		Slope:     payload.Multiplier,
+		Intercept: payload.Shift,
+		Strict:    payload.Strict,
 	}
 
-	c.Strict = payload.Strict
 	if payload.Reverse {
-		return c.DecipherString(payload.Message)
+		return c.Decipher(payload.Message)
 	}
-	return c.EncipherString(payload.Message)
+	return c.Encipher(payload.Message)
 }
 
 // Atbash cipher processing
@@ -68,16 +79,15 @@ func Atbash(s string) (string, error) {
 		return "", err
 	}
 
-	c, err := masc.NewAtbashCipher(payload.Alphabet)
-	if err != nil {
-		return "", err
+	c := atbash.Cipher{
+		Alphabet: payload.Alphabet,
+		Strict:   payload.Strict,
 	}
 
-	c.Strict = payload.Strict
 	if payload.Reverse {
-		return c.DecipherString(payload.Message)
+		return c.Decipher(payload.Message)
 	}
-	return c.EncipherString(payload.Message)
+	return c.Encipher(payload.Message)
 }
 
 // Caesar cipher processing
@@ -90,16 +100,16 @@ func Caesar(s string) (string, error) {
 		return "", err
 	}
 
-	c, err := masc.NewCaesarCipher(payload.Alphabet, payload.Shift)
-	if err != nil {
-		return "", err
+	c := caesar.Cipher{
+		Alphabet: payload.Alphabet,
+		Shift:    payload.Shift,
+		Strict:   payload.Strict,
 	}
 
-	c.Strict = payload.Strict
 	if payload.Reverse {
-		return c.DecipherString(payload.Message)
+		return c.Decipher(payload.Message)
 	}
-	return c.EncipherString(payload.Message)
+	return c.Encipher(payload.Message)
 }
 
 // Decimation cipher processing
@@ -112,16 +122,16 @@ func Decimation(s string) (string, error) {
 		return "", err
 	}
 
-	c, err := masc.NewDecimationCipher(payload.Alphabet, payload.Multiplier)
-	if err != nil {
-		return "", err
+	c := decimation.Cipher{
+		Alphabet:   payload.Alphabet,
+		Multiplier: payload.Multiplier,
+		Strict:     payload.Strict,
 	}
 
-	c.Strict = payload.Strict
 	if payload.Reverse {
-		return c.DecipherString(payload.Message)
+		return c.Decipher(payload.Message)
 	}
-	return c.EncipherString(payload.Message)
+	return c.Encipher(payload.Message)
 }
 
 // Keyword cipher processing
@@ -133,16 +143,16 @@ func Keyword(s string) (string, error) {
 	if err := json.Unmarshal([]byte(s), &payload); err != nil {
 		return "", err
 	}
-	c, err := masc.NewKeywordCipher(payload.Alphabet, payload.Keyword)
-	if err != nil {
-		return "", err
+	c := keyword.Cipher{
+		Alphabet: payload.Alphabet,
+		Keyword:  payload.Keyword,
+		Strict:   payload.Strict,
 	}
 
-	c.Strict = payload.Strict
 	if payload.Reverse {
-		return c.DecipherString(payload.Message)
+		return c.Decipher(payload.Message)
 	}
-	return c.EncipherString(payload.Message)
+	return c.Encipher(payload.Message)
 }
 
 // Rot13 cipher processing
@@ -154,16 +164,12 @@ func Rot13(s string) (string, error) {
 		return "", err
 	}
 
-	c, err := masc.NewRot13Cipher(payload.Alphabet)
-	if err != nil {
-		return "", err
-	}
+	c := rot13.Cipher{}
 
-	c.Strict = payload.Strict
 	if payload.Reverse {
-		return c.DecipherString(payload.Message)
+		return c.Decipher(payload.Message)
 	}
-	return c.EncipherString(payload.Message)
+	return c.Encipher(payload.Message)
 }
 
 // Vigenere cipher processing
@@ -181,18 +187,22 @@ func Vigenere(s string) (string, error) {
 		return "", errors.New("Text autoclave and key autoclave are mutually exclusive")
 	}
 
-	c, err := pasc.NewVigenereCipher(payload.Countersign, payload.Alphabet)
-	if err != nil {
-		return "", err
+	c := vigenere.Cipher{
+		Alphabet: payload.Alphabet,
+		Key:      payload.Countersign,
+		Strict:   payload.Strict,
 	}
 
-	c.TextAutoclave = payload.TextAutoclave
-	c.KeyAutoclave = payload.KeyAutoclave
-	c.Strict = payload.Strict
-	if payload.Reverse {
-		return c.DecipherString(payload.Message), nil
+	if payload.TextAutoclave {
+		c.Autokey = vigenere.TextAutokey
+	} else if payload.KeyAutoclave {
+		c.Autokey = vigenere.KeyAutokey
 	}
-	return c.EncipherString(payload.Message), nil
+
+	if payload.Reverse {
+		return c.Decipher(payload.Message)
+	}
+	return c.Encipher(payload.Message)
 }
 
 // Beaufort cipher processing
@@ -204,16 +214,16 @@ func Beaufort(s string) (string, error) {
 		return "", err
 	}
 
-	c, err := pasc.NewBeaufortCipher(payload.Countersign, payload.Alphabet)
-	if err != nil {
-		return "", err
+	c := beaufort.Cipher{
+		Alphabet: payload.Alphabet,
+		Key:      payload.Countersign,
+		Strict:   payload.Strict,
 	}
 
-	c.Strict = payload.Strict
 	if payload.Reverse {
-		return c.DecipherString(payload.Message), nil
+		return c.Decipher(payload.Message)
 	}
-	return c.EncipherString(payload.Message), nil
+	return c.Encipher(payload.Message)
 }
 
 // DellaPorta cipher processing
@@ -225,16 +235,16 @@ func DellaPorta(s string) (string, error) {
 		return "", err
 	}
 
-	c, err := pasc.NewDellaPortaCipher(payload.Countersign, payload.Alphabet)
-	if err != nil {
-		return "", err
+	c := dellaporta.Cipher{
+		Alphabet: payload.Alphabet,
+		Key:      payload.Countersign,
+		Strict:   payload.Strict,
 	}
 
-	c.Strict = payload.Strict
 	if payload.Reverse {
-		return c.DecipherString(payload.Message), nil
+		return c.Decipher(payload.Message)
 	}
-	return c.EncipherString(payload.Message), nil
+	return c.Encipher(payload.Message)
 }
 
 // Gronsfeld cipher processing
@@ -246,16 +256,16 @@ func Gronsfeld(s string) (string, error) {
 		return "", err
 	}
 
-	c, err := pasc.NewGronsfeldCipher(payload.Countersign, payload.Alphabet)
-	if err != nil {
-		return "", err
+	c := gronsfeld.Cipher{
+		Alphabet: payload.Alphabet,
+		Key:      payload.Countersign,
+		Strict:   payload.Strict,
 	}
 
-	c.Strict = payload.Strict
 	if payload.Reverse {
-		return c.DecipherString(payload.Message), nil
+		return c.Decipher(payload.Message)
 	}
-	return c.EncipherString(payload.Message), nil
+	return c.Encipher(payload.Message)
 }
 
 // Trithemius cipher processing
@@ -267,16 +277,15 @@ func Trithemius(s string) (string, error) {
 		return "", err
 	}
 
-	c, err := pasc.NewTrithemiusCipher(payload.Alphabet)
-	if err != nil {
-		return "", err
+	c := trithemius.Cipher{
+		Alphabet: payload.Alphabet,
+		Strict:   payload.Strict,
 	}
 
-	c.Strict = payload.Strict
 	if payload.Reverse {
-		return c.DecipherString(payload.Message), nil
+		return c.Decipher(payload.Message)
 	}
-	return c.EncipherString(payload.Message), nil
+	return c.Encipher(payload.Message)
 }
 
 // VariantBeaufort cipher processing
@@ -288,14 +297,14 @@ func VariantBeaufort(s string) (string, error) {
 		return "", err
 	}
 
-	c, err := pasc.NewVariantBeaufortCipher(payload.Countersign, payload.Alphabet)
-	if err != nil {
-		return "", err
+	c := variantbeaufort.Cipher{
+		Alphabet: payload.Alphabet,
+		Key:      payload.Countersign,
+		Strict:   payload.Strict,
 	}
 
-	c.Strict = payload.Strict
 	if payload.Reverse {
-		return c.DecipherString(payload.Message), nil
+		return c.Decipher(payload.Message)
 	}
-	return c.EncipherString(payload.Message), nil
+	return c.Encipher(payload.Message)
 }
