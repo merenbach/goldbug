@@ -102,6 +102,7 @@ func groupString(s string, size int, padding rune) []string {
 // WrapString will error out if the provided offset is negative.
 func WrapString(s string, i int) string {
 	// if we simply `return s[i:] + s[:i]`, we're operating on bytes, not runes
+	// When adapting for slices in the input, remember to copy so as to not modify the original
 	rr := []rune(s)
 	return string(append(rr[i:], rr[:i]...))
 	// return string(rr[i:]) + string(rr[:i])
