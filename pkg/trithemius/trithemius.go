@@ -14,7 +14,9 @@
 
 package trithemius
 
-import "github.com/merenbach/goldbug/internal/pasc"
+import (
+	"github.com/merenbach/goldbug/internal/pasc"
+)
 
 // Cipher implements a Trithemius cipher.
 type Cipher struct {
@@ -22,44 +24,43 @@ type Cipher struct {
 	Strict   bool
 }
 
-// NewCipher creates and configures a new Trithemius cipher.
-// NewCipher considers this simply the Vigenere cipher with the countersign equal to the alphabet.
-func newCipher(alphabet string) (*pasc.VigenereFamilyCipher, error) {
+func (c *Cipher) tabularecta() (*pasc.TabulaRecta, error) {
+	alphabet := c.Alphabet
 	if alphabet == "" {
 		alphabet = pasc.Alphabet
 	}
-	return pasc.NewVigenereFamilyCipher(alphabet, alphabet, alphabet, alphabet)
+
+	return &pasc.TabulaRecta{
+		PtAlphabet:  alphabet,
+		CtAlphabet:  alphabet,
+		KeyAlphabet: alphabet,
+		Strict:      c.Strict,
+	}, nil
 }
 
 // Encipher a message.
 func (c *Cipher) Encipher(s string) (string, error) {
-	c2, err := newCipher(c.Alphabet)
+	t, err := c.tabularecta()
 	if err != nil {
 		return "", err
 	}
-
-	c2.Strict = c.Strict
-	return c2.EncipherString(s), nil
+	return t.Encipher(s, t.KeyAlphabet, nil)
 }
 
 // Decipher a message.
 func (c *Cipher) Decipher(s string) (string, error) {
-	c2, err := newCipher(c.Alphabet)
+	t, err := c.tabularecta()
 	if err != nil {
 		return "", err
 	}
-
-	c2.Strict = c.Strict
-	return c2.DecipherString(s), nil
+	return t.Decipher(s, t.KeyAlphabet, nil)
 }
 
 // Tableau for encipherment and decipherment.
 func (c *Cipher) tableau() (string, error) {
-	c2, err := newCipher(c.Alphabet)
+	t, err := c.tabularecta()
 	if err != nil {
 		return "", err
 	}
-
-	c2.Strict = c.Strict
-	return c2.Printable(), nil
+	return t.Printable()
 }

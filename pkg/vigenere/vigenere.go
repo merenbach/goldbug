@@ -32,17 +32,6 @@ const (
 	KeyAutokey
 )
 
-func autokeyOptionFromString(s string) autokeyOption {
-	switch s {
-	case "TextAutokey":
-		return TextAutokey
-	case "KeyAutokey":
-		return KeyAutokey
-	default:
-		return NoAutokey
-	}
-}
-
 // Cipher implements a Vigenere cipher.
 type Cipher struct {
 	Alphabet string
@@ -51,55 +40,59 @@ type Cipher struct {
 	Strict   bool
 }
 
-// NewCipher creates a new Vigenere cipher.
-func newCipher(countersign string, alphabet string) (*pasc.VigenereFamilyCipher, error) {
+func (c *Cipher) tabularecta() (*pasc.TabulaRecta, error) {
+	alphabet := c.Alphabet
 	if alphabet == "" {
 		alphabet = pasc.Alphabet
 	}
-	return pasc.NewVigenereFamilyCipher(countersign, alphabet, alphabet, alphabet)
+
+	return &pasc.TabulaRecta{
+		PtAlphabet:  alphabet,
+		CtAlphabet:  alphabet,
+		KeyAlphabet: alphabet,
+		Strict:      c.Strict,
+	}, nil
 }
 
 // Encipher a message.
 func (c *Cipher) Encipher(s string) (string, error) {
-	c2, err := newCipher(c.Key, c.Alphabet)
+	t, err := c.tabularecta()
 	if err != nil {
 		return "", err
 	}
-
-	c2.Strict = c.Strict
-	switch c.Autokey {
-	case TextAutokey:
-		c2.TextAutoclave = true
-	case KeyAutokey:
-		c2.KeyAutoclave = true
-	}
-	return c2.EncipherString(s), nil
+	return t.Encipher(s, c.Key, func(original rune, translated rune) rune {
+		switch c.Autokey {
+		case TextAutokey:
+			return original
+		case KeyAutokey:
+			return translated
+		}
+		return (-1)
+	})
 }
 
 // Decipher a message.
 func (c *Cipher) Decipher(s string) (string, error) {
-	c2, err := newCipher(c.Key, c.Alphabet)
+	t, err := c.tabularecta()
 	if err != nil {
 		return "", err
 	}
-
-	c2.Strict = c.Strict
-	switch c.Autokey {
-	case TextAutokey:
-		c2.TextAutoclave = true
-	case KeyAutokey:
-		c2.KeyAutoclave = true
-	}
-	return c2.DecipherString(s), nil
+	return t.Decipher(s, c.Key, func(original rune, translated rune) rune {
+		switch c.Autokey {
+		case TextAutokey:
+			return translated
+		case KeyAutokey:
+			return original
+		}
+		return (-1)
+	})
 }
 
 // Tableau for encipherment and decipherment.
 func (c *Cipher) tableau() (string, error) {
-	c2, err := newCipher(c.Key, c.Alphabet)
+	t, err := c.tabularecta()
 	if err != nil {
 		return "", err
 	}
-
-	c2.Strict = c.Strict
-	return c2.Printable(), nil
+	return t.Printable()
 }

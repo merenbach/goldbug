@@ -15,10 +15,12 @@
 package affine
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"unicode/utf8"
 
+	"github.com/merenbach/goldbug/internal/mathutil"
 	"github.com/merenbach/goldbug/internal/prng"
 )
 
@@ -39,29 +41,27 @@ func backpermute(s string, ii []int) (string, error) {
 	return string(out), nil
 }
 
-// AffineTransform applies an transform to a string.
-func affineTransform(s string, multiply int, add int) (string, error) {
+// Transform a string according to an affine equation.
+func transform(s string, slope int, intercept int) (string, error) {
 	m := utf8.RuneCountInString(s)
 
-	for multiply < 0 {
-		multiply += m
+	for slope < 0 {
+		slope += m
 	}
-	for add < 0 {
-		add += m
+	for intercept < 0 {
+		intercept += m
+	}
+
+	if !mathutil.Coprime(m, slope) {
+		return "", errors.New("Slope and string length must be coprime")
 	}
 
 	lcg := &prng.LCG{
 		Modulus:    m,
 		Multiplier: 1,
-		Increment:  multiply,
-		Seed:       add,
+		Increment:  slope,
+		Seed:       intercept,
 	}
-
-	// TODO: consider using Hull-Dobell satisfaction to determine if `a` is valid (must be coprime with `m`)
-	// if err := lcg.HullDobell(); err != nil {
-	// 	log.Println("LCG values don't satisfy Hull-Dobell theorem")
-	// 	return "", err
-	// }
 
 	positions, err := lcg.Slice(m)
 	if err != nil {

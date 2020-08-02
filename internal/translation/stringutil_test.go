@@ -1,4 +1,4 @@
-// Copyright 2018 Andrew Merenbach
+// Copyright 2020 Andrew Merenbach
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,75 +12,63 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package keyword
+package translation
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"path/filepath"
+	"reflect"
 	"testing"
 )
 
-func TestCipher_Encipher(t *testing.T) {
-	testdata, err := ioutil.ReadFile(filepath.Join("testdata", "cipher_encipher.json"))
+func TestMakeMap(t *testing.T) {
+	testdata, err := ioutil.ReadFile(filepath.Join("testdata", "makemap.json"))
 	if err != nil {
 		t.Fatal("Could not read testdata fixture:", err)
 	}
 
 	var tables []struct {
-		Cipher
-
-		Input  string
-		Output string
+		Src string
+		Dst string
+		Del string
+		Map map[rune]rune
 	}
 	if err := json.Unmarshal(testdata, &tables); err != nil {
 		t.Fatal("Could not unmarshal testdata:", err)
 	}
 
 	for _, table := range tables {
-		if out, err := table.Encipher(table.Input); err != nil {
-			t.Error("Could not encipher:", err)
-		} else if out != table.Output {
-			t.Errorf("Expected %q to encipher to %q, but instead got %q", table.Input, table.Output, out)
+		m, err := makeMap(table.Src, table.Dst, table.Del)
+		if err != nil {
+			t.Error("Error:", err)
+		}
+		if !reflect.DeepEqual(m, table.Map) {
+			t.Errorf("Got %+v instead of %+v", m, table.Map)
 		}
 	}
 }
 
-func TestCipher_Decipher(t *testing.T) {
-	testdata, err := ioutil.ReadFile(filepath.Join("testdata", "cipher_decipher.json"))
+func TestTranslate(t *testing.T) {
+	testdata, err := ioutil.ReadFile(filepath.Join("testdata", "translate.json"))
 	if err != nil {
 		t.Fatal("Could not read testdata fixture:", err)
 	}
 
 	var tables []struct {
-		Cipher
-
 		Input  string
 		Output string
+		Strict bool
+		Map    map[rune]rune
 	}
 	if err := json.Unmarshal(testdata, &tables); err != nil {
 		t.Fatal("Could not unmarshal testdata:", err)
 	}
 
 	for _, table := range tables {
-		if out, err := table.Decipher(table.Input); err != nil {
-			t.Error("Could not decipher:", err)
-		} else if out != table.Output {
-			t.Errorf("Expected %q to decipher to %q, but instead got %q", table.Input, table.Output, out)
+		o := translate(table.Input, table.Map, table.Strict)
+		if o != table.Output {
+			t.Errorf("Expected %q, but got %q instead", table.Output, o)
 		}
 	}
-}
-
-func ExampleCipher_Tableau() {
-	c := Cipher{Keyword: "CIPHER"}
-	out, err := c.Tableau()
-	if err != nil {
-		fmt.Println("Error:", err)
-	}
-	fmt.Println(out)
-
-	// Output:
-	// PT: ABCDEFGHIJKLMNOPQRSTUVWXYZ
-	// CT: CIPHERABDFGJKLMNOQSTUVWXYZ
 }

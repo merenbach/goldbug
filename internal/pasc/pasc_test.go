@@ -14,33 +14,35 @@
 
 package pasc
 
-import (
-	"testing"
-)
+// const defaultPolyalphabeticAlphabet = Alphabet
 
-const defaultPolyalphabeticAlphabet = Alphabet
-
-func runPolyalphabeticEncipherTest(t *testing.T, input string, expected string, c *VigenereFamilyCipher) {
-	output := c.EncipherString(input)
-	if output != expected {
-		t.Errorf("ciphertext %q for input %q was incorrect; wanted %q", output, input, expected)
-	}
-}
-
-func runPolyalphabeticDecipherTest(t *testing.T, input string, expected string, c *VigenereFamilyCipher) {
-	output := c.DecipherString(input)
-	if output != expected {
-		t.Errorf("plaintext %q for input %q was incorrect; wanted: %q", output, input, expected)
-	}
-}
-
-// func runPolyalphabeticReciprocalTests(t *testing.T, plaintext, ciphertext string, c VigenereFamilyCipher, strict bool) {
-// 	encrypted := c.EncipherString(plaintext, strict)
-// 	decrypted := c.DecipherString(ciphertext, strict)
-// 	if string(encrypted) != ciphertext {
-// 		t.Errorf("ciphertext %q was incorrect; wanted %q", encrypted, ciphertext)
+// func runPolyalphabeticEncipherTest(t *testing.T, input string, key string, expected string, c *VigenereFamilyCipher) {
+// 	output, err := c.EncipherString(input, key)
+// 	if err != nil {
+// 		t.Error("Error:", err)
 // 	}
-// 	if string(decrypted) != plaintext {
-// 		t.Errorf("plaintext %q was incorrect; wanted: %q", decrypted, plaintext)
+// 	if output != expected {
+// 		t.Errorf("ciphertext %q for input %q was incorrect; wanted %q", output, input, expected)
 // 	}
 // }
+
+// func runPolyalphabeticDecipherTest(t *testing.T, input string, key string, expected string, c *VigenereFamilyCipher) {
+// 	output, err := c.DecipherString(input, key)
+// 	if err != nil {
+// 		t.Error("Error:", err)
+// 	}
+// 	if output != expected {
+// 		t.Errorf("plaintext %q for input %q was incorrect; wanted: %q", output, input, expected)
+// 	}
+// }
+
+// // func runPolyalphabeticReciprocalTests(t *testing.T, plaintext, ciphertext string, c VigenereFamilyCipher, strict bool) {
+// // 	encrypted := c.EncipherString(plaintext, strict)
+// // 	decrypted := c.DecipherString(ciphertext, strict)
+// // 	if string(encrypted) != ciphertext {
+// // 		t.Errorf("ciphertext %q was incorrect; wanted %q", encrypted, ciphertext)
+// // 	}
+// // 	if string(decrypted) != plaintext {
+// // 		t.Errorf("plaintext %q was incorrect; wanted: %q", decrypted, plaintext)
+// // 	}
+// // }

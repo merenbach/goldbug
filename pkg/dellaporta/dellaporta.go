@@ -15,7 +15,11 @@
 package dellaporta
 
 import (
+	"errors"
+	"unicode/utf8"
+
 	"github.com/merenbach/goldbug/internal/pasc"
+	"github.com/merenbach/goldbug/internal/stringutil"
 )
 
 // Cipher implements a Della Porta cipher.
@@ -25,43 +29,71 @@ type Cipher struct {
 	Strict   bool
 }
 
-// NewCipher creates a new DellaPorta cipher.
-func newCipher(countersign string, alphabet string) (*pasc.VigenereFamilyCipher, error) {
+// owrapString wraps two halves of a string in opposite directions, like gears turning outward.
+// owrapString will panic if the provided offset is negative.
+func owrapString(s string, i int) string {
+	// if we simply `return s[i:] + s[:i]`, we're operating on bytes, not runes
+	sRunes := []rune(s)
+	if len(sRunes)%2 != 0 {
+		panic("owrapString sequence length must be divisible by two")
+	}
+	u, v := sRunes[:len(sRunes)/2], sRunes[len(sRunes)/2:]
+	return stringutil.WrapString(string(u), i) + stringutil.WrapString(string(v), len(v)-i)
+}
+
+func (c *Cipher) reciprocaltable() (*pasc.ReciprocalTable, error) {
+	alphabet := c.Alphabet
 	if alphabet == "" {
 		alphabet = pasc.Alphabet
 	}
-	return pasc.NewDellaPortaReciprocalTable(countersign, alphabet, alphabet, alphabet)
+
+	ptAlphabet, ctAlphabet, keyAlphabet := alphabet, alphabet, alphabet
+
+	keyRunes := []rune(keyAlphabet)
+	ctAlphabets := make([]string, len(keyRunes))
+
+	if utf8.RuneCountInString(ctAlphabet)%2 != 0 {
+		return nil, errors.New("Della Porta cipher alphabets must have even length")
+	}
+	ctAlphabetWrapped := stringutil.WrapString(ctAlphabet, utf8.RuneCountInString(ctAlphabet)/2)
+
+	for i := range keyRunes {
+		ctAlphabets[i] = owrapString(ctAlphabetWrapped, i/2)
+	}
+
+	tr := pasc.ReciprocalTable{
+		PtAlphabet:  ptAlphabet,
+		KeyAlphabet: keyAlphabet,
+		CtAlphabets: ctAlphabets,
+		Strict:      c.Strict,
+	}
+
+	return &tr, nil
 }
 
 // Encipher a message.
 func (c *Cipher) Encipher(s string) (string, error) {
-	c2, err := newCipher(c.Key, c.Alphabet)
+	t, err := c.reciprocaltable()
 	if err != nil {
 		return "", err
 	}
-
-	c2.Strict = c.Strict
-	return c2.EncipherString(s), nil
+	return t.Encipher(s, c.Key, nil)
 }
 
 // Decipher a message.
 func (c *Cipher) Decipher(s string) (string, error) {
-	c2, err := newCipher(c.Key, c.Alphabet)
+	t, err := c.reciprocaltable()
 	if err != nil {
 		return "", err
 	}
-
-	c2.Strict = c.Strict
-	return c2.DecipherString(s), nil
+	return t.Decipher(s, c.Key, nil)
 }
 
 // Tableau for encipherment and decipherment.
 func (c *Cipher) tableau() (string, error) {
-	c2, err := newCipher(c.Key, c.Alphabet)
+	t, err := c.reciprocaltable()
 	if err != nil {
 		return "", err
 	}
-
-	c2.Strict = c.Strict
-	return c2.Printable(), nil
+	return t.Printable()
 }

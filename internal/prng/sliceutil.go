@@ -1,4 +1,4 @@
-// Copyright 2018 Andrew Merenbach
+// Copyright 2019 Andrew Merenbach
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,9 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package pasc
+package prng
 
-// Polyalphabetic substitution ciphers
-
-// Alphabet to use by default for substitution ciphers
-const Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+// Take a slice of integers from a generating function.
+func take(n int, f func() int) []int {
+	out := make([]int, n)
+	for i := range out {
+		out[i] = f()
+	}
+	return out
+}

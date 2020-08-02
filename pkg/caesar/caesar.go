@@ -14,9 +14,7 @@
 
 package caesar
 
-import (
-	"github.com/merenbach/goldbug/pkg/affine"
-)
+import "github.com/merenbach/goldbug/pkg/affine"
 
 // Slope for the affine cipher.
 const slope = 1

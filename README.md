@@ -22,8 +22,8 @@ Instantiate your deployment pipeline as follows, adapting as necessary the param
 
 ## TODO
 
-* Recombine pkg contents into masc/pasc packages again since there is interdependence?
 * MASC casing preservation/normalization?
 * Account for decimation/affine/atbash mod/mod-inv issues regarding alphabet length, key values--add coprime tests
 * Add shift and directionality to Trithemius?
 * Nulls for rail fence?
+* Add keyed vigenere (Quagmire IV)

@@ -88,7 +88,7 @@ func TestCipher_Decipher(t *testing.T) {
 	}
 }
 
-func ExampleCipher_tableau() {
+func ExampleCipher_Tableau() {
 	c := Cipher{Slope: 7, Intercept: 3}
 	out, err := c.Tableau()
 	if err != nil {

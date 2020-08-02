@@ -26,44 +26,44 @@ type Cipher struct {
 	Strict   bool
 }
 
-// NewCipher creates a new Beaufort cipher.
-func newCipher(countersign string, alphabet string) (*pasc.VigenereFamilyCipher, error) {
+func (c *Cipher) tabularecta() (*pasc.TabulaRecta, error) {
+	alphabet := c.Alphabet
 	if alphabet == "" {
 		alphabet = pasc.Alphabet
 	}
 	revAlphabet := stringutil.Reverse(alphabet)
-	return pasc.NewVigenereFamilyCipher(countersign, alphabet, revAlphabet, revAlphabet)
+
+	return &pasc.TabulaRecta{
+		PtAlphabet:  alphabet,
+		CtAlphabet:  revAlphabet,
+		KeyAlphabet: revAlphabet,
+		Strict:      c.Strict,
+	}, nil
 }
 
 // Encipher a message.
 func (c *Cipher) Encipher(s string) (string, error) {
-	c2, err := newCipher(c.Key, c.Alphabet)
+	t, err := c.tabularecta()
 	if err != nil {
 		return "", err
 	}
-
-	c2.Strict = c.Strict
-	return c2.EncipherString(s), nil
+	return t.Encipher(s, c.Key, nil)
 }
 
 // Decipher a message.
 func (c *Cipher) Decipher(s string) (string, error) {
-	c2, err := newCipher(c.Key, c.Alphabet)
+	t, err := c.tabularecta()
 	if err != nil {
 		return "", err
 	}
-
-	c2.Strict = c.Strict
-	return c2.DecipherString(s), nil
+	return t.Decipher(s, c.Key, nil)
 }
 
 // Tableau for encipherment and decipherment.
 func (c *Cipher) tableau() (string, error) {
-	c2, err := newCipher(c.Key, c.Alphabet)
+	t, err := c.tabularecta()
 	if err != nil {
 		return "", err
 	}
-
-	c2.Strict = c.Strict
-	return c2.Printable(), nil
+	return t.Printable()
 }

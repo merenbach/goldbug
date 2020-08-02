@@ -15,7 +15,6 @@
 package stringutil
 
 import (
-	"errors"
 	"sort"
 	"strings"
 	"unicode/utf8"
@@ -106,51 +105,4 @@ func WrapString(s string, i int) string {
 	rr := []rune(s)
 	return string(append(rr[i:], rr[:i]...))
 	// return string(rr[i:]) + string(rr[:i])
-}
-
-// MakeTranslationTable creates a translation table with source and destination runes, plus optional set of runes to delete.
-// MakeTranslationTable is meant in spirit to simulate the Python `str.maketrans` function.
-func makeTranslationTable(src []rune, dst []rune, del []rune) (map[rune]rune, error) {
-	if len(src) != len(dst) {
-		return nil, errors.New("The first two arguments must have equal length")
-	}
-
-	t := make(map[rune]rune, len(src))
-
-	// Translate from A to B
-	// Indexing here should be safe because of length check above
-	for i, r := range src {
-		t[r] = dst[i]
-	}
-
-	// Mark C for deletion
-	for _, r := range del {
-		t[r] = (-1)
-	}
-
-	return t, nil
-}
-
-// MakeTranslationTable creates a translation table with source and destination runes, plus optional set of runes to delete.
-// MakeTranslationTable requires all args. The `del` arg may be an empty string.
-// MakeTranslationTable is meant in spirit to simulate the Python `str.maketrans` function.
-func MakeTranslationTable(src string, dst string, del string) (map[rune]rune, error) {
-	return makeTranslationTable([]rune(src), []rune(dst), []rune(del))
-}
-
-// Translate a string based on a map of runes.
-// Translate returns non-transcodable runes as-is without strict mode.
-// Translate will remove any runes that explicitly map to (-1).
-func Translate(s string, m map[rune]rune, strict bool) string {
-	return strings.Map(func(r rune) rune {
-		if o, ok := m[r]; ok {
-			// Rune found
-			return o
-		} else if !strict {
-			// Rune not found and strict mode off
-			return r
-		}
-		// Rune not found and strict mode on
-		return (-1)
-	}, s)
 }

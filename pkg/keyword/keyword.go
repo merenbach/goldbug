@@ -15,10 +15,12 @@
 package keyword
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/merenbach/goldbug/internal/masc"
 	"github.com/merenbach/goldbug/internal/stringutil"
+	"github.com/merenbach/goldbug/internal/translation"
 )
 
 // Cipher implements a keyword cipher.
@@ -28,45 +30,53 @@ type Cipher struct {
 	Strict   bool
 }
 
-// NewCipher creates a new keyword cipher.
-// NewCipher currently doesn't return any errors, but returns the error argument for shape consistency.
-func newCipher(ptAlphabet string, keyword string) (*masc.MonoalphabeticSubstitutionCipher, error) {
+func (c *Cipher) alphabets() (string, string, error) {
+	ptAlphabet := c.Alphabet
 	if ptAlphabet == "" {
 		ptAlphabet = masc.Alphabet
 	}
-
-	ctAlphabet := stringutil.Deduplicate(keyword + ptAlphabet)
-	return masc.New(ptAlphabet, ctAlphabet)
+	ctAlphabet := stringutil.Deduplicate(c.Keyword + ptAlphabet)
+	return ptAlphabet, ctAlphabet, nil
 }
 
 // Encipher a message.
 func (c *Cipher) Encipher(s string) (string, error) {
-	c2, err := newCipher(c.Alphabet, c.Keyword)
+	ptAlphabet, ctAlphabet, err := c.alphabets()
 	if err != nil {
-		log.Println("Couldn't create cipher")
+		log.Println("Could not calculate alphabets")
 		return "", err
 	}
-	c2.Strict = c.Strict
-	return c2.EncipherString(s)
+
+	table := translation.Table{
+		Src:    ptAlphabet,
+		Dst:    ctAlphabet,
+		Strict: c.Strict,
+	}
+	return table.Translate(s)
 }
 
 // Decipher a message.
 func (c *Cipher) Decipher(s string) (string, error) {
-	c2, err := newCipher(c.Alphabet, c.Keyword)
+	ptAlphabet, ctAlphabet, err := c.alphabets()
 	if err != nil {
-		log.Println("Couldn't create cipher")
+		log.Println("Could not calculate alphabets")
 		return "", err
 	}
-	c2.Strict = c.Strict
-	return c2.DecipherString(s)
+
+	table := translation.Table{
+		Src:    ctAlphabet,
+		Dst:    ptAlphabet,
+		Strict: c.Strict,
+	}
+	return table.Translate(s)
 }
 
-// Tableau for encipherment and decipherment.
-func (c *Cipher) tableau() (string, error) {
-	c2, err := newCipher(c.Alphabet, c.Keyword)
+// Tableau for this cipher.
+func (c *Cipher) Tableau() (string, error) {
+	ptAlphabet, ctAlphabet, err := c.alphabets()
 	if err != nil {
-		log.Println("Couldn't create cipher")
+		log.Println("Could not calculate alphabets")
 		return "", err
 	}
-	return c2.Printable(), nil
+	return fmt.Sprintf("PT: %s\nCT: %s", ptAlphabet, ctAlphabet), nil
 }

@@ -29,23 +29,17 @@ func TestCipher_Encipher(t *testing.T) {
 	}
 
 	var tables []struct {
-		Alphabet string
-		Input    string
-		Key      string
-		Output   string
-		Strict   bool
+		Cipher
+
+		Input  string
+		Output string
 	}
 	if err := json.Unmarshal(testdata, &tables); err != nil {
 		t.Fatal("Could not unmarshal testdata:", err)
 	}
 
 	for _, table := range tables {
-		c := Cipher{
-			Alphabet: table.Alphabet,
-			Key:      table.Key,
-			Strict:   table.Strict,
-		}
-		if out, err := c.Encipher(table.Input); err != nil {
+		if out, err := table.Encipher(table.Input); err != nil {
 			t.Error("Could not encipher:", err)
 		} else if out != table.Output {
 			t.Errorf("Expected %q to encipher to %q, but instead got %q", table.Input, table.Output, out)
@@ -60,23 +54,17 @@ func TestCipher_Decipher(t *testing.T) {
 	}
 
 	var tables []struct {
-		Alphabet string
-		Input    string
-		Key      string
-		Output   string
-		Strict   bool
+		Cipher
+
+		Input  string
+		Output string
 	}
 	if err := json.Unmarshal(testdata, &tables); err != nil {
 		t.Fatal("Could not unmarshal testdata:", err)
 	}
 
 	for _, table := range tables {
-		c := Cipher{
-			Alphabet: table.Alphabet,
-			Key:      table.Key,
-			Strict:   table.Strict,
-		}
-		if out, err := c.Decipher(table.Input); err != nil {
+		if out, err := table.Decipher(table.Input); err != nil {
 			t.Error("Could not decipher:", err)
 		} else if out != table.Output {
 			t.Errorf("Expected %q to decipher to %q, but instead got %q", table.Input, table.Output, out)

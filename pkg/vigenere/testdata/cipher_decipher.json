@@ -4,7 +4,7 @@
         "Input": "",
         "Output": "",
         "Key": "",
-        "Autokey": "NoAutokey",
+        "Autokey": 0,
         "Strict": false
     },
     {
@@ -12,7 +12,7 @@
         "Input": "",
         "Output": "",
         "Key": "OCEANOGRAPHYWHAT",
-        "Autokey": "NoAutokey",
+        "Autokey": 0,
         "Strict": false
     },
     {
@@ -20,7 +20,7 @@
         "Input": "",
         "Output": "",
         "Key": "OCEANOGRAPHYWHAT",
-        "Autokey": "NoAutokey",
+        "Autokey": 0,
         "Strict": true
     },
     {
@@ -28,7 +28,7 @@
         "Input": "HELLO, WORLD!",
         "Output": "HELLO, WORLD!",
         "Key": "A",
-        "Autokey": "NoAutokey",
+        "Autokey": 0,
         "Strict": false
     },
     {
@@ -36,7 +36,7 @@
         "Input": "HELLO, WORLD!",
         "Output": "HELLOWORLD",
         "Key": "A",
-        "Autokey": "NoAutokey",
+        "Autokey": 0,
         "Strict": true
     },
     {
@@ -44,7 +44,7 @@
         "Input": "VGPLB, KUILS!",
         "Output": "HELLO, WORLD!",
         "Key": "OCEANOGRAPHYWHAT",
-        "Autokey": "NoAutokey",
+        "Autokey": 0,
         "Strict": false
     },
     {
@@ -52,7 +52,7 @@
         "Input": "VGPLB, KUILS!",
         "Output": "HELLOWORLD",
         "Key": "OCEANOGRAPHYWHAT",
-        "Autokey": "NoAutokey",
+        "Autokey": 0,
         "Strict": true
     },
     {
@@ -60,7 +60,7 @@
         "Input": "XUBBE, MEHBT!",
         "Output": "HELLO, WORLD!",
         "Key": "Q",
-        "Autokey": "NoAutokey",
+        "Autokey": 0,
         "Strict": false
     },
     {
@@ -68,7 +68,7 @@
         "Input": "XUBBE, MEHBT!",
         "Output": "HELLOWORLD",
         "Key": "Q",
-        "Autokey": "NoAutokey",
+        "Autokey": 0,
         "Strict": true
     },
     {
@@ -76,7 +76,7 @@
         "Input": "REYRO, NCFVD!",
         "Output": "HELLO, WORLD!",
         "Key": "KANGAROO",
-        "Autokey": "NoAutokey",
+        "Autokey": 0,
         "Strict": false
     },
     {
@@ -84,7 +84,7 @@
         "Input": "REYRO, NCFVD!",
         "Output": "HELLOWORLD",
         "Key": "KANGAROO",
-        "Autokey": "NoAutokey",
+        "Autokey": 0,
         "Strict": true
     },
     {
@@ -92,7 +92,7 @@
         "Input": "VGPLB, KUILS!",
         "Output": "HELLO, WORLD!",
         "Key": "OCEANOGRAPHYWHAT",
-        "Autokey": "TextAutokey",
+        "Autokey": 1,
         "Strict": false
     },
     {
@@ -100,7 +100,7 @@
         "Input": "VGPLB, KUILS!",
         "Output": "HELLOWORLD",
         "Key": "OCEANOGRAPHYWHAT",
-        "Autokey": "TextAutokey",
+        "Autokey": 1,
         "Strict": true
     },
     {
@@ -108,7 +108,7 @@
         "Input": "HLPWZ, KKFCO!",
         "Output": "HELLO, WORLD!",
         "Key": "A",
-        "Autokey": "TextAutokey",
+        "Autokey": 1,
         "Strict": false
     },
     {
@@ -116,7 +116,7 @@
         "Input": "HLPWZ, KKFCO!",
         "Output": "HELLOWORLD",
         "Key": "A",
-        "Autokey": "TextAutokey",
+        "Autokey": 1,
         "Strict": true
     },
     {
@@ -124,7 +124,7 @@
         "Input": "XLPWZ, KKFCO!",
         "Output": "HELLO, WORLD!",
         "Key": "Q",
-        "Autokey": "TextAutokey",
+        "Autokey": 1,
         "Strict": false
     },
     {
@@ -132,7 +132,7 @@
         "Input": "XLPWZ, KKFCO!",
         "Output": "HELLOWORLD",
         "Key": "Q",
-        "Autokey": "TextAutokey",
+        "Autokey": 1,
         "Strict": true
     },
     {
@@ -140,7 +140,7 @@
         "Input": "REYRO, NCFSH!",
         "Output": "HELLO, WORLD!",
         "Key": "KANGAROO",
-        "Autokey": "TextAutokey",
+        "Autokey": 1,
         "Strict": false
     },
     {
@@ -148,7 +148,7 @@
         "Input": "REYRO, NCFSH!",
         "Output": "HELLOWORLD",
         "Key": "KANGAROO",
-        "Autokey": "TextAutokey",
+        "Autokey": 1,
         "Strict": true
     },
     {
@@ -156,7 +156,7 @@
         "Input": "VGPLB, KUILS!",
         "Output": "HELLO, WORLD!",
         "Key": "OCEANOGRAPHYWHAT",
-        "Autokey": "KeyAutokey",
+        "Autokey": 2,
         "Strict": false
     },
     {
@@ -164,7 +164,7 @@
         "Input": "VGPLB, KUILS!",
         "Output": "HELLOWORLD",
         "Key": "OCEANOGRAPHYWHAT",
-        "Autokey": "KeyAutokey",
+        "Autokey": 2,
         "Strict": true
     },
     {
@@ -172,7 +172,7 @@
         "Input": "HLWHV, RFWHK!",
         "Output": "HELLO, WORLD!",
         "Key": "A",
-        "Autokey": "KeyAutokey",
+        "Autokey": 2,
         "Strict": false
     },
     {
@@ -180,7 +180,7 @@
         "Input": "HLWHV, RFWHK!",
         "Output": "HELLOWORLD",
         "Key": "A",
-        "Autokey": "KeyAutokey",
+        "Autokey": 2,
         "Strict": true
     },
     {
@@ -188,7 +188,7 @@
         "Input": "XBMXL, HVMXA!",
         "Output": "HELLO, WORLD!",
         "Key": "Q",
-        "Autokey": "KeyAutokey",
+        "Autokey": 2,
         "Strict": false
     },
     {
@@ -196,7 +196,7 @@
         "Input": "XBMXL, HVMXA!",
         "Output": "HELLOWORLD",
         "Key": "Q",
-        "Autokey": "KeyAutokey",
+        "Autokey": 2,
         "Strict": true
     },
     {
@@ -204,7 +204,7 @@
         "Input": "REYRO, NCFCH!",
         "Output": "HELLO, WORLD!",
         "Key": "KANGAROO",
-        "Autokey": "KeyAutokey",
+        "Autokey": 2,
         "Strict": false
     },
     {
@@ -212,7 +212,7 @@
         "Input": "REYRO, NCFCH!",
         "Output": "HELLOWORLD",
         "Key": "KANGAROO",
-        "Autokey": "KeyAutokey",
+        "Autokey": 2,
         "Strict": true
     }
 ]

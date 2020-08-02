@@ -14,7 +14,9 @@
 
 package gronsfeld
 
-import "github.com/merenbach/goldbug/internal/pasc"
+import (
+	"github.com/merenbach/goldbug/internal/pasc"
+)
 
 // Cipher implements a Gronsfeld cipher.
 type Cipher struct {
@@ -23,44 +25,45 @@ type Cipher struct {
 	Strict   bool
 }
 
-// NewCipher creates a new Gronsfeld cipher.
-func newCipher(key string, alphabet string) (*pasc.VigenereFamilyCipher, error) {
+func (c *Cipher) tabularecta() (*pasc.TabulaRecta, error) {
 	const digits = "0123456789"
+
+	alphabet := c.Alphabet
 	if alphabet == "" {
 		alphabet = pasc.Alphabet
 	}
-	return pasc.NewVigenereFamilyCipher(key, alphabet, alphabet, digits)
+
+	return &pasc.TabulaRecta{
+		PtAlphabet:  alphabet,
+		CtAlphabet:  alphabet,
+		KeyAlphabet: digits,
+		Strict:      c.Strict,
+	}, nil
 }
 
 // Encipher a message.
 func (c *Cipher) Encipher(s string) (string, error) {
-	c2, err := newCipher(c.Key, c.Alphabet)
+	t, err := c.tabularecta()
 	if err != nil {
 		return "", err
 	}
-
-	c2.Strict = c.Strict
-	return c2.EncipherString(s), nil
+	return t.Encipher(s, c.Key, nil)
 }
 
 // Decipher a message.
 func (c *Cipher) Decipher(s string) (string, error) {
-	c2, err := newCipher(c.Key, c.Alphabet)
+	t, err := c.tabularecta()
 	if err != nil {
 		return "", err
 	}
-
-	c2.Strict = c.Strict
-	return c2.DecipherString(s), nil
+	return t.Decipher(s, c.Key, nil)
 }
 
 // Tableau for encipherment and decipherment.
 func (c *Cipher) tableau() (string, error) {
-	c2, err := newCipher(c.Key, c.Alphabet)
+	t, err := c.tabularecta()
 	if err != nil {
 		return "", err
 	}
-
-	c2.Strict = c.Strict
-	return c2.Printable(), nil
+	return t.Printable()
 }

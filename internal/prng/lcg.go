@@ -36,16 +36,6 @@ type LCG struct {
 // 	return g.Increment == 0
 // }
 
-// Copy this LCG into a fresh duplicate with pristine state.
-func (g *LCG) Copy() *LCG {
-	return &LCG{
-		Modulus:    g.Modulus,
-		Multiplier: g.Multiplier,
-		Increment:  g.Increment,
-		Seed:       g.Seed,
-	}
-}
-
 // HullDobell tests for compliance with the Hull-Dobell theorem.
 // The error parameter, if set, will contain the first-found failing constraint.
 // When c != 0, this test passing means that the cycle is equal to g.multiplier.
@@ -64,10 +54,10 @@ func (g *LCG) HullDobell() error {
 
 // Iterator across LCG values.
 func (g *LCG) Iterator() (func() int, error) {
-	if g.Modulus == 0 {
+	if g.Modulus <= 0 {
 		return nil, errors.New("modulus must be greater than zero")
 	}
-	if g.Multiplier == 0 {
+	if g.Multiplier <= 0 {
 		return nil, errors.New("multiplier must be greater than zero")
 	}
 
@@ -85,12 +75,5 @@ func (g *LCG) Slice(n int) ([]int, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	out := make([]int, n)
-	for i := range out {
-		out[i] = iter()
-		// state = (state*g.Multiplier + g.Increment) % g.Modulus
-	}
-
-	return out, nil
+	return take(n, iter), nil
 }
