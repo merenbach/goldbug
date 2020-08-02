@@ -15,11 +15,9 @@
 package affine
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/merenbach/goldbug/internal/masc"
-	"github.com/merenbach/goldbug/internal/translation"
 )
 
 // Cipher implements an affine cipher.
@@ -30,56 +28,49 @@ type Cipher struct {
 	Strict    bool
 }
 
-func (c *Cipher) alphabets() (string, string, error) {
+func (c *Cipher) maketableau() (*masc.Tableau, error) {
 	ptAlphabet := c.Alphabet
 	if ptAlphabet == "" {
 		ptAlphabet = masc.Alphabet
 	}
 	ctAlphabet, err := transform(ptAlphabet, c.Slope, c.Intercept)
 	if err != nil {
-		return "", "", err
+		return nil, err
 	}
-	return ptAlphabet, ctAlphabet, nil
+
+	return &masc.Tableau{
+		PtAlphabet: ptAlphabet,
+		CtAlphabet: ctAlphabet,
+		Strict:     c.Strict,
+	}, nil
 }
 
 // Encipher a message.
 func (c *Cipher) Encipher(s string) (string, error) {
-	ptAlphabet, ctAlphabet, err := c.alphabets()
+	t, err := c.maketableau()
 	if err != nil {
 		log.Println("Could not calculate alphabets")
 		return "", err
 	}
-
-	table := translation.Table{
-		Src:    ptAlphabet,
-		Dst:    ctAlphabet,
-		Strict: c.Strict,
-	}
-	return table.Translate(s)
+	return t.Encipher(s)
 }
 
 // Decipher a message.
 func (c *Cipher) Decipher(s string) (string, error) {
-	ptAlphabet, ctAlphabet, err := c.alphabets()
+	t, err := c.maketableau()
 	if err != nil {
 		log.Println("Could not calculate alphabets")
 		return "", err
 	}
-
-	table := translation.Table{
-		Src:    ctAlphabet,
-		Dst:    ptAlphabet,
-		Strict: c.Strict,
-	}
-	return table.Translate(s)
+	return t.Decipher(s)
 }
 
 // Tableau for this cipher.
 func (c *Cipher) Tableau() (string, error) {
-	ptAlphabet, ctAlphabet, err := c.alphabets()
+	t, err := c.maketableau()
 	if err != nil {
 		log.Println("Could not calculate alphabets")
 		return "", err
 	}
-	return fmt.Sprintf("PT: %s\nCT: %s", ptAlphabet, ctAlphabet), nil
+	return t.Printable()
 }

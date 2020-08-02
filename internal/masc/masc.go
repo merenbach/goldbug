@@ -14,5 +14,44 @@
 
 package masc
 
+import (
+	"fmt"
+
+	"github.com/merenbach/goldbug/internal/translation"
+)
+
 // Alphabet to use by default for substitution ciphers
 const Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+// A Tableau holds a translation table.
+type Tableau struct {
+	PtAlphabet string
+	CtAlphabet string
+
+	Strict bool
+}
+
+// Encipher a string.
+func (t *Tableau) Encipher(s string) (string, error) {
+	tt := translation.Table{
+		Src:    t.PtAlphabet,
+		Dst:    t.CtAlphabet,
+		Strict: t.Strict,
+	}
+	return tt.Translate(s)
+}
+
+// Decipher a string.
+func (t *Tableau) Decipher(s string) (string, error) {
+	tt := translation.Table{
+		Src:    t.CtAlphabet,
+		Dst:    t.PtAlphabet,
+		Strict: t.Strict,
+	}
+	return tt.Translate(s)
+}
+
+// Printable representation of this tableau.
+func (t *Tableau) Printable() (string, error) {
+	return fmt.Sprintf("PT: %s\nCT: %s", t.PtAlphabet, t.CtAlphabet), nil
+}
