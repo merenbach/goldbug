@@ -24,7 +24,7 @@ type Cipher struct {
 	Strict   bool
 }
 
-func (c *Cipher) tabularecta() (*pasc.TabulaRecta, error) {
+func (c *Cipher) maketableau() (*pasc.TabulaRecta, error) {
 	alphabet := c.Alphabet
 	if alphabet == "" {
 		alphabet = pasc.Alphabet
@@ -40,7 +40,7 @@ func (c *Cipher) tabularecta() (*pasc.TabulaRecta, error) {
 
 // Encipher a message.
 func (c *Cipher) Encipher(s string) (string, error) {
-	t, err := c.tabularecta()
+	t, err := c.maketableau()
 	if err != nil {
 		return "", err
 	}
@@ -49,7 +49,7 @@ func (c *Cipher) Encipher(s string) (string, error) {
 
 // Decipher a message.
 func (c *Cipher) Decipher(s string) (string, error) {
-	t, err := c.tabularecta()
+	t, err := c.maketableau()
 	if err != nil {
 		return "", err
 	}
@@ -58,7 +58,7 @@ func (c *Cipher) Decipher(s string) (string, error) {
 
 // Tableau for encipherment and decipherment.
 func (c *Cipher) tableau() (string, error) {
-	t, err := c.tabularecta()
+	t, err := c.maketableau()
 	if err != nil {
 		return "", err
 	}

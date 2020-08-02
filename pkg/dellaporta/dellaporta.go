@@ -41,7 +41,7 @@ func owrapString(s string, i int) string {
 	return stringutil.WrapString(string(u), i) + stringutil.WrapString(string(v), len(v)-i)
 }
 
-func (c *Cipher) reciprocaltable() (*pasc.ReciprocalTable, error) {
+func (c *Cipher) maketableau() (*pasc.ReciprocalTable, error) {
 	alphabet := c.Alphabet
 	if alphabet == "" {
 		alphabet = pasc.Alphabet
@@ -73,7 +73,7 @@ func (c *Cipher) reciprocaltable() (*pasc.ReciprocalTable, error) {
 
 // Encipher a message.
 func (c *Cipher) Encipher(s string) (string, error) {
-	t, err := c.reciprocaltable()
+	t, err := c.maketableau()
 	if err != nil {
 		return "", err
 	}
@@ -82,7 +82,7 @@ func (c *Cipher) Encipher(s string) (string, error) {
 
 // Decipher a message.
 func (c *Cipher) Decipher(s string) (string, error) {
-	t, err := c.reciprocaltable()
+	t, err := c.maketableau()
 	if err != nil {
 		return "", err
 	}
@@ -91,7 +91,7 @@ func (c *Cipher) Decipher(s string) (string, error) {
 
 // Tableau for encipherment and decipherment.
 func (c *Cipher) tableau() (string, error) {
-	t, err := c.reciprocaltable()
+	t, err := c.maketableau()
 	if err != nil {
 		return "", err
 	}
