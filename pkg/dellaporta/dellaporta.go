@@ -41,6 +41,17 @@ func owrapString(s string, i int) string {
 	return stringutil.WrapString(string(u), i) + stringutil.WrapString(string(v), len(v)-i)
 }
 
+func sign(i int) int {
+	switch {
+	case i < 0:
+		return (-1)
+	case i > 0:
+		return 1
+	default:
+		return 0
+	}
+}
+
 func (c *Cipher) maketableau2() (*pasc.ReciprocalTable, error) {
 	alphabet := c.Alphabet
 	if alphabet == "" {
@@ -61,11 +72,22 @@ func (c *Cipher) maketableau2() (*pasc.ReciprocalTable, error) {
 	for y := range keyRunes {
 		out := make([]rune, len(ctAlphabet))
 		for x := range out {
-			if x < 13 {
-				out[x] = ctRunes[13+(x+y/2)%13]
-			} else {
-				out[x] = ctRunes[(13+x-y/2)%13]
-			}
+			// var v int
+			// if x < 13 {
+			// 	v = y
+			// 	// v = 13 - x + x%13 + (x+y/2)%13
+			// 	// v = 13 + (x+y/2)%13 <--- THIS IS THE MOST BASIC VERSION
+			// } else {
+			// 	v = -y
+			// 	// v = (13 + x - y/2) % 13 <--- THIS IS THE MOST BASIC VERSION
+			// 	// v = 13 - x + x%13 + (13+x-y/2)%13
+			// }
+			// TODO: can use this line if we remove the +13 from the first branch above
+			v := (13 - x + x%13) + (13+x-sign(x-13)*y/2)%13
+			// v +=
+
+			// TODO: use backpermute
+			out[x] = ctRunes[v]
 		}
 		ctAlphabets[y] = string(out)
 	}
