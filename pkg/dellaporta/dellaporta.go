@@ -41,6 +41,45 @@ func owrapString(s string, i int) string {
 	return stringutil.WrapString(string(u), i) + stringutil.WrapString(string(v), len(v)-i)
 }
 
+func (c *Cipher) maketableau2() (*pasc.ReciprocalTable, error) {
+	alphabet := c.Alphabet
+	if alphabet == "" {
+		alphabet = pasc.Alphabet
+	}
+
+	ptAlphabet, ctAlphabet, keyAlphabet := alphabet, alphabet, alphabet
+
+	keyRunes := []rune(keyAlphabet)
+	ctAlphabets := make([]string, len(keyRunes))
+
+	if utf8.RuneCountInString(ctAlphabet)%2 != 0 {
+		return nil, errors.New("Della Porta cipher alphabets must have even length")
+	}
+
+	ctRunes := []rune(ctAlphabet)
+
+	for y := range keyRunes {
+		out := make([]rune, len(ctAlphabet))
+		for x := range out {
+			if x < 13 {
+				out[x] = ctRunes[13+(x+y/2)%13]
+			} else {
+				out[x] = ctRunes[(13+x-y/2)%13]
+			}
+		}
+		ctAlphabets[y] = string(out)
+	}
+
+	tr := pasc.ReciprocalTable{
+		PtAlphabet:  ptAlphabet,
+		KeyAlphabet: keyAlphabet,
+		CtAlphabets: ctAlphabets,
+		Strict:      c.Strict,
+	}
+
+	return &tr, nil
+}
+
 func (c *Cipher) maketableau() (*pasc.ReciprocalTable, error) {
 	alphabet := c.Alphabet
 	if alphabet == "" {
@@ -73,7 +112,7 @@ func (c *Cipher) maketableau() (*pasc.ReciprocalTable, error) {
 
 // Encipher a message.
 func (c *Cipher) Encipher(s string) (string, error) {
-	t, err := c.maketableau()
+	t, err := c.maketableau2()
 	if err != nil {
 		return "", err
 	}
@@ -82,7 +121,7 @@ func (c *Cipher) Encipher(s string) (string, error) {
 
 // Decipher a message.
 func (c *Cipher) Decipher(s string) (string, error) {
-	t, err := c.maketableau()
+	t, err := c.maketableau2()
 	if err != nil {
 		return "", err
 	}
