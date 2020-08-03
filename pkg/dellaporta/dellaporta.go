@@ -16,6 +16,7 @@ package dellaporta
 
 import (
 	"errors"
+	"log"
 	"unicode/utf8"
 
 	"github.com/merenbach/goldbug/internal/pasc"
@@ -83,7 +84,10 @@ func (c *Cipher) maketableau2() (*pasc.ReciprocalTable, error) {
 			// 	// v = 13 - x + x%13 + (13+x-y/2)%13
 			// }
 			// TODO: can use this line if we remove the +13 from the first branch above
-			v := (13 - x + x%13) + (13+x-sign(x-13)*y/2)%13
+			if (x - sign(x-13)*y/2) < 0 {
+				log.Fatalln("ALERT!", x, y)
+			}
+			v := (13 - x + x%13) + (x-sign(x-13)*y/2)%13
 			// v +=
 
 			// TODO: use backpermute
