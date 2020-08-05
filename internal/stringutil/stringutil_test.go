@@ -15,10 +15,40 @@
 package stringutil
 
 import (
-	"fmt"
+	"encoding/json"
+	"io/ioutil"
+	"path/filepath"
 	"reflect"
 	"testing"
 )
+
+func TestBackpermute(t *testing.T) {
+	testdata, err := ioutil.ReadFile(filepath.Join("testdata", "backpermute.json"))
+	if err != nil {
+		t.Fatal("Could not read testdata fixture:", err)
+	}
+
+	var tables []struct {
+		Input   string
+		Output  string
+		Indices []int
+		Success bool
+	}
+	if err := json.Unmarshal(testdata, &tables); err != nil {
+		t.Fatal("Could not unmarshal testdata:", err)
+	}
+
+	for i, table := range tables {
+		t.Logf("Testing table %d of %d", i+1, len(tables))
+		if out, err := Backpermute(table.Input, table.Indices); err != nil && table.Success {
+			t.Error("Unexpected backpermute failure:", err)
+		} else if err == nil && !table.Success {
+			t.Error("Unexpected backpermute success")
+		} else if string(out) != table.Output {
+			t.Error("Received incorrect output:", out)
+		}
+	}
+}
 
 func TestDeduplicate(t *testing.T) {
 	table := map[string]string{
@@ -62,43 +92,43 @@ func TestReverse(t *testing.T) {
 	}
 }
 
-func TestWrapString(t *testing.T) {
-	tables := []struct {
-		s        string
-		i        int
-		expected string
-	}{
-		{"hello", 3, "lohel"},
-		{"hello world", 0, "hello world"},
-		{"hello world", 11, "hello world"},
-	}
-	for _, table := range tables {
-		if o := WrapString(table.s, table.i); o != table.expected {
-			t.Errorf("Wrapping of string %q by %d places was %q; expected %q", table.s, table.i, o, table.expected)
-		}
-	}
-}
+// func TestWrapString(t *testing.T) {
+// 	tables := []struct {
+// 		s        string
+// 		i        int
+// 		expected string
+// 	}{
+// 		{"hello", 3, "lohel"},
+// 		{"hello world", 0, "hello world"},
+// 		{"hello world", 11, "hello world"},
+// 	}
+// 	for _, table := range tables {
+// 		if o := WrapString(table.s, table.i); o != table.expected {
+// 			t.Errorf("Wrapping of string %q by %d places was %q; expected %q", table.s, table.i, o, table.expected)
+// 		}
+// 	}
+// }
 
-func ExampleWrapString() {
-	s := "HELLO,_WORLD!"
-	for i := range []rune(s) {
-		fmt.Println(WrapString(s, i))
-	}
-	// Output:
-	// HELLO,_WORLD!
-	// ELLO,_WORLD!H
-	// LLO,_WORLD!HE
-	// LO,_WORLD!HEL
-	// O,_WORLD!HELL
-	// ,_WORLD!HELLO
-	// _WORLD!HELLO,
-	// WORLD!HELLO,_
-	// ORLD!HELLO,_W
-	// RLD!HELLO,_WO
-	// LD!HELLO,_WOR
-	// D!HELLO,_WORL
-	// !HELLO,_WORLD
-}
+// func ExampleWrapString() {
+// 	s := "HELLO,_WORLD!"
+// 	for i := range []rune(s) {
+// 		fmt.Println(WrapString(s, i))
+// 	}
+// 	// Output:
+// 	// HELLO,_WORLD!
+// 	// ELLO,_WORLD!H
+// 	// LLO,_WORLD!HE
+// 	// LO,_WORLD!HEL
+// 	// O,_WORLD!HELL
+// 	// ,_WORLD!HELLO
+// 	// _WORLD!HELLO,
+// 	// WORLD!HELLO,_
+// 	// ORLD!HELLO,_W
+// 	// RLD!HELLO,_WO
+// 	// LD!HELLO,_WOR
+// 	// D!HELLO,_WORL
+// 	// !HELLO,_WORLD
+// }
 
 func TestChunk(t *testing.T) {
 	tables := []struct {

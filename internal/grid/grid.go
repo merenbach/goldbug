@@ -43,6 +43,22 @@ func (g Grid) FillByCol(s string) {
 	g.sortByCol()
 }
 
+// ReadByRow concatenates cell contents by row.
+func (g Grid) ReadByRow() string {
+	g2 := make(Grid, len(g))
+	copy(g2, g)
+	g2.sortByRow()
+	return g2.contents()
+}
+
+// ReadByCol concatenates cell contents by column.
+func (g Grid) ReadByCol() string {
+	g2 := make(Grid, len(g))
+	copy(g2, g)
+	g2.sortByCol()
+	return g2.contents()
+}
+
 // Printable version of this grid.
 func (g Grid) Printable() string {
 	g2 := make(Grid, len(g))
@@ -73,8 +89,8 @@ func (g Grid) Printable() string {
 	return out.String()
 }
 
-// Contents of this grid.
-func (g Grid) Contents() string {
+// Contents of this grid in the current order.
+func (g Grid) contents() string {
 	var b strings.Builder
 	for _, c := range g {
 		b.WriteRune(c.Rune)

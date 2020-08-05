@@ -16,30 +16,13 @@ package affine
 
 import (
 	"errors"
-	"fmt"
 	"log"
 	"unicode/utf8"
 
 	"github.com/merenbach/goldbug/internal/mathutil"
 	"github.com/merenbach/goldbug/internal/prng"
+	"github.com/merenbach/goldbug/internal/stringutil"
 )
-
-// Backpermute a string based on a slice of index values.
-// Backpermute will return [E E O H L O] for inputs [H E L L O] and [1 1 4 0 2 4]
-// Backpermute will return an error if the transform function returns any invalid string index values.
-func backpermute(s string, ii []int) (string, error) {
-	out := make([]rune, len(ii))
-
-	rr := []rune(s)
-	for n, i := range ii {
-		if i < 0 || i >= len(rr) {
-			return "", fmt.Errorf("Index %d out of bounds of interval [0, %d)", i, len(rr))
-		}
-		out[n] = rr[i] // or rr[ii[n]]
-	}
-
-	return string(out), nil
-}
 
 // Transform a string according to an affine equation.
 func transform(s string, slope int, intercept int) (string, error) {
@@ -69,7 +52,7 @@ func transform(s string, slope int, intercept int) (string, error) {
 		return "", err
 	}
 
-	out, err := backpermute(s, positions)
+	out, err := stringutil.Backpermute(s, positions)
 	if err != nil {
 		log.Println("Couldn't backpermute input")
 		return "", err

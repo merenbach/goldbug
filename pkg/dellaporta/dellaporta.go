@@ -16,7 +16,6 @@ package dellaporta
 
 import (
 	"errors"
-	"log"
 	"unicode/utf8"
 
 	"github.com/merenbach/goldbug/internal/pasc"
@@ -28,82 +27,6 @@ type Cipher struct {
 	Alphabet string
 	Key      string
 	Strict   bool
-}
-
-// owrapString wraps two halves of a string in opposite directions, like gears turning outward.
-// owrapString will panic if the provided offset is negative.
-func owrapString(s string, i int) string {
-	// if we simply `return s[i:] + s[:i]`, we're operating on bytes, not runes
-	sRunes := []rune(s)
-	if len(sRunes)%2 != 0 {
-		panic("owrapString sequence length must be divisible by two")
-	}
-	u, v := sRunes[:len(sRunes)/2], sRunes[len(sRunes)/2:]
-	return stringutil.WrapString(string(u), i) + stringutil.WrapString(string(v), len(v)-i)
-}
-
-func sign(i int) int {
-	switch {
-	case i < 0:
-		return (-1)
-	case i > 0:
-		return 1
-	default:
-		return 0
-	}
-}
-
-func (c *Cipher) maketableau2() (*pasc.ReciprocalTable, error) {
-	alphabet := c.Alphabet
-	if alphabet == "" {
-		alphabet = pasc.Alphabet
-	}
-
-	ptAlphabet, ctAlphabet, keyAlphabet := alphabet, alphabet, alphabet
-
-	keyRunes := []rune(keyAlphabet)
-	ctAlphabets := make([]string, len(keyRunes))
-
-	if utf8.RuneCountInString(ctAlphabet)%2 != 0 {
-		return nil, errors.New("Della Porta cipher alphabets must have even length")
-	}
-
-	ctRunes := []rune(ctAlphabet)
-
-	for y := range keyRunes {
-		out := make([]rune, len(ctAlphabet))
-		for x := range out {
-			// var v int
-			// if x < 13 {
-			// 	v = y
-			// 	// v = 13 - x + x%13 + (x+y/2)%13
-			// 	// v = 13 + (x+y/2)%13 <--- THIS IS THE MOST BASIC VERSION
-			// } else {
-			// 	v = -y
-			// 	// v = (13 + x - y/2) % 13 <--- THIS IS THE MOST BASIC VERSION
-			// 	// v = 13 - x + x%13 + (13+x-y/2)%13
-			// }
-			// TODO: can use this line if we remove the +13 from the first branch above
-			if (x - sign(x-13)*y/2) < 0 {
-				log.Fatalln("ALERT!", x, y)
-			}
-			v := (13 - x + x%13) + (x-sign(x-13)*y/2)%13
-			// v +=
-
-			// TODO: use backpermute
-			out[x] = ctRunes[v]
-		}
-		ctAlphabets[y] = string(out)
-	}
-
-	tr := pasc.ReciprocalTable{
-		PtAlphabet:  ptAlphabet,
-		KeyAlphabet: keyAlphabet,
-		CtAlphabets: ctAlphabets,
-		Strict:      c.Strict,
-	}
-
-	return &tr, nil
 }
 
 func (c *Cipher) maketableau() (*pasc.ReciprocalTable, error) {
@@ -120,10 +43,29 @@ func (c *Cipher) maketableau() (*pasc.ReciprocalTable, error) {
 	if utf8.RuneCountInString(ctAlphabet)%2 != 0 {
 		return nil, errors.New("Della Porta cipher alphabets must have even length")
 	}
-	ctAlphabetWrapped := stringutil.WrapString(ctAlphabet, utf8.RuneCountInString(ctAlphabet)/2)
 
-	for i := range keyRunes {
-		ctAlphabets[i] = owrapString(ctAlphabetWrapped, i/2)
+	for y := range keyRunes {
+		ii := make([]int, utf8.RuneCountInString(ctAlphabet))
+		for x := range ii {
+			if x < 13 {
+				// 	// v = 13 - x + x%13 + (x+y/2)%13
+				// v = 13 + (x+y/2)%13 // <--- THIS IS THE MOST BASIC VERSION
+				ii[x] = 13 + (x+y/2)%13
+			} else {
+				// v = (x - y/2) % 13 // <--- THIS IS THE MOST BASIC VERSION
+				ii[x] = (x - y/2) % 13
+				// v2 := mod(x, 13) - y/2 + 13
+				// log.Printf("v = %d and v2 = %d", v, v2)
+				// 	// v = 13 - x + x%13 + (13+x-y/2)%13
+			}
+			// ii[x] = (13-x)%13 + x%13 + (x-y*sign(x-13)/2)%13
+		}
+
+		out, err := stringutil.Backpermute(ctAlphabet, ii)
+		if err != nil {
+			return nil, err
+		}
+		ctAlphabets[y] = string(out)
 	}
 
 	tr := pasc.ReciprocalTable{
@@ -138,7 +80,7 @@ func (c *Cipher) maketableau() (*pasc.ReciprocalTable, error) {
 
 // Encipher a message.
 func (c *Cipher) Encipher(s string) (string, error) {
-	t, err := c.maketableau2()
+	t, err := c.maketableau()
 	if err != nil {
 		return "", err
 	}
@@ -147,7 +89,7 @@ func (c *Cipher) Encipher(s string) (string, error) {
 
 // Decipher a message.
 func (c *Cipher) Decipher(s string) (string, error) {
-	t, err := c.maketableau2()
+	t, err := c.maketableau()
 	if err != nil {
 		return "", err
 	}

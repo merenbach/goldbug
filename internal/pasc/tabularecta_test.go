@@ -14,54 +14,49 @@
 
 package pasc
 
-// func TestTabulaRecta(t *testing.T) {
-// 	const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+import "testing"
 
-// 	tables := []struct {
-// 		keyAlphabet string
-// 		ptAlphabet  string
-// 		ctAlphabet  string
-// 		keyRune     string
-// 		srcRune     string
-// 		dstRune     string
-// 	}{
-// 		{alphabet, alphabet, alphabet, "A", "A", "A"},
-// 		{alphabet, alphabet, alphabet, "B", "B", "C"},
-// 		{alphabet, alphabet, alphabet, "K", "V", "F"},
-// 		{alphabet, alphabet, alphabet, "O", "K", "Y"},
-// 		{alphabet, alphabet, alphabet, "Y", "Y", "W"},
-// 		{alphabet, alphabet, alphabet, "Z", "O", "N"},
-// 		{alphabet, alphabet, alphabet, "Z", "Z", "Y"},
-// 	}
+func TestTabulaRecta(t *testing.T) {
+	const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-// 	for _, table := range tables {
-// 		keyRunes := []rune(table.keyAlphabet)
-// 		ctAlphabets := make([]string, len(keyRunes))
+	tables := []struct {
+		keyAlphabet string
+		ptAlphabet  string
+		ctAlphabet  string
+		keyRune     string
+		srcRune     string
+		dstRune     string
+	}{
+		{alphabet, alphabet, alphabet, "A", "A", "A"},
+		{alphabet, alphabet, alphabet, "B", "B", "C"},
+		{alphabet, alphabet, alphabet, "K", "V", "F"},
+		{alphabet, alphabet, alphabet, "O", "K", "Y"},
+		{alphabet, alphabet, alphabet, "Y", "Y", "W"},
+		{alphabet, alphabet, alphabet, "Z", "O", "N"},
+		{alphabet, alphabet, alphabet, "Z", "Z", "Y"},
+	}
 
-// 		for i := range keyRunes {
-// 			ctAlphabets[i] = stringutil.WrapString(table.ctAlphabet, i)
-// 		}
+	for _, table := range tables {
+		tr := TabulaRecta{
+			PtAlphabet:  table.ptAlphabet,
+			KeyAlphabet: table.keyAlphabet,
+			CtAlphabet:  table.ctAlphabet,
+		}
 
-// 		tr := TabulaRecta{
-// 			PtAlphabet:  table.ptAlphabet,
-// 			KeyAlphabet: table.keyAlphabet,
-// 			CtAlphabets: ctAlphabets,
-// 		}
+		dst, err := tr.Encipher(table.srcRune, table.keyRune, nil)
+		if err != nil {
+			t.Errorf("Expected encipherment key rune %s to be in key alphabet, but it was not", table.keyRune)
+		}
+		if dst != table.dstRune {
+			t.Errorf("Expected E(p=%s,k=%s)=%s but got %s instead", table.srcRune, table.keyRune, table.dstRune, dst)
+		}
 
-// 		dst, err := tr.Encipher(table.srcRune, table.keyRune, nil)
-// 		if err != nil {
-// 			t.Errorf("Expected encipherment key rune %s to be in key alphabet, but it was not", table.keyRune)
-// 		}
-// 		if dst != table.dstRune {
-// 			t.Errorf("Expected E(p=%s,k=%s)=%s but got %s instead", table.srcRune, table.keyRune, table.dstRune, dst)
-// 		}
-
-// 		src, err := tr.Decipher(dst, table.keyRune, nil)
-// 		if err != nil {
-// 			t.Errorf("Expected decipherment key rune %s to be in key alphabet, but it was not", table.keyRune)
-// 		}
-// 		if src != table.srcRune {
-// 			t.Errorf("Expected D(c=%s,k=%s)=%s but got %s instead", table.dstRune, table.keyRune, table.srcRune, src)
-// 		}
-// 	}
-// }
+		src, err := tr.Decipher(dst, table.keyRune, nil)
+		if err != nil {
+			t.Errorf("Expected decipherment key rune %s to be in key alphabet, but it was not", table.keyRune)
+		}
+		if src != table.srcRune {
+			t.Errorf("Expected D(c=%s,k=%s)=%s but got %s instead", table.dstRune, table.keyRune, table.srcRune, src)
+		}
+	}
+}

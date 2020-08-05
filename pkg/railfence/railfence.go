@@ -53,7 +53,7 @@ func (c *Cipher) Encipher(s string) (string, error) {
 
 	g := c.makegrid(utf8.RuneCountInString(s))
 	g.FillByRow(s)
-	return g.Contents(), nil
+	return g.ReadByRow(), nil
 }
 
 // Decipher a message.
@@ -64,7 +64,7 @@ func (c *Cipher) Decipher(s string) (string, error) {
 
 	g := c.makegrid(utf8.RuneCountInString(s))
 	g.FillByCol(s)
-	return g.Contents(), nil
+	return g.ReadByCol(), nil
 }
 
 // EnciphermentGrid returns the output tableau upon encipherment.

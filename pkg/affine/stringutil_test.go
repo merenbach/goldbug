@@ -13,38 +13,3 @@
 // limitations under the License.
 
 package affine
-
-import (
-	"encoding/json"
-	"io/ioutil"
-	"path/filepath"
-	"testing"
-)
-
-func TestBackpermute(t *testing.T) {
-	testdata, err := ioutil.ReadFile(filepath.Join("testdata", "backpermute.json"))
-	if err != nil {
-		t.Fatal("Could not read testdata fixture:", err)
-	}
-
-	var tables []struct {
-		Input   string
-		Output  string
-		Indices []int
-		Success bool
-	}
-	if err := json.Unmarshal(testdata, &tables); err != nil {
-		t.Fatal("Could not unmarshal testdata:", err)
-	}
-
-	for i, table := range tables {
-		t.Logf("Testing table %d of %d", i+1, len(tables))
-		if out, err := backpermute(table.Input, table.Indices); err != nil && table.Success {
-			t.Error("Unexpected backpermute failure:", err)
-		} else if err == nil && !table.Success {
-			t.Error("Unexpected backpermute success")
-		} else if string(out) != table.Output {
-			t.Error("Received incorrect output:", out)
-		}
-	}
-}

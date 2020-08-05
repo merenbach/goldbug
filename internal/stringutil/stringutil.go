@@ -15,25 +15,26 @@
 package stringutil
 
 import (
+	"fmt"
 	"sort"
 	"strings"
 	"unicode/utf8"
 )
 
-// // Backpermute transforms a string based on a generator function.
-// // Backpermute will panic if the transform function returns any invalid string index values.
-// func Backpermute(s string, g func() uint) (string, error) {
-// 	var out strings.Builder
-// 	asRunes := []rune(s)
-// 	for range asRunes {
-// 		newRune := asRunes[g()]
-// 		_, err := out.WriteRune(newRune)
-// 		if err != nil {
-// 			return "", err
-// 		}
-// 	}
-// 	return out.String(), nil
-// }
+// Backpermute a string based on a slice of index values.
+// Backpermute will return [E E O H L O] for inputs [H E L L O] and [1 1 4 0 2 4]
+// Backpermute will return an error if the transform function returns any invalid string index values.
+func Backpermute(s string, ii []int) (string, error) {
+	var b strings.Builder
+	rr := []rune(s)
+	for _, i := range ii {
+		if i < 0 || i >= len(rr) {
+			return "", fmt.Errorf("Index %d out of bounds of interval [0, %d)", i, len(rr))
+		}
+		b.WriteRune(rr[i])
+	}
+	return b.String(), nil
+}
 
 // Deduplicate removes recurrences for runes from a string, preserving order of first appearance.
 func Deduplicate(s string) string {
@@ -98,12 +99,12 @@ func groupString(s string, size int, padding rune) []string {
 	return out
 }
 
-// WrapString wraps a string a specified number of indices.
-// WrapString will error out if the provided offset is negative.
-func WrapString(s string, i int) string {
-	// if we simply `return s[i:] + s[:i]`, we're operating on bytes, not runes
-	// When adapting for slices in the input, remember to copy so as to not modify the original
-	rr := []rune(s)
-	return string(append(rr[i:], rr[:i]...))
-	// return string(rr[i:]) + string(rr[:i])
-}
+// // WrapString wraps a string a specified number of indices.
+// // WrapString will error out if the provided offset is negative.
+// func WrapString(s string, i int) string {
+// 	// if we simply `return s[i:] + s[:i]`, we're operating on bytes, not runes
+// 	// When adapting for slices in the input, remember to copy so as to not modify the original
+// 	rr := []rune(s)
+// 	return string(append(rr[i:], rr[:i]...))
+// 	// return string(rr[i:]) + string(rr[:i])
+// }

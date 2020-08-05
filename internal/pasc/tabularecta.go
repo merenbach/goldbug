@@ -16,6 +16,7 @@ package pasc
 
 import (
 	"fmt"
+	"unicode/utf8"
 
 	"github.com/merenbach/goldbug/internal/stringutil"
 )
@@ -33,14 +34,20 @@ type TabulaRecta struct {
 func (tr *TabulaRecta) makereciprocaltable() (*ReciprocalTable, error) {
 	keyRunes := []rune(tr.KeyAlphabet)
 	ctAlphabets := make([]string, len(keyRunes))
+	ctAlphabetLen := utf8.RuneCountInString(tr.CtAlphabet)
 
-	// Cast to increase index without gaps
+	// Cast to []rune to increase index without gaps
 	for i := range keyRunes {
-		// ctAlphabetRotated, err := stringutil.Affine(ctAlphabet, 1, i)
-		// if err != nil {
-		// 	return nil
-		// }
-		ctAlphabets[i] = stringutil.WrapString(tr.CtAlphabet, i)
+		ii := make([]int, ctAlphabetLen)
+		for j := range ii {
+			ii[j] = (i + j) % ctAlphabetLen
+		}
+
+		out, err := stringutil.Backpermute(tr.CtAlphabet, ii)
+		if err != nil {
+			return nil, err
+		}
+		ctAlphabets[i] = out
 	}
 
 	rt := ReciprocalTable{
