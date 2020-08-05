@@ -33,14 +33,12 @@ type Grid []cell
 func (g Grid) FillByRow(s string) {
 	g.sortByCol()
 	g.fill(s)
-	g.sortByRow()
 }
 
 // FillByCol populates cell contents by column.
 func (g Grid) FillByCol(s string) {
 	g.sortByRow()
 	g.fill(s)
-	g.sortByCol()
 }
 
 // ReadByRow concatenates cell contents by row.

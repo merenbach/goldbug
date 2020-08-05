@@ -37,23 +37,25 @@ func (c *Cipher) maketableau() (*pasc.ReciprocalTable, error) {
 
 	ptAlphabet, ctAlphabet, keyAlphabet := alphabet, alphabet, alphabet
 
-	keyRunes := []rune(keyAlphabet)
-	ctAlphabets := make([]string, len(keyRunes))
+	ctAlphabets := make([]string, utf8.RuneCountInString(keyAlphabet))
+	ctAlphabetLen := utf8.RuneCountInString(ctAlphabet)
 
-	if utf8.RuneCountInString(ctAlphabet)%2 != 0 {
+	if ctAlphabetLen%2 != 0 {
 		return nil, errors.New("Della Porta cipher alphabets must have even length")
 	}
 
-	for y := range keyRunes {
-		ii := make([]int, utf8.RuneCountInString(ctAlphabet))
+	halfCtAlphabetLen := ctAlphabetLen / 2
+
+	for y := range ctAlphabets {
+		ii := make([]int, ctAlphabetLen)
 		for x := range ii {
-			if x < 13 {
+			if x < halfCtAlphabetLen {
 				// 	// v = 13 - x + x%13 + (x+y/2)%13
 				// v = 13 + (x+y/2)%13 // <--- THIS IS THE MOST BASIC VERSION
-				ii[x] = 13 + (x+y/2)%13
+				ii[x] = halfCtAlphabetLen + (x+y/2)%halfCtAlphabetLen
 			} else {
 				// v = (x - y/2) % 13 // <--- THIS IS THE MOST BASIC VERSION
-				ii[x] = (x - y/2) % 13
+				ii[x] = (x - y/2) % halfCtAlphabetLen
 				// v2 := mod(x, 13) - y/2 + 13
 				// log.Printf("v = %d and v2 = %d", v, v2)
 				// 	// v = 13 - x + x%13 + (13+x-y/2)%13

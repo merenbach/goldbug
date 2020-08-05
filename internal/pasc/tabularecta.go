@@ -32,22 +32,21 @@ type TabulaRecta struct {
 
 // MakeTabulaRecta creates a standard Caesar shift tabula recta.
 func (tr *TabulaRecta) makereciprocaltable() (*ReciprocalTable, error) {
-	keyRunes := []rune(tr.KeyAlphabet)
-	ctAlphabets := make([]string, len(keyRunes))
+	ctAlphabets := make([]string, utf8.RuneCountInString(tr.KeyAlphabet))
 	ctAlphabetLen := utf8.RuneCountInString(tr.CtAlphabet)
 
 	// Cast to []rune to increase index without gaps
-	for i := range keyRunes {
+	for y := range ctAlphabets {
 		ii := make([]int, ctAlphabetLen)
-		for j := range ii {
-			ii[j] = (i + j) % ctAlphabetLen
+		for x := range ii {
+			ii[x] = (x + y) % ctAlphabetLen
 		}
 
 		out, err := stringutil.Backpermute(tr.CtAlphabet, ii)
 		if err != nil {
 			return nil, err
 		}
-		ctAlphabets[i] = out
+		ctAlphabets[y] = out
 	}
 
 	rt := ReciprocalTable{
