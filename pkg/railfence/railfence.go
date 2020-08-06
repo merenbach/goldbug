@@ -52,7 +52,8 @@ func (c *Cipher) Encipher(s string) (string, error) {
 	}
 
 	g := c.makegrid(utf8.RuneCountInString(s))
-	g.FillByRow(s)
+	g.SortByCol()
+	g.Fill(s)
 	return g.ReadByRow(), nil
 }
 
@@ -63,7 +64,8 @@ func (c *Cipher) Decipher(s string) (string, error) {
 	}
 
 	g := c.makegrid(utf8.RuneCountInString(s))
-	g.FillByCol(s)
+	g.SortByRow()
+	g.Fill(s)
 	return g.ReadByCol(), nil
 }
 
@@ -74,7 +76,8 @@ func (c *Cipher) enciphermentGrid(s string) (string, error) {
 	}
 
 	g := c.makegrid(utf8.RuneCountInString(s))
-	g.FillByRow(s)
+	g.SortByCol()
+	g.Fill(s)
 	return g.Printable(), nil
 }
 
@@ -85,6 +88,7 @@ func (c *Cipher) deciphermentGrid(s string) (string, error) {
 	}
 
 	g := c.makegrid(utf8.RuneCountInString(s))
-	g.FillByCol(s)
+	g.SortByRow()
+	g.Fill(s)
 	return g.Printable(), nil
 }
