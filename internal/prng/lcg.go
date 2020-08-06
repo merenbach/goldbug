@@ -53,7 +53,7 @@ func (g *LCG) HullDobell() error {
 }
 
 // Iterator across LCG values.
-func (g *LCG) Iterator() (func() int, error) {
+func (g *LCG) iterator() (func() int, error) {
 	if g.Modulus <= 0 {
 		return nil, errors.New("modulus must be greater than zero")
 	}
@@ -71,7 +71,7 @@ func (g *LCG) Iterator() (func() int, error) {
 
 // Slice of LCG values.
 func (g *LCG) Slice(n int) ([]int, error) {
-	iter, err := g.Iterator()
+	iter, err := g.iterator()
 	if err != nil {
 		return nil, err
 	}
