@@ -29,45 +29,40 @@ func TestLCG(t *testing.T) {
 		hulldobell bool
 		expected   []int
 	}{
+		// {
+		// 	m:        100,
+		// 	a:        17,
+		// 	c:        43,
+		// 	seed:     27,
+		// 	expected: []int{27, 2, 77, 52, 27},
+		// },
 		{
-			m:          100,
-			a:          17,
-			c:          43,
-			seed:       27,
-			hulldobell: false,
-			expected:   []int{27, 2, 77, 52, 27},
+			m:        64,
+			a:        13,
+			c:        0,
+			seed:     1,
+			expected: []int{1, 13, 41, 21, 17, 29, 57, 37, 33, 45, 9, 53, 49, 61, 25, 5, 1},
 		},
 		{
-			m:          64,
-			a:          13,
-			c:          0,
-			seed:       1,
-			hulldobell: false,
-			expected:   []int{1, 13, 41, 21, 17, 29, 57, 37, 33, 45, 9, 53, 49, 61, 25, 5, 1},
+			m:        64,
+			a:        13,
+			c:        0,
+			seed:     2,
+			expected: []int{2, 26, 18, 42, 34, 58, 50, 10, 2},
 		},
 		{
-			m:          64,
-			a:          13,
-			c:          0,
-			seed:       2,
-			hulldobell: false,
-			expected:   []int{2, 26, 18, 42, 34, 58, 50, 10, 2},
+			m:        64,
+			a:        13,
+			c:        0,
+			seed:     3,
+			expected: []int{3, 39, 59, 63, 51, 23, 43, 47, 35, 7, 27, 31, 19, 55, 11, 15, 3},
 		},
 		{
-			m:          64,
-			a:          13,
-			c:          0,
-			seed:       3,
-			hulldobell: false,
-			expected:   []int{3, 39, 59, 63, 51, 23, 43, 47, 35, 7, 27, 31, 19, 55, 11, 15, 3},
-		},
-		{
-			m:          64,
-			a:          13,
-			c:          0,
-			seed:       4,
-			hulldobell: false,
-			expected:   []int{4, 52, 36, 20, 4},
+			m:        64,
+			a:        13,
+			c:        0,
+			seed:     4,
+			expected: []int{4, 52, 36, 20, 4},
 		},
 	}
 
@@ -78,18 +73,8 @@ func TestLCG(t *testing.T) {
 		lcg.Increment = table.c
 		lcg.Seed = table.seed
 
-		err := lcg.hullDobell()
-		if err == nil && !table.hulldobell {
-			t.Errorf("LCG %+v satisfies Hull-Dobell, contrary to expectations", lcg)
-		} else if err != nil && table.hulldobell {
-			t.Errorf("LCG %+v fails Hull-Dobell, contrary to expectations: %s", lcg, err)
-		}
-		if err != nil {
-			continue
-		}
-
 		if out, err := lcg.Slice(len(table.expected)); err != nil {
-			t.Error("Error:", err)
+			t.Errorf("Error for LCG %+v: %+v", lcg, err)
 		} else if !reflect.DeepEqual(out, table.expected) {
 			t.Errorf("expected LCG %+v to produce values %+v, but got %+v instead", lcg, table.expected, out)
 		}
