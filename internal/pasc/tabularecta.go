@@ -109,19 +109,19 @@ func (tr *TabulaRecta) Printable() (string, error) {
 // }
 
 // Encipher a string.
-func (tr *TabulaRecta) Encipher(s string, k string, autoclave func(rune, rune) rune) (string, error) {
+func (tr *TabulaRecta) Encipher(s string, k string, onSuccess func(rune, rune, *[]rune)) (string, error) {
 	rt, err := tr.makereciprocaltable()
 	if err != nil {
 		return "", err
 	}
-	return rt.Encipher(s, k, autoclave)
+	return rt.Encipher(s, k, onSuccess)
 }
 
 // Decipher a string.
-func (tr *TabulaRecta) Decipher(s string, k string, autoclave func(rune, rune) rune) (string, error) {
+func (tr *TabulaRecta) Decipher(s string, k string, onSuccess func(rune, rune, *[]rune)) (string, error) {
 	rt, err := tr.makereciprocaltable()
 	if err != nil {
 		return "", err
 	}
-	return rt.Decipher(s, k, autoclave)
+	return rt.Decipher(s, k, onSuccess)
 }

@@ -134,7 +134,8 @@ func (tr *ReciprocalTable) Printable() (string, error) {
 // }
 
 // Encipher a string.
-func (tr *ReciprocalTable) Encipher(s string, k string, autoclave func(rune, rune) rune) (string, error) {
+// Encipher will invoke the onSuccess function with before and after runes.
+func (tr *ReciprocalTable) Encipher(s string, k string, onSuccess func(rune, rune, *[]rune)) (string, error) {
 	pt2ct, _, err := makedicts(tr.PtAlphabet, tr.KeyAlphabet, tr.CtAlphabets)
 	if err != nil {
 		return "", err
@@ -155,10 +156,8 @@ func (tr *ReciprocalTable) Encipher(s string, k string, autoclave func(rune, run
 		if o, ok := m[r]; ok {
 			// Transcoding successful
 			transcodedCharCount++
-			if autoclave != nil {
-				if newRune := autoclave(r, o); newRune != (-1) {
-					keyRunes = append(keyRunes, newRune)
-				}
+			if onSuccess != nil {
+				onSuccess(r, o, &keyRunes)
 			}
 			return o
 		} else if !tr.Strict {
@@ -171,7 +170,8 @@ func (tr *ReciprocalTable) Encipher(s string, k string, autoclave func(rune, run
 }
 
 // Decipher a string.
-func (tr *ReciprocalTable) Decipher(s string, k string, autoclave func(rune, rune) rune) (string, error) {
+// Decipher will invoke the onSuccess function with before and after runes.
+func (tr *ReciprocalTable) Decipher(s string, k string, onSuccess func(rune, rune, *[]rune)) (string, error) {
 	_, ct2pt, err := makedicts(tr.PtAlphabet, tr.KeyAlphabet, tr.CtAlphabets)
 	if err != nil {
 		return "", err
@@ -192,10 +192,8 @@ func (tr *ReciprocalTable) Decipher(s string, k string, autoclave func(rune, run
 		if o, ok := m[r]; ok {
 			// Transcoding successful
 			transcodedCharCount++
-			if autoclave != nil {
-				if newRune := autoclave(r, o); newRune != (-1) {
-					keyRunes = append(keyRunes, newRune)
-				}
+			if onSuccess != nil {
+				onSuccess(r, o, &keyRunes)
 			}
 			return o
 		} else if !tr.Strict {

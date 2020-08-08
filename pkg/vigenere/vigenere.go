@@ -60,14 +60,13 @@ func (c *Cipher) Encipher(s string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return t.Encipher(s, c.Key, func(original rune, translated rune) rune {
+	return t.Encipher(s, c.Key, func(a rune, b rune, keystream *[]rune) {
 		switch c.Autokey {
 		case TextAutokey:
-			return original
+			*keystream = append(*keystream, a)
 		case KeyAutokey:
-			return translated
+			*keystream = append(*keystream, b)
 		}
-		return (-1)
 	})
 }
 
@@ -77,14 +76,13 @@ func (c *Cipher) Decipher(s string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return t.Decipher(s, c.Key, func(original rune, translated rune) rune {
+	return t.Decipher(s, c.Key, func(a rune, b rune, keystream *[]rune) {
 		switch c.Autokey {
 		case TextAutokey:
-			return translated
+			*keystream = append(*keystream, b)
 		case KeyAutokey:
-			return original
+			*keystream = append(*keystream, a)
 		}
-		return (-1)
 	})
 }
 

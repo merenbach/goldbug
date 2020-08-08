@@ -25,4 +25,5 @@ Instantiate your deployment pipeline as follows, adapting as necessary the param
 * MASC casing preservation/normalization?
 * Add shift and directionality to Trithemius?
 * Nulls for rail fence?
+* Improve autoclave further
 * Add keyed vigenere (Quagmire IV)
