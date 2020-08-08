@@ -30,15 +30,25 @@ type LCG struct {
 	Seed       int // X_0
 }
 
-// // Lehmer RNG validation.
-// func (g *LCG) Lehmer() bool {
+// // Multiplicative RNGs have a zero increment.
+// // Multiplicative RNGs are also called Lehmer RNGs and Park-Miller RNGs.
+// func (g *LCG) multiplicative() bool {
 // 	return g.Increment == 0
 // }
+
+// Mixed RNGs have a non-zero increment.
+func (g *LCG) mixed() bool {
+	return g.Increment != 0
+}
 
 // HullDobell tests for compliance with the Hull-Dobell theorem.
 // The error parameter, if set, will contain the first-found failing constraint.
 // When c != 0, this test passing means that the cycle is equal to g.multiplier.
 func (g *LCG) hullDobell() error {
+	if !g.mixed() {
+		return nil
+	}
+
 	switch {
 	case !mathutil.Coprime(g.Modulus, g.Increment):
 		return errors.New("multiplier and increment should be coprime")

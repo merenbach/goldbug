@@ -79,9 +79,9 @@ func TestLCG(t *testing.T) {
 		lcg.Seed = table.seed
 
 		err := lcg.hullDobell()
-		if err != nil && table.hulldobell {
+		if err == nil && !table.hulldobell {
 			t.Errorf("LCG %+v satisfies Hull-Dobell, contrary to expectations", lcg)
-		} else if err == nil && !table.hulldobell {
+		} else if err != nil && table.hulldobell {
 			t.Errorf("LCG %+v fails Hull-Dobell, contrary to expectations: %s", lcg, err)
 		}
 		if err != nil {
