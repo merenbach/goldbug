@@ -78,13 +78,14 @@ func TestLCG(t *testing.T) {
 		lcg.Increment = table.c
 		lcg.Seed = table.seed
 
-		err := lcg.HullDobell()
-		if (err != nil) == table.hulldobell {
-			if err != nil {
-				t.Errorf("LCG %+v satisfies Hull-Dobell, contrary to expectations", lcg)
-			} else {
-				t.Errorf("LCG %+v fails Hull-Dobell, contrary to expectations: %s", lcg, err)
-			}
+		err := lcg.hullDobell()
+		if err != nil && table.hulldobell {
+			t.Errorf("LCG %+v satisfies Hull-Dobell, contrary to expectations", lcg)
+		} else if err == nil && !table.hulldobell {
+			t.Errorf("LCG %+v fails Hull-Dobell, contrary to expectations: %s", lcg, err)
+		}
+		if err != nil {
+			continue
 		}
 
 		if out, err := lcg.Slice(len(table.expected)); err != nil {

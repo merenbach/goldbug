@@ -31,7 +31,6 @@ type LCG struct {
 }
 
 // // Lehmer RNG validation.
-// // TODO
 // func (g *LCG) Lehmer() bool {
 // 	return g.Increment == 0
 // }
@@ -39,7 +38,7 @@ type LCG struct {
 // HullDobell tests for compliance with the Hull-Dobell theorem.
 // The error parameter, if set, will contain the first-found failing constraint.
 // When c != 0, this test passing means that the cycle is equal to g.multiplier.
-func (g *LCG) HullDobell() error {
+func (g *LCG) hullDobell() error {
 	switch {
 	case !mathutil.Coprime(g.Modulus, g.Increment):
 		return errors.New("multiplier and increment should be coprime")
@@ -52,13 +51,21 @@ func (g *LCG) HullDobell() error {
 	}
 }
 
-// Iterator across LCG values.
-func (g *LCG) iterator() (func() int, error) {
+// Validate settings for this generator.
+func (g *LCG) validate() error {
 	if g.Modulus <= 0 {
-		return nil, errors.New("modulus must be greater than zero")
+		return errors.New("modulus must be greater than zero")
 	}
 	if g.Multiplier <= 0 {
-		return nil, errors.New("multiplier must be greater than zero")
+		return errors.New("multiplier must be greater than zero")
+	}
+	return g.hullDobell()
+}
+
+// Iterator across LCG values.
+func (g *LCG) iterator() (func() int, error) {
+	if err := g.validate(); err != nil {
+		return nil, err
 	}
 
 	state := g.Seed % g.Modulus
