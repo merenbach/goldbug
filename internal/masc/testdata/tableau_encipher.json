@@ -1,0 +1,34 @@
+[
+    {
+        "PtAlphabet": "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        "CtAlphabet": "DEFGHIJKLMNOPQRSTUVWXYZABC",
+        "Input": "HELLO, WORLD! Hello, world!",
+        "Output": "KHOOR, ZRUOG! Kello, world!",
+        "Strict": false,
+        "Caseless": false
+    },
+    {
+        "PtAlphabet": "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        "CtAlphabet": "DEFGHIJKLMNOPQRSTUVWXYZABC",
+        "Input": "HELLO, WORLD! Hello, world!",
+        "Output": "KHOORZRUOGK",
+        "Strict": true,
+        "Caseless": false
+    },
+    {
+        "PtAlphabet": "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        "CtAlphabet": "DEFGHIJKLMNOPQRSTUVWXYZABC",
+        "Input": "HELLO, WORLD! Hello, world!",
+        "Output": "KHOOR, ZRUOG! Khoor, zruog!",
+        "Strict": false,
+        "Caseless": true
+    },
+    {
+        "PtAlphabet": "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        "CtAlphabet": "DEFGHIJKLMNOPQRSTUVWXYZABC",
+        "Input": "HELLO, WORLD! Hello, world!",
+        "Output": "KHOORZRUOGKhoorzruog",
+        "Strict": true,
+        "Caseless": true
+    }
+]

@@ -1,0 +1,34 @@
+[
+    {
+        "PtAlphabet": "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        "CtAlphabet": "DEFGHIJKLMNOPQRSTUVWXYZABC",
+        "Input": "KHOOR, ZRUOG! Khoor, zruog!",
+        "Output": "HELLO, WORLD! Hhoor, zruog!",
+        "Strict": false,
+        "Caseless": false
+    },
+    {
+        "PtAlphabet": "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        "CtAlphabet": "DEFGHIJKLMNOPQRSTUVWXYZABC",
+        "Input": "KHOOR, ZRUOG! Khoor, zruog!",
+        "Output": "HELLOWORLDH",
+        "Strict": true,
+        "Caseless": false
+    },
+    {
+        "PtAlphabet": "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        "CtAlphabet": "DEFGHIJKLMNOPQRSTUVWXYZABC",
+        "Input": "KHOOR, ZRUOG! Khoor, zruog!",
+        "Output": "HELLO, WORLD! Hello, world!",
+        "Strict": false,
+        "Caseless": true
+    },
+    {
+        "PtAlphabet": "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        "CtAlphabet": "DEFGHIJKLMNOPQRSTUVWXYZABC",
+        "Input": "KHOOR, ZRUOG! Khoor, zruog!",
+        "Output": "HELLOWORLDHelloworld",
+        "Strict": true,
+        "Caseless": true
+    }
+]

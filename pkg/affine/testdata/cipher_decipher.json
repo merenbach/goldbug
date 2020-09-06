@@ -1,6 +1,15 @@
 [
     {
         "Alphabet": "",
+        "Input": "Afccx, bxscy!",
+        "Output": "Hello, world!",
+        "Slope": 7,
+        "Intercept": 3,
+        "Strict": false,
+        "Caseless": true
+    },
+    {
+        "Alphabet": "",
         "Input": "AFCCX, BXSCY!",
         "Output": "HELLO, WORLD!",
         "Slope": 7,

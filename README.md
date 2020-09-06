@@ -22,7 +22,7 @@ Instantiate your deployment pipeline as follows, adapting as necessary the param
 
 ## TODO
 
-* MASC casing preservation/normalization?
+* Add PASC caseless option
 * Add shift and directionality to Trithemius?
 * Nulls for rail fence?
 * Improve autoclave further

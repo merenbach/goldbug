@@ -26,6 +26,7 @@ type Cipher struct {
 	Alphabet string
 	Keyword  string
 	Strict   bool
+	Caseless bool
 }
 
 func (c *Cipher) maketableau() (*masc.Tableau, error) {
@@ -39,6 +40,7 @@ func (c *Cipher) maketableau() (*masc.Tableau, error) {
 		PtAlphabet: ptAlphabet,
 		CtAlphabet: ctAlphabet,
 		Strict:     c.Strict,
+		Caseless:   c.Caseless,
 	}, nil
 }
 

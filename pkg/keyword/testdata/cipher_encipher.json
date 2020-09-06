@@ -1,6 +1,14 @@
 [
     {
         "Alphabet": "",
+        "Input": "Hello, world!",
+        "Output": "Crhhl, wlqhg!",
+        "Keyword": "KANGAROO",
+        "Strict": false,
+        "Caseless": true
+    },
+    {
+        "Alphabet": "",
         "Input": "HELLO, WORLD!",
         "Output": "CRHHL, WLQHG!",
         "Keyword": "KANGAROO",

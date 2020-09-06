@@ -13,3 +13,60 @@
 // limitations under the License.
 
 package masc
+
+import (
+	"encoding/json"
+	"io/ioutil"
+	"path/filepath"
+	"testing"
+)
+
+func TestTableau_Encipher(t *testing.T) {
+	testdata, err := ioutil.ReadFile(filepath.Join("testdata", "tableau_encipher.json"))
+	if err != nil {
+		t.Fatal("Could not read testdata fixture:", err)
+	}
+
+	var tables []struct {
+		Tableau
+
+		Input  string
+		Output string
+	}
+	if err := json.Unmarshal(testdata, &tables); err != nil {
+		t.Fatal("Could not unmarshal testdata:", err)
+	}
+
+	for _, table := range tables {
+		if out, err := table.Encipher(table.Input); err != nil {
+			t.Error("Could not encipher:", err)
+		} else if out != table.Output {
+			t.Errorf("Expected %q to encipher to %q, but instead got %q", table.Input, table.Output, out)
+		}
+	}
+}
+
+func TestTableau_Decipher(t *testing.T) {
+	testdata, err := ioutil.ReadFile(filepath.Join("testdata", "tableau_decipher.json"))
+	if err != nil {
+		t.Fatal("Could not read testdata fixture:", err)
+	}
+
+	var tables []struct {
+		Tableau
+
+		Input  string
+		Output string
+	}
+	if err := json.Unmarshal(testdata, &tables); err != nil {
+		t.Fatal("Could not unmarshal testdata:", err)
+	}
+
+	for _, table := range tables {
+		if out, err := table.Decipher(table.Input); err != nil {
+			t.Error("Could not decipher:", err)
+		} else if out != table.Output {
+			t.Errorf("Expected %q to decipher to %q, but instead got %q", table.Input, table.Output, out)
+		}
+	}
+}

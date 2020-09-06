@@ -16,6 +16,7 @@ package masc
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/merenbach/goldbug/internal/translation"
 )
@@ -28,14 +29,23 @@ type Tableau struct {
 	PtAlphabet string
 	CtAlphabet string
 
-	Strict bool
+	Strict   bool
+	Caseless bool
 }
 
 // Encipher a string.
 func (t *Tableau) Encipher(s string) (string, error) {
+	ptAlphabet := t.PtAlphabet
+	ctAlphabet := t.CtAlphabet
+
+	if t.Caseless {
+		ptAlphabet = strings.ToUpper(ptAlphabet) + strings.ToLower(ptAlphabet)
+		ctAlphabet = strings.ToUpper(ctAlphabet) + strings.ToLower(ctAlphabet)
+	}
+
 	tt := translation.Table{
-		Src:    t.PtAlphabet,
-		Dst:    t.CtAlphabet,
+		Src:    ptAlphabet,
+		Dst:    ctAlphabet,
 		Strict: t.Strict,
 	}
 	return tt.Translate(s)
@@ -43,9 +53,17 @@ func (t *Tableau) Encipher(s string) (string, error) {
 
 // Decipher a string.
 func (t *Tableau) Decipher(s string) (string, error) {
+	ptAlphabet := t.PtAlphabet
+	ctAlphabet := t.CtAlphabet
+
+	if t.Caseless {
+		ptAlphabet = strings.ToUpper(ptAlphabet) + strings.ToLower(ptAlphabet)
+		ctAlphabet = strings.ToUpper(ctAlphabet) + strings.ToLower(ctAlphabet)
+	}
+
 	tt := translation.Table{
-		Src:    t.CtAlphabet,
-		Dst:    t.PtAlphabet,
+		Src:    ctAlphabet,
+		Dst:    ptAlphabet,
 		Strict: t.Strict,
 	}
 	return tt.Translate(s)
