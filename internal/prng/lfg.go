@@ -29,9 +29,23 @@ func all(ii []int, f func(int) bool) bool {
 	return true
 }
 
+func iterateLagTable(m int, seed []int, f func([]int) int) func() int {
+	// current set of elements, effectively a FIFO queue
+	lagTable := make([]int, len(seed))
+	copy(lagTable, seed)
+
+	return func() int {
+		o := f(lagTable) % m
+		copy(lagTable, lagTable[1:])
+		lagTable[len(lagTable)-1] = o
+		return o
+	}
+}
+
 // An LFG is a lagged Fibonacci generator.
 // An LFG is a type of pseudo-random number generator (PRNG).
 // An LFG may not be cryptographically secure.
+// An LFG uses 1-indexed taps.
 type LFG struct {
 	Modulus int
 	Seed    []int
@@ -65,20 +79,13 @@ func (g *LFG) IteratorA() (func() int, error) {
 		return nil, errors.New("At least one ALFG seed value must be odd")
 	}
 
-	// current set of records, effectively a FIFO queue
-	lagTable := g.Seed[:]
-
-	return func() int {
-		sum := 0
-
+	return iterateLagTable(g.Modulus, g.Seed, func(lagTable []int) int {
+		e := 0
 		for _, t := range g.Taps {
-			sum += lagTable[t-1]
+			e += lagTable[t-1]
 		}
-
-		e := sum % g.Modulus
-		lagTable = append(lagTable[1:], e)
 		return e
-	}, nil
+	}), nil
 }
 
 // IteratorM returns a multiplicative lagged Fibonacci generator (MLFG) function.
@@ -93,18 +100,11 @@ func (g *LFG) IteratorM() (func() int, error) {
 		return nil, errors.New("All MLFG seed values must be odd")
 	}
 
-	// current set of records, effectively a FIFO queue
-	lagTable := g.Seed[:]
-
-	return func() int {
-		product := 1
-
+	return iterateLagTable(g.Modulus, g.Seed, func(lagTable []int) int {
+		e := 1
 		for _, t := range g.Taps {
-			product *= lagTable[t-1]
+			e *= lagTable[t-1]
 		}
-
-		e := product % g.Modulus
-		lagTable = append(lagTable[1:], e)
 		return e
-	}, nil
+	}), nil
 }
