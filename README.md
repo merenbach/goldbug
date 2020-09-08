@@ -23,6 +23,7 @@ Instantiate your deployment pipeline as follows, adapting as necessary the param
 ## TODO
 
 * Include primer at beginning of GROMARK text and end with check digit per https://www.cryptogram.org/downloads/aca.info/ciphers/Gromark.pdf?
+* Add null options to transposition cipher? Special null adder utility module?
 * Add PASC caseless option
 * Add shift and directionality to Trithemius?
 * Nulls for rail fence?
