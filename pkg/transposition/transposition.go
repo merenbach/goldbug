@@ -16,7 +16,6 @@ package transposition
 
 import (
 	"sort"
-	"strings"
 	"unicode/utf8"
 
 	"github.com/merenbach/goldbug/internal/stringutil"
@@ -38,17 +37,24 @@ func lexicalKey(s string, repeats bool) []int {
 		dataString = stringutil.Deduplicate(dataString)
 	}
 
-	seen := make(map[rune]int)
+	seen := make(map[int]struct{})
 	for i, r := range []rune(s) {
-		out[i] = strings.IndexRune(dataString, r) + 1
-		if !repeats {
-			if n, ok := seen[r]; ok {
-				seen[r]++
-				out[i] += n
-			} else {
-				seen[r] = 1
+
+		var z int
+		for i2, r2 := range []rune(dataString) {
+			if r2 == r {
+				if _, ok := seen[i2]; ok {
+					if !repeats {
+						continue
+					}
+				}
+
+				seen[i2] = struct{}{}
+				z = i2
+				break
 			}
 		}
+		out[i] = z + 1
 	}
 	return out
 }
