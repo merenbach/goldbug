@@ -40,17 +40,16 @@ func lexicalKey(s string) []int {
 
 // Cipher implements a columnar transposition cipher.
 type Cipher struct {
-	Cols int
-	Key  string
+	Keys []string
 }
 
 // Makegrid creates a grid and numbers its cells.
-func (c *Cipher) makegrid(n int) grid.Grid {
+func (c *Cipher) makegrid(n int, cols int) grid.Grid {
 	g := make(grid.Grid, n)
 
 	for i := range g {
-		g[i].Col = i % c.Cols
-		g[i].Row = i / c.Cols
+		g[i].Col = i % cols
+		g[i].Row = i / cols
 	}
 
 	return g
@@ -58,54 +57,54 @@ func (c *Cipher) makegrid(n int) grid.Grid {
 
 // Encipher a message.
 func (c *Cipher) Encipher(s string) (string, error) {
-	if c.Cols == 1 {
-		return s, nil
+	for _, k := range c.Keys {
+		g := c.makegrid(utf8.RuneCountInString(s), utf8.RuneCountInString(k))
+		g.SortByRow()
+		g.Fill(s)
+
+		keyNums := lexicalKey(k)
+		s = g.ReadCols(keyNums)
 	}
 
-	g := c.makegrid(utf8.RuneCountInString(s))
-	g.SortByRow()
-	g.Fill(s)
-
-	keyNums := lexicalKey(c.Key)
-	return g.ReadCols(keyNums), nil
+	return s, nil
 }
 
 // Decipher a message.
 func (c *Cipher) Decipher(s string) (string, error) {
-	if c.Cols == 1 {
-		return s, nil
+	for i := len(c.Keys) - 1; i >= 0; i-- {
+		k := c.Keys[i]
+		g := c.makegrid(utf8.RuneCountInString(s), utf8.RuneCountInString(k))
+		keyNums := lexicalKey(k)
+
+		g.OrderByCol(keyNums)
+		g.Fill(s)
+		g.SortByCol()
+		s = g.ReadByRow()
 	}
 
-	g := c.makegrid(utf8.RuneCountInString(s))
-
-	keyNums := lexicalKey(c.Key)
-	g.OrderByCol(keyNums)
-
-	g.Fill(s)
-	g.SortByCol()
-	return g.ReadByRow(), nil
+	return s, nil
 }
 
-// EnciphermentGrid returns the output tableau upon encipherment.
-func (c *Cipher) enciphermentGrid(s string) (string, error) {
-	if c.Cols == 1 {
-		return s, nil
-	}
+// // EnciphermentGrid returns the output tableau upon encipherment.
+// func (c *Cipher) enciphermentGrid(s string) (string, error) {
+// 	if c.Cols == 1 {
+// 		return s, nil
+// 	}
 
-	g := c.makegrid(utf8.RuneCountInString(s))
-	g.SortByCol()
-	g.Fill(s)
-	return g.Printable(), nil
-}
+// 	g := c.makegrid(utf8.RuneCountInString(s))
+// 	g.SortByCol()
+// 	g.Fill(s)
+// 	return g.Printable(), nil
+// }
 
-// DeciphermentGrid returns the output tableau upon encipherment.
-func (c *Cipher) deciphermentGrid(s string) (string, error) {
-	if c.Cols == 1 {
-		return s, nil
-	}
+// // DeciphermentGrid returns the output tableau upon encipherment.
+// func (c *Cipher) deciphermentGrid(s string) (string, error) {
+// 	if c.Cols == 1 {
+// 		return s, nil
+// 	}
 
-	g := c.makegrid(utf8.RuneCountInString(s))
-	g.SortByRow()
-	g.Fill(s)
-	return g.Printable(), nil
-}
+// 	g := c.makegrid(utf8.RuneCountInString(s))
+// 	g.SortByRow()
+// 	g.Fill(s)
+// 	return g.Printable(), nil
+// }

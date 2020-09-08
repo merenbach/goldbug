@@ -81,8 +81,7 @@ func (c *Cipher) maketableau() (*pasc.TabulaRecta, error) {
 	ctAlphabetInput := stringutil.Deduplicate(c.Key + alphabet)
 
 	tc := transposition.Cipher{
-		Key:  c.Key,
-		Cols: utf8.RuneCountInString(c.Key),
+		Keys: []string{c.Key},
 	}
 	transposedCtAlphabet, err := tc.Encipher(ctAlphabetInput)
 	if err != nil {

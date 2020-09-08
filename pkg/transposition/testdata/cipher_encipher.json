@@ -2,8 +2,13 @@
     {
         "Input": "WEAREDISCOVEREDFLEEATONCE",
         "Output": "EVLNACDTESEAROFODEECWIREE",
-        "Key": "ZEBRAS",
-        "Cols": 6,
+        "Keys": ["ZEBRAS"],
+        "Strict": false
+    },
+    {
+        "Input": "WEAREDISCOVEREDFLEEATONCE",
+        "Output": "CAEENSOIAEDRLEFWEDREEVTOC",
+        "Keys": ["ZEBRAS", "STRIPE"],
         "Strict": false
     }
 ]
