@@ -22,6 +22,9 @@ Instantiate your deployment pipeline as follows, adapting as necessary the param
 
 ## TODO
 
+* Allow transposition cipher key to be for columns directly, rather than relative ordering
+* Allow number duplicates to be ordered backwards when creating lexicographic key
+* Add printout option to columnar transposition ciphers
 * Include primer at beginning of GROMARK text and end with check digit per https://www.cryptogram.org/downloads/aca.info/ciphers/Gromark.pdf?
 * Add null options to transposition cipher? Special null adder utility module?
 * Add PASC caseless option
