@@ -15,46 +15,14 @@
 package gromark
 
 import (
-	"log"
-	"sort"
 	"strings"
 	"unicode/utf8"
 
-	"github.com/merenbach/goldbug/internal/grid"
 	"github.com/merenbach/goldbug/internal/lfg"
 	"github.com/merenbach/goldbug/internal/pasc"
 	"github.com/merenbach/goldbug/internal/stringutil"
+	"github.com/merenbach/goldbug/pkg/transposition"
 )
-
-// make alphabetic grid based on transposition cipher
-func makegrid(s string, cols []int) string {
-	g := make(grid.Grid, utf8.RuneCountInString(s))
-
-	for i := range g {
-		g[i].Col = i % len(cols)
-		g[i].Row = i / len(cols)
-	}
-
-	g.SortByRow()
-	g.Fill(s)
-	return g.ReadCols(cols)
-}
-
-// LexicalKey returns a key based on the relative lexicographic ordering of runes in a string.
-func lexicalKey(s string) []int {
-	out := make([]int, utf8.RuneCountInString(s))
-
-	data := []rune(s)
-	sort.Slice(data, func(i, j int) bool {
-		return data[i] < data[j]
-	})
-	dataString := string(data)
-
-	for i, r := range []rune(s) {
-		out[i] = strings.IndexRune(dataString, r) + 1
-	}
-	return out
-}
 
 func chainadder(m int, count int, primer []int) ([]int, error) {
 	g := lfg.Additive{
@@ -111,11 +79,19 @@ func (c *Cipher) maketableau() (*pasc.TabulaRecta, error) {
 	}
 
 	ctAlphabetInput := stringutil.Deduplicate(c.Key + alphabet)
-	cols := lexicalKey(c.Key)
+
+	tc := transposition.Cipher{
+		Key:  c.Key,
+		Cols: utf8.RuneCountInString(c.Key),
+	}
+	transposedCtAlphabet, err := tc.Encipher(ctAlphabetInput)
+	if err != nil {
+		return nil, err
+	}
 
 	return &pasc.TabulaRecta{
 		PtAlphabet:  alphabet,
-		CtAlphabet:  makegrid(ctAlphabetInput, cols),
+		CtAlphabet:  transposedCtAlphabet,
 		KeyAlphabet: digits,
 		Strict:      c.Strict,
 	}, nil
@@ -127,7 +103,7 @@ func (c *Cipher) Encipher(s string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	log.Println(lexicalKey(c.Key))
+
 	key, err := makekey(c.Primer, utf8.RuneCountInString(s))
 	if err != nil {
 		return "", err
