@@ -45,6 +45,14 @@ func (g Grid) ReadByCol() string {
 	return g2.contents()
 }
 
+// ReadCols reads numbered columns // EXPERIMENTAL
+func (g Grid) ReadCols(ii []int) string {
+	g2 := make(Grid, len(g))
+	copy(g2, g)
+	g2.OrderByCol(ii)
+	return g2.contents()
+}
+
 // Printable version of this grid.
 func (g Grid) Printable() string {
 	g2 := make(Grid, len(g))
@@ -94,12 +102,11 @@ func (g Grid) Fill(s string) {
 func (g Grid) SortByRow() {
 	// SliceStable works here with the assumption that cells are already sorted by column.
 	// A stable slice isn't required so much as having column values being used as a tiebreaker.
-	// One functional equivalent (in this context) that works with sort.Slice() would be:
+	// One functional equivalent (in this context) that works instead with sort.Slice() would be:
 	//
 	//    return (g[i].Row == g[j].Row && g[i].Col < g[j].Col) || g[i].Row < g[j].Row
 	//
 	sort.SliceStable(g, func(i, j int) bool {
-		// return (g[i].Row == g[j].Row && g[i].Col < g[j].Col) || g[i].Row < g[j].Row
 		return g[i].Row < g[j].Row
 	})
 }
@@ -108,12 +115,24 @@ func (g Grid) SortByRow() {
 func (g Grid) SortByCol() {
 	// SliceStable works here with the assumption that cells are already sorted by row.
 	// A stable slice isn't required so much as having row values being used as a tiebreaker.
-	// One functional equivalent (in this context) that works with sort.Slice() would be:
+	// One functional equivalent (in this context) that works instead with sort.Slice() would be:
 	//
 	//    return (g[i].Col == g[j].Col && g[i].Row < g[j].Row) || g[i].Col < g[j].Col
 	//
 	sort.SliceStable(g, func(i, j int) bool {
-		// return (g[i].Col == g[j].Col && g[i].Row < g[j].Row) || g[i].Col < g[j].Col
 		return g[i].Col < g[j].Col
+	})
+}
+
+// OrderByCol sorts a grid by column.
+func (g Grid) OrderByCol(ii []int) {
+	// SliceStable works here with the assumption that cells are already sorted by row.
+	// A stable slice isn't required so much as having row values being used as a tiebreaker.
+	// One functional equivalent (in this context) that works instead with sort.Slice() would be:
+	//
+	//    return (g[i].Col == g[j].Col && g[i].Row < g[j].Row) || ii[g[i].Col] < ii[g[j].Col]
+	//
+	sort.SliceStable(g, func(i, j int) bool {
+		return ii[g[i].Col] < ii[g[j].Col]
 	})
 }

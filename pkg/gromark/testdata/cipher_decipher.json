@@ -1,0 +1,10 @@
+[
+    {
+        "Alphabet": "",
+        "Input": "NFYCKBTIJCNWZYCACJNAYNLQPWWSTWPJQFL",
+        "Output": "THEREAREUPTOTENSUBSTITUTESPERLETTER",
+        "Key": "ENIGMA",
+        "Primer": "23452",
+        "Strict": false
+    }
+]
