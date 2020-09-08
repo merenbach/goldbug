@@ -19,11 +19,13 @@ import (
 	"strings"
 	"unicode/utf8"
 
+	"github.com/merenbach/goldbug/internal/stringutil"
+
 	"github.com/merenbach/goldbug/internal/grid"
 )
 
 // LexicalKey returns a key based on the relative lexicographic ordering of runes in a string.
-func lexicalKey(s string) []int {
+func lexicalKey(s string, repeats bool) []int {
 	out := make([]int, utf8.RuneCountInString(s))
 
 	data := []rune(s)
@@ -32,26 +34,38 @@ func lexicalKey(s string) []int {
 	})
 	dataString := string(data)
 
+	if repeats {
+		dataString = stringutil.Deduplicate(dataString)
+	}
+
+	seen := make(map[rune]int)
 	for i, r := range []rune(s) {
 		out[i] = strings.IndexRune(dataString, r) + 1
+		if !repeats {
+			if n, ok := seen[r]; ok {
+				seen[r]++
+				out[i] += n
+			} else {
+				seen[r] = 1
+			}
+		}
 	}
 	return out
 }
 
 // Cipher implements a columnar transposition cipher.
 type Cipher struct {
-	Keys []string
+	Keys       []string
+	Myszkowski bool
 }
 
 // Makegrid creates a grid and numbers its cells.
 func (c *Cipher) makegrid(n int, cols int) grid.Grid {
 	g := make(grid.Grid, n)
-
 	for i := range g {
 		g[i].Col = i % cols
 		g[i].Row = i / cols
 	}
-
 	return g
 }
 
@@ -62,7 +76,7 @@ func (c *Cipher) Encipher(s string) (string, error) {
 		g.SortByRow()
 		g.Fill(s)
 
-		keyNums := lexicalKey(k)
+		keyNums := lexicalKey(k, c.Myszkowski)
 		s = g.ReadCols(keyNums)
 	}
 
@@ -74,7 +88,7 @@ func (c *Cipher) Decipher(s string) (string, error) {
 	for i := len(c.Keys) - 1; i >= 0; i-- {
 		k := c.Keys[i]
 		g := c.makegrid(utf8.RuneCountInString(s), utf8.RuneCountInString(k))
-		keyNums := lexicalKey(k)
+		keyNums := lexicalKey(k, c.Myszkowski)
 
 		g.OrderByCol(keyNums)
 		g.Fill(s)
@@ -87,10 +101,6 @@ func (c *Cipher) Decipher(s string) (string, error) {
 
 // // EnciphermentGrid returns the output tableau upon encipherment.
 // func (c *Cipher) enciphermentGrid(s string) (string, error) {
-// 	if c.Cols == 1 {
-// 		return s, nil
-// 	}
-
 // 	g := c.makegrid(utf8.RuneCountInString(s))
 // 	g.SortByCol()
 // 	g.Fill(s)
@@ -99,10 +109,6 @@ func (c *Cipher) Decipher(s string) (string, error) {
 
 // // DeciphermentGrid returns the output tableau upon encipherment.
 // func (c *Cipher) deciphermentGrid(s string) (string, error) {
-// 	if c.Cols == 1 {
-// 		return s, nil
-// 	}
-
 // 	g := c.makegrid(utf8.RuneCountInString(s))
 // 	g.SortByRow()
 // 	g.Fill(s)

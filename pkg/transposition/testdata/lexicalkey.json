@@ -1,0 +1,50 @@
+[
+    {
+        "Input": "ZEBRAS",
+        "Output": [
+            6,
+            3,
+            2,
+            4,
+            1,
+            5
+        ],
+        "Repetition": false
+    },
+    {
+        "Input": "STRIPE",
+        "Output": [
+            5,
+            6,
+            4,
+            2,
+            3,
+            1
+        ],
+        "Repetition": false
+    },
+    {
+        "Input": "TOMATO",
+        "Output": [
+            5,
+            3,
+            2,
+            1,
+            6,
+            4
+        ],
+        "Repetition": false
+    },
+    {
+        "Input": "TOMATO",
+        "Output": [
+            4,
+            3,
+            2,
+            1,
+            4,
+            3
+        ],
+        "Repetition": true
+    }
+]

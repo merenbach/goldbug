@@ -18,8 +18,33 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"path/filepath"
+	"reflect"
 	"testing"
 )
+
+func TestLexicalKey(t *testing.T) {
+	testdata, err := ioutil.ReadFile(filepath.Join("testdata", "lexicalkey.json"))
+	if err != nil {
+		t.Fatal("Could not read testdata fixture:", err)
+	}
+
+	var tables []struct {
+		Input      string
+		Repetition bool
+		Output     []int
+	}
+	if err := json.Unmarshal(testdata, &tables); err != nil {
+		t.Fatal("Could not unmarshal testdata:", err)
+	}
+
+	for _, table := range tables {
+		if out := lexicalKey(table.Input, table.Repetition); err != nil {
+			t.Error("Error:", err)
+		} else if !reflect.DeepEqual(out, table.Output) {
+			t.Errorf("Expected %q to lexically yield %v, but instead got %v", table.Input, table.Output, out)
+		}
+	}
+}
 
 func TestCipher_Encipher(t *testing.T) {
 	testdata, err := ioutil.ReadFile(filepath.Join("testdata", "cipher_encipher.json"))
