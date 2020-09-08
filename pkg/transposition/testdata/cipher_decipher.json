@@ -1,0 +1,9 @@
+[
+    {
+        "Input": "EVLNACDTESEAROFODEECWIREE",
+        "Output": "WEAREDISCOVEREDFLEEATONCE",
+        "Key": "ZEBRAS",
+        "Cols": 6,
+        "Strict": false
+    }
+]
