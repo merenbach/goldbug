@@ -62,12 +62,16 @@ func (c *Cipher) Encipher(s string) (string, error) {
 		return s, nil
 	}
 
-	keyNums := lexicalKey(c.Key)
-
 	g := c.makegrid(utf8.RuneCountInString(s))
 	g.SortByRow()
 	g.Fill(s)
-	return g.ReadCols(keyNums), nil
+
+	if c.Key != "" {
+		keyNums := lexicalKey(c.Key)
+		return g.ReadCols(keyNums), nil
+	}
+
+	return g.ReadByCol(), nil
 }
 
 // Decipher a message.
@@ -76,10 +80,15 @@ func (c *Cipher) Decipher(s string) (string, error) {
 		return s, nil
 	}
 
-	keyNums := lexicalKey(c.Key)
-
 	g := c.makegrid(utf8.RuneCountInString(s))
-	g.OrderByCol(keyNums)
+
+	if c.Key != "" {
+		keyNums := lexicalKey(c.Key)
+		g.OrderByCol(keyNums)
+	} else {
+		g.SortByCol()
+	}
+
 	g.Fill(s)
 	g.SortByCol()
 	return g.ReadByRow(), nil
