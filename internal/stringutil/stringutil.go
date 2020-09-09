@@ -21,6 +21,11 @@ import (
 	"unicode/utf8"
 )
 
+// Key a string with prefix text.
+func Key(s string, k string) string {
+	return Deduplicate(k + s)
+}
+
 // Backpermute a string based on a slice of index values.
 // Backpermute will return [E E O H L O] for inputs [H E L L O] and [1 1 4 0 2 4]
 // Backpermute will return an error if the transform function returns any invalid string index values.

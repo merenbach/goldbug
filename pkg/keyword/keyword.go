@@ -34,7 +34,7 @@ func (c *Cipher) maketableau() (*masc.Tableau, error) {
 	if ptAlphabet == "" {
 		ptAlphabet = masc.Alphabet
 	}
-	ctAlphabet := stringutil.Deduplicate(c.Keyword + ptAlphabet)
+	ctAlphabet := stringutil.Key(ptAlphabet, c.Keyword)
 
 	return &masc.Tableau{
 		PtAlphabet: ptAlphabet,
