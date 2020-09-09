@@ -3,7 +3,22 @@
         "Input": "WEAREDISCOVEREDFLEEATONCE",
         "Output": "EVLNACDTESEAROFODEECWIREE",
         "Keys": [
+            "632415"
+        ]
+    },
+    {
+        "Input": "WEAREDISCOVEREDFLEEATONCE",
+        "Output": "EVLNACDTESEAROFODEECWIREE",
+        "Keys": [
             "ZEBRAS"
+        ]
+    },
+    {
+        "Input": "WEAREDISCOVEREDFLEEATONCE",
+        "Output": "CAEENSOIAEDRLEFWEDREEVTOC",
+        "Keys": [
+            "632415",
+            "564231"
         ]
     },
     {
@@ -12,6 +27,21 @@
         "Keys": [
             "ZEBRAS",
             "STRIPE"
+        ]
+    },
+    {
+        "Input": "WEAREDISCOVEREDFLEEATONCE",
+        "Output": "ROFOACDTESEADEECWIREEEVLN",
+        "Keys": [
+            "532164"
+        ]
+    },
+    {
+        "Input": "WEAREDISCOVEREDFLEEATONCE",
+        "Output": "ROFOACDTEDSEEEACWEIVRLENE",
+        "Myszkowski": true,
+        "Keys": [
+            "432143"
         ]
     },
     {
