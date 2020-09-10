@@ -22,7 +22,7 @@ import (
 )
 
 func TestTableau_Encipher(t *testing.T) {
-	testdata, err := ioutil.ReadFile(filepath.Join("testdata", "tableau_encipher.json"))
+	testdata, err := ioutil.ReadFile(filepath.Join("testdata", t.Name()+".json"))
 	if err != nil {
 		t.Fatal("Could not read testdata fixture:", err)
 	}
@@ -47,7 +47,7 @@ func TestTableau_Encipher(t *testing.T) {
 }
 
 func TestTableau_Decipher(t *testing.T) {
-	testdata, err := ioutil.ReadFile(filepath.Join("testdata", "tableau_decipher.json"))
+	testdata, err := ioutil.ReadFile(filepath.Join("testdata", t.Name()+".json"))
 	if err != nil {
 		t.Fatal("Could not read testdata fixture:", err)
 	}

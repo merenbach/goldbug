@@ -23,7 +23,7 @@ import (
 )
 
 func TestMakeMap(t *testing.T) {
-	testdata, err := ioutil.ReadFile(filepath.Join("testdata", "makemap.json"))
+	testdata, err := ioutil.ReadFile(filepath.Join("testdata", t.Name()+".json"))
 	if err != nil {
 		t.Fatal("Could not read testdata fixture:", err)
 	}
@@ -50,7 +50,7 @@ func TestMakeMap(t *testing.T) {
 }
 
 func TestTranslate(t *testing.T) {
-	testdata, err := ioutil.ReadFile(filepath.Join("testdata", "translate.json"))
+	testdata, err := ioutil.ReadFile(filepath.Join("testdata", t.Name()+".json"))
 	if err != nil {
 		t.Fatal("Could not read testdata fixture:", err)
 	}

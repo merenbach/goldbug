@@ -22,7 +22,7 @@ import (
 )
 
 func TestAbs(t *testing.T) {
-	testdata, err := ioutil.ReadFile(filepath.Join("testdata", "abs.json"))
+	testdata, err := ioutil.ReadFile(filepath.Join("testdata", t.Name()+".json"))
 	if err != nil {
 		t.Fatal("Could not read testdata fixture:", err)
 	}

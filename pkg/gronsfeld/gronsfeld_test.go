@@ -26,7 +26,7 @@ import (
 var update = flag.Bool("update", false, "update .golden files")
 
 func TestCipher_Encipher(t *testing.T) {
-	testdata, err := ioutil.ReadFile(filepath.Join("testdata", "cipher_encipher.json"))
+	testdata, err := ioutil.ReadFile(filepath.Join("testdata", t.Name()+".json"))
 	if err != nil {
 		t.Fatal("Could not read testdata fixture:", err)
 	}
@@ -51,7 +51,7 @@ func TestCipher_Encipher(t *testing.T) {
 }
 
 func TestCipher_Decipher(t *testing.T) {
-	testdata, err := ioutil.ReadFile(filepath.Join("testdata", "cipher_decipher.json"))
+	testdata, err := ioutil.ReadFile(filepath.Join("testdata", t.Name()+".json"))
 	if err != nil {
 		t.Fatal("Could not read testdata fixture:", err)
 	}

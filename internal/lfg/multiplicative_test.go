@@ -23,7 +23,7 @@ import (
 )
 
 func TestMultiplicative_Slice(t *testing.T) {
-	testdata, err := ioutil.ReadFile(filepath.Join("testdata", "multiplicative_slice.json"))
+	testdata, err := ioutil.ReadFile(filepath.Join("testdata", t.Name()+".json"))
 	if err != nil {
 		t.Fatal("Could not read testdata fixture:", err)
 	}
