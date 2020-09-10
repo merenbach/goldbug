@@ -15,12 +15,15 @@
 package beaufort
 
 import (
+	"bytes"
 	"encoding/json"
-	"fmt"
+	"flag"
 	"io/ioutil"
 	"path/filepath"
 	"testing"
 )
+
+var update = flag.Bool("update", false, "update .golden files")
 
 func TestCipher_Encipher(t *testing.T) {
 	testdata, err := ioutil.ReadFile(filepath.Join("testdata", "cipher_encipher.json"))
@@ -72,41 +75,28 @@ func TestCipher_Decipher(t *testing.T) {
 	}
 }
 
-func ExampleCipher_Tableau() {
+func TestCipher_Tableau(t *testing.T) {
 	c := Cipher{}
-	out, err := c.Tableau()
+	tableau, err := c.Tableau()
 	if err != nil {
-		fmt.Println("Error:", err)
+		t.Fatal("Error:", err)
 	}
-	fmt.Println(out)
 
-	// Output:
-	//     A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
-	//
-	// Z   Z Y X W V U T S R Q P O N M L K J I H G F E D C B A
-	// Y   Y X W V U T S R Q P O N M L K J I H G F E D C B A Z
-	// X   X W V U T S R Q P O N M L K J I H G F E D C B A Z Y
-	// W   W V U T S R Q P O N M L K J I H G F E D C B A Z Y X
-	// V   V U T S R Q P O N M L K J I H G F E D C B A Z Y X W
-	// U   U T S R Q P O N M L K J I H G F E D C B A Z Y X W V
-	// T   T S R Q P O N M L K J I H G F E D C B A Z Y X W V U
-	// S   S R Q P O N M L K J I H G F E D C B A Z Y X W V U T
-	// R   R Q P O N M L K J I H G F E D C B A Z Y X W V U T S
-	// Q   Q P O N M L K J I H G F E D C B A Z Y X W V U T S R
-	// P   P O N M L K J I H G F E D C B A Z Y X W V U T S R Q
-	// O   O N M L K J I H G F E D C B A Z Y X W V U T S R Q P
-	// N   N M L K J I H G F E D C B A Z Y X W V U T S R Q P O
-	// M   M L K J I H G F E D C B A Z Y X W V U T S R Q P O N
-	// L   L K J I H G F E D C B A Z Y X W V U T S R Q P O N M
-	// K   K J I H G F E D C B A Z Y X W V U T S R Q P O N M L
-	// J   J I H G F E D C B A Z Y X W V U T S R Q P O N M L K
-	// I   I H G F E D C B A Z Y X W V U T S R Q P O N M L K J
-	// H   H G F E D C B A Z Y X W V U T S R Q P O N M L K J I
-	// G   G F E D C B A Z Y X W V U T S R Q P O N M L K J I H
-	// F   F E D C B A Z Y X W V U T S R Q P O N M L K J I H G
-	// E   E D C B A Z Y X W V U T S R Q P O N M L K J I H G F
-	// D   D C B A Z Y X W V U T S R Q P O N M L K J I H G F E
-	// C   C B A Z Y X W V U T S R Q P O N M L K J I H G F E D
-	// B   B A Z Y X W V U T S R Q P O N M L K J I H G F E D C
-	// A   A Z Y X W V U T S R Q P O N M L K J I H G F E D C B
+	actual := []byte(tableau)
+	golden := filepath.Join("testdata", t.Name()+".golden")
+	if *update {
+		err := ioutil.WriteFile(golden, actual, 0644)
+		if err != nil {
+			t.Fatalf("Could not write file %q: %v", golden, err)
+		}
+	}
+
+	expected, err := ioutil.ReadFile(golden)
+	if err != nil {
+		t.Fatal("Could not read testdata fixture:", err)
+	}
+
+	if !bytes.Equal(actual, expected) {
+		t.Errorf("Expected %s but got %s", actual, expected)
+	}
 }

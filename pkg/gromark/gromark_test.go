@@ -15,12 +15,15 @@
 package gromark
 
 import (
+	"bytes"
 	"encoding/json"
-	"fmt"
+	"flag"
 	"io/ioutil"
 	"path/filepath"
 	"testing"
 )
+
+var update = flag.Bool("update", false, "update .golden files")
 
 func TestCipher_Encipher(t *testing.T) {
 	testdata, err := ioutil.ReadFile(filepath.Join("testdata", "cipher_encipher.json"))
@@ -72,28 +75,31 @@ func TestCipher_Decipher(t *testing.T) {
 	}
 }
 
-func ExampleCipher_tableau() {
+func TestCipher_Tableau(t *testing.T) {
 	c := Cipher{
 		Key:    "ENIGMA",
 		Primer: "23452",
 	}
-	out, err := c.tableau()
+	tableau, err := c.Tableau()
 	if err != nil {
-		fmt.Println("Error:", err)
+		t.Fatal("Error:", err)
 	}
-	fmt.Println(out)
 
-	// Output:
-	//     A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
-	//   +----------------------------------------------------
-	// 0 | A J R X E B K S Y G F P V I D O U M H Q W N C L T Z
-	// 1 | J R X E B K S Y G F P V I D O U M H Q W N C L T Z A
-	// 2 | R X E B K S Y G F P V I D O U M H Q W N C L T Z A J
-	// 3 | X E B K S Y G F P V I D O U M H Q W N C L T Z A J R
-	// 4 | E B K S Y G F P V I D O U M H Q W N C L T Z A J R X
-	// 5 | B K S Y G F P V I D O U M H Q W N C L T Z A J R X E
-	// 6 | K S Y G F P V I D O U M H Q W N C L T Z A J R X E B
-	// 7 | S Y G F P V I D O U M H Q W N C L T Z A J R X E B K
-	// 8 | Y G F P V I D O U M H Q W N C L T Z A J R X E B K S
-	// 9 | G F P V I D O U M H Q W N C L T Z A J R X E B K S Y
+	actual := []byte(tableau)
+	golden := filepath.Join("testdata", t.Name()+".golden")
+	if *update {
+		err := ioutil.WriteFile(golden, actual, 0644)
+		if err != nil {
+			t.Fatalf("Could not write file %q: %v", golden, err)
+		}
+	}
+
+	expected, err := ioutil.ReadFile(golden)
+	if err != nil {
+		t.Fatal("Could not read testdata fixture:", err)
+	}
+
+	if !bytes.Equal(actual, expected) {
+		t.Errorf("Expected %s but got %s", actual, expected)
+	}
 }

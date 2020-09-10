@@ -99,7 +99,7 @@ func (c *Cipher) Decipher(s string) (string, error) {
 }
 
 // Tableau for encipherment and decipherment.
-func (c *Cipher) tableau() (string, error) {
+func (c *Cipher) Tableau() (string, error) {
 	t, err := c.maketableau()
 	if err != nil {
 		return "", err

@@ -15,12 +15,15 @@
 package gronsfeld
 
 import (
+	"bytes"
 	"encoding/json"
-	"fmt"
+	"flag"
 	"io/ioutil"
 	"path/filepath"
 	"testing"
 )
+
+var update = flag.Bool("update", false, "update .golden files")
 
 func TestCipher_Encipher(t *testing.T) {
 	testdata, err := ioutil.ReadFile(filepath.Join("testdata", "cipher_encipher.json"))
@@ -72,25 +75,28 @@ func TestCipher_Decipher(t *testing.T) {
 	}
 }
 
-func ExampleCipher_Tableau() {
+func TestCipher_Tableau(t *testing.T) {
 	c := Cipher{}
-	out, err := c.Tableau()
+	tableau, err := c.Tableau()
 	if err != nil {
-		fmt.Println("Error:", err)
+		t.Fatal("Error:", err)
 	}
-	fmt.Println(out)
 
-	// Output:
-	//     A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
-	//
-	// 0   A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
-	// 1   B C D E F G H I J K L M N O P Q R S T U V W X Y Z A
-	// 2   C D E F G H I J K L M N O P Q R S T U V W X Y Z A B
-	// 3   D E F G H I J K L M N O P Q R S T U V W X Y Z A B C
-	// 4   E F G H I J K L M N O P Q R S T U V W X Y Z A B C D
-	// 5   F G H I J K L M N O P Q R S T U V W X Y Z A B C D E
-	// 6   G H I J K L M N O P Q R S T U V W X Y Z A B C D E F
-	// 7   H I J K L M N O P Q R S T U V W X Y Z A B C D E F G
-	// 8   I J K L M N O P Q R S T U V W X Y Z A B C D E F G H
-	// 9   J K L M N O P Q R S T U V W X Y Z A B C D E F G H I
+	actual := []byte(tableau)
+	golden := filepath.Join("testdata", t.Name()+".golden")
+	if *update {
+		err := ioutil.WriteFile(golden, actual, 0644)
+		if err != nil {
+			t.Fatalf("Could not write file %q: %v", golden, err)
+		}
+	}
+
+	expected, err := ioutil.ReadFile(golden)
+	if err != nil {
+		t.Fatal("Could not read testdata fixture:", err)
+	}
+
+	if !bytes.Equal(actual, expected) {
+		t.Errorf("Expected %s but got %s", actual, expected)
+	}
 }

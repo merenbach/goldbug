@@ -18,6 +18,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"text/tabwriter"
 
 	"github.com/merenbach/goldbug/internal/translation"
 )
@@ -75,30 +76,22 @@ func (tr *ReciprocalTable) String() string {
 
 // Printable representation of this tabula recta.
 func (tr *ReciprocalTable) Printable() (string, error) {
-	var out strings.Builder
-	var err error
+	var b strings.Builder
+
+	w := tabwriter.NewWriter(&b, 4, 1, 3, ' ', 0)
+
 	formatForPrinting := func(s string) string {
 		spl := strings.Split(s, "")
 		return strings.Join(spl, " ")
 	}
-	if _, err = out.WriteString("    " + formatForPrinting(tr.PtAlphabet) + "\n  +"); err != nil {
-		return "", err
+
+	fmt.Fprintf(w, "\t%s\n", formatForPrinting(tr.PtAlphabet))
+	for i, r := range []rune(tr.KeyAlphabet) {
+		fmt.Fprintf(w, "\n%c\t%s", r, formatForPrinting(tr.CtAlphabets[i]))
 	}
-	for range tr.PtAlphabet {
-		if _, err = out.WriteRune('-'); err != nil {
-			return "", err
-		}
-		if _, err = out.WriteRune('-'); err != nil {
-			return "", err
-		}
-	}
-	for i, r := range tr.KeyAlphabet {
-		ctAlpha := fmt.Sprintf("\n%c | %s", r, formatForPrinting(tr.CtAlphabets[i]))
-		if _, err = out.WriteString(ctAlpha); err != nil {
-			return "", err
-		}
-	}
-	return out.String(), nil
+
+	w.Flush()
+	return b.String(), nil
 }
 
 // // Encipher a plaintext rune with a given key alphabet rune.
