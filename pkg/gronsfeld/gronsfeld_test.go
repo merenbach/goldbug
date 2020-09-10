@@ -72,9 +72,9 @@ func TestCipher_Decipher(t *testing.T) {
 	}
 }
 
-func ExampleCipher_tableau() {
+func ExampleCipher_Tableau() {
 	c := Cipher{}
-	out, err := c.tableau()
+	out, err := c.Tableau()
 	if err != nil {
 		fmt.Println("Error:", err)
 	}
@@ -82,15 +82,15 @@ func ExampleCipher_tableau() {
 
 	// Output:
 	//     A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
-	//   +----------------------------------------------------
-	// 0 | A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
-	// 1 | B C D E F G H I J K L M N O P Q R S T U V W X Y Z A
-	// 2 | C D E F G H I J K L M N O P Q R S T U V W X Y Z A B
-	// 3 | D E F G H I J K L M N O P Q R S T U V W X Y Z A B C
-	// 4 | E F G H I J K L M N O P Q R S T U V W X Y Z A B C D
-	// 5 | F G H I J K L M N O P Q R S T U V W X Y Z A B C D E
-	// 6 | G H I J K L M N O P Q R S T U V W X Y Z A B C D E F
-	// 7 | H I J K L M N O P Q R S T U V W X Y Z A B C D E F G
-	// 8 | I J K L M N O P Q R S T U V W X Y Z A B C D E F G H
-	// 9 | J K L M N O P Q R S T U V W X Y Z A B C D E F G H I
+	//
+	// 0   A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+	// 1   B C D E F G H I J K L M N O P Q R S T U V W X Y Z A
+	// 2   C D E F G H I J K L M N O P Q R S T U V W X Y Z A B
+	// 3   D E F G H I J K L M N O P Q R S T U V W X Y Z A B C
+	// 4   E F G H I J K L M N O P Q R S T U V W X Y Z A B C D
+	// 5   F G H I J K L M N O P Q R S T U V W X Y Z A B C D E
+	// 6   G H I J K L M N O P Q R S T U V W X Y Z A B C D E F
+	// 7   H I J K L M N O P Q R S T U V W X Y Z A B C D E F G
+	// 8   I J K L M N O P Q R S T U V W X Y Z A B C D E F G H
+	// 9   J K L M N O P Q R S T U V W X Y Z A B C D E F G H I
 }

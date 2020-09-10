@@ -72,9 +72,9 @@ func TestCipher_Decipher(t *testing.T) {
 	}
 }
 
-func ExampleCipher_tableau() {
+func ExampleCipher_Tableau() {
 	c := Cipher{}
-	out, err := c.tableau()
+	out, err := c.Tableau()
 	if err != nil {
 		fmt.Println("Error:", err)
 	}
@@ -82,31 +82,31 @@ func ExampleCipher_tableau() {
 
 	// Output:
 	//     Z Y X W V U T S R Q P O N M L K J I H G F E D C B A
-	//   +----------------------------------------------------
-	// A | Z Y X W V U T S R Q P O N M L K J I H G F E D C B A
-	// B | Y X W V U T S R Q P O N M L K J I H G F E D C B A Z
-	// C | X W V U T S R Q P O N M L K J I H G F E D C B A Z Y
-	// D | W V U T S R Q P O N M L K J I H G F E D C B A Z Y X
-	// E | V U T S R Q P O N M L K J I H G F E D C B A Z Y X W
-	// F | U T S R Q P O N M L K J I H G F E D C B A Z Y X W V
-	// G | T S R Q P O N M L K J I H G F E D C B A Z Y X W V U
-	// H | S R Q P O N M L K J I H G F E D C B A Z Y X W V U T
-	// I | R Q P O N M L K J I H G F E D C B A Z Y X W V U T S
-	// J | Q P O N M L K J I H G F E D C B A Z Y X W V U T S R
-	// K | P O N M L K J I H G F E D C B A Z Y X W V U T S R Q
-	// L | O N M L K J I H G F E D C B A Z Y X W V U T S R Q P
-	// M | N M L K J I H G F E D C B A Z Y X W V U T S R Q P O
-	// N | M L K J I H G F E D C B A Z Y X W V U T S R Q P O N
-	// O | L K J I H G F E D C B A Z Y X W V U T S R Q P O N M
-	// P | K J I H G F E D C B A Z Y X W V U T S R Q P O N M L
-	// Q | J I H G F E D C B A Z Y X W V U T S R Q P O N M L K
-	// R | I H G F E D C B A Z Y X W V U T S R Q P O N M L K J
-	// S | H G F E D C B A Z Y X W V U T S R Q P O N M L K J I
-	// T | G F E D C B A Z Y X W V U T S R Q P O N M L K J I H
-	// U | F E D C B A Z Y X W V U T S R Q P O N M L K J I H G
-	// V | E D C B A Z Y X W V U T S R Q P O N M L K J I H G F
-	// W | D C B A Z Y X W V U T S R Q P O N M L K J I H G F E
-	// X | C B A Z Y X W V U T S R Q P O N M L K J I H G F E D
-	// Y | B A Z Y X W V U T S R Q P O N M L K J I H G F E D C
-	// Z | A Z Y X W V U T S R Q P O N M L K J I H G F E D C B
+	//
+	// A   Z Y X W V U T S R Q P O N M L K J I H G F E D C B A
+	// B   Y X W V U T S R Q P O N M L K J I H G F E D C B A Z
+	// C   X W V U T S R Q P O N M L K J I H G F E D C B A Z Y
+	// D   W V U T S R Q P O N M L K J I H G F E D C B A Z Y X
+	// E   V U T S R Q P O N M L K J I H G F E D C B A Z Y X W
+	// F   U T S R Q P O N M L K J I H G F E D C B A Z Y X W V
+	// G   T S R Q P O N M L K J I H G F E D C B A Z Y X W V U
+	// H   S R Q P O N M L K J I H G F E D C B A Z Y X W V U T
+	// I   R Q P O N M L K J I H G F E D C B A Z Y X W V U T S
+	// J   Q P O N M L K J I H G F E D C B A Z Y X W V U T S R
+	// K   P O N M L K J I H G F E D C B A Z Y X W V U T S R Q
+	// L   O N M L K J I H G F E D C B A Z Y X W V U T S R Q P
+	// M   N M L K J I H G F E D C B A Z Y X W V U T S R Q P O
+	// N   M L K J I H G F E D C B A Z Y X W V U T S R Q P O N
+	// O   L K J I H G F E D C B A Z Y X W V U T S R Q P O N M
+	// P   K J I H G F E D C B A Z Y X W V U T S R Q P O N M L
+	// Q   J I H G F E D C B A Z Y X W V U T S R Q P O N M L K
+	// R   I H G F E D C B A Z Y X W V U T S R Q P O N M L K J
+	// S   H G F E D C B A Z Y X W V U T S R Q P O N M L K J I
+	// T   G F E D C B A Z Y X W V U T S R Q P O N M L K J I H
+	// U   F E D C B A Z Y X W V U T S R Q P O N M L K J I H G
+	// V   E D C B A Z Y X W V U T S R Q P O N M L K J I H G F
+	// W   D C B A Z Y X W V U T S R Q P O N M L K J I H G F E
+	// X   C B A Z Y X W V U T S R Q P O N M L K J I H G F E D
+	// Y   B A Z Y X W V U T S R Q P O N M L K J I H G F E D C
+	// Z   A Z Y X W V U T S R Q P O N M L K J I H G F E D C B
 }
