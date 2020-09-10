@@ -22,6 +22,7 @@ import (
 )
 
 // Key a string with prefix text.
+// TODO: rename Prefix? or something to allow semantically for suffix counterpart?
 func Key(s string, k string) string {
 	return Deduplicate(k + s)
 }

@@ -22,10 +22,12 @@ Instantiate your deployment pipeline as follows, adapting as necessary the param
 
 ## TODO
 
+* Allow grouping/delimiters
+* Make grids one-based instead of zero-based in some contexts? (e.g., Polybius)
 * Allow transposition cipher key to be for columns directly, rather than relative ordering
 * Allow number duplicates to be ordered backwards when creating lexicographic key
 * Add more to-string printable options to transposition and other ciphers
-* Add printout option to columnar transposition ciphers
+* Add printout option to columnar transposition ciphers--and use tab writer
 * Include primer at beginning of GROMARK text and end with check digit per https://www.cryptogram.org/downloads/aca.info/ciphers/Gromark.pdf?
 * Add null options to transposition cipher? Special null adder utility module?
 * Add PASC caseless option
