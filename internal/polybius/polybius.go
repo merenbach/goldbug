@@ -16,106 +16,177 @@ package polybius
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
-	"unicode/utf8"
+	"text/tabwriter"
 )
 
-// A Square implements a Polybius square.
-type Square struct {
-	Alphabet string
-	Columns  int
+const defaultAlphabet = "ABCDEFGHIKLMNOPQRSTUVWXYZ"
+
+// A Cipher implements a Polybius square cipher.
+type Cipher struct {
+	Alphabet  string
+	Cols      int
+	Delimiter string
+	Strict    bool
 }
 
-func (ps *Square) String() string {
-	return fmt.Sprintf("Polybius square with %d columns and alphabet %q", ps.Columns, ps.Alphabet)
-}
+func (c *Cipher) String() string {
+	alphabet := c.Alphabet
+	if alphabet == "" {
+		alphabet = defaultAlphabet
+	}
 
-// Printable representation of this tableau.
-func (ps *Square) Printable() string {
 	var b strings.Builder
-	b.WriteString("   ")
-	for i := 0; i < ps.Columns; i++ {
-		b.WriteString(fmt.Sprintf(" %d", i+1))
+
+	w := tabwriter.NewWriter(&b, 0, 1, 1, ' ', 0)
+
+	fmt.Fprintf(w, "")
+	for i := 0; i < c.Cols; i++ {
+		fmt.Fprintf(w, "\t%d", i+1)
 	}
 
-	b.WriteRune('\n')
-	b.WriteString("  +")
-	for i := 0; i < 2*ps.Columns; i++ {
-		b.WriteRune('-')
+	alphaRunes := []rune(alphabet)
+	rows := len(alphaRunes) / c.Cols
+	if len(alphaRunes)%c.Cols > 0 {
+		rows++
 	}
-	alphaRunes := []rune(ps.Alphabet)
-	for i := 0; i < ps.Rows(); i++ {
-		b.WriteRune('\n')
-		b.WriteString(fmt.Sprintf("%d | ", i+1))
-		for j := 0; j < ps.Columns; j++ {
-			b.WriteRune(alphaRunes[i*ps.Columns+j])
-			b.WriteRune(' ')
+	for i := 0; i < rows; i++ {
+		fmt.Fprintf(w, "\n%d", i+1)
+		for j := 0; j < c.Cols; j++ {
+			fmt.Fprintf(w, "\t%c", alphaRunes[i*c.Cols+j])
 		}
 	}
+
+	w.Flush()
 	return b.String()
 }
 
-// func (ps *Square) rowFor(r rune) int {
-// 	i := strings.IndexRune(ps.Alphabet, r)
-// 	if i != (-1) {
-// 		return i / ps.Columns
+// // Makegrid creates a grid and numbers its cells.
+// func (c *Cipher) makegrid(n int, cols int) grid.Grid {
+// 	g := make(grid.Grid, n)
+// 	for i := range g {
+// 		g[i].Col = i%cols + 1
+// 		g[i].Row = i/cols + 1
 // 	}
-// 	return (-1)
+// 	return g
 // }
 
-// func (ps *Square) colFor(r rune) int {
-// 	i := strings.IndexRune(ps.Alphabet, r)
-// 	if i != (-1) {
-// 		return i % ps.Columns
+// Encipher a message.
+// func (c *Cipher) Encipher(s string) (string, error) {
+// 	alphabet := c.Alphabet
+// 	if alphabet == "" {
+// 		alphabet = defaultAlphabet
 // 	}
-// 	return (-1)
+
+// 	g := c.makegrid(utf8.RuneCountInString(alphabet), c.Cols)
+// 	g.SortByRow()
+// 	g.Fill(alphabet)
+
+// 	m := make(map[rune]int)
+// 	log.Println("len of g = ", g)
+// 	for _, c := range g {
+// 		m[c.Rune] = 10*c.Row + c.Col
+// 	}
+
+// 	for _, r := range []rune(s) {
+// 		log.Printf("%c encodes to %d", r, m[r])
+// 	}
+// 	// for _, k := range c.Keys {
+// 	// 	g := c.makegrid(utf8.RuneCountInString(s), utf8.RuneCountInString(k))
+// 	// 	g.SortByRow()
+// 	// 	g.Fill(s)
+
+// 	// 	keyNums := lexicalKey(k, c.Myszkowski)
+// 	// 	s = g.ReadCols(keyNums)
+// 	// }
+
+// 	return s, nil
 // }
 
-// Rows in this Polybius square.
-func (ps *Square) Rows() int {
-	runeCount := utf8.RuneCountInString(ps.Alphabet)
-	out := runeCount / ps.Columns
-	if runeCount%ps.Columns > 0 {
-		out++
-	}
-	return out
+// // Decipher a message.
+// func (c *Cipher) Decipher(s string) (string, error) {
+// 	alphabet := c.Alphabet
+// 	if alphabet == "" {
+// 		alphabet = defaultAlphabet
+// 	}
+
+// 	g := c.makegrid(utf8.RuneCountInString(alphabet), c.Cols)
+// 	g.SortByRow()
+// 	g.Fill(s)
+
+// 	// for i := len(c.Keys) - 1; i >= 0; i-- {
+// 	// 	k := c.Keys[i]
+// 	// 	g := c.makegrid(utf8.RuneCountInString(s), utf8.RuneCountInString(k))
+// 	// 	keyNums := lexicalKey(k, c.Myszkowski)
+
+// 	// 	g.OrderByCol(keyNums)
+// 	// 	g.Fill(s)
+// 	// 	g.SortByCol()
+// 	// 	s = g.ReadByRow()
+// 	// }
+
+// 	return s, nil
+// }
+
+func (c *Cipher) rowcol(i int) string {
+	q, m := i/c.Cols+1, i%c.Cols+1
+	return strconv.Itoa(10*q + m)
 }
 
 // Encipher a message.
-func (ps *Square) Encipher(s string) ([]int, error) {
-	pt2ct := make(map[rune]int)
-	for _, r := range []rune(ps.Alphabet) {
-		rIdx := strings.IndexRune(ps.Alphabet, r)
-		q, m := rIdx/ps.Columns+1, rIdx%ps.Columns+1
-		pt2ct[r] = 10*q + m
+func (c *Cipher) Encipher(s string) (string, error) {
+	alphabet := c.Alphabet
+	if alphabet == "" {
+		alphabet = defaultAlphabet
+	}
+
+	// create rune map
+	pt2ct := make(map[rune]string)
+	for i, r := range []rune(alphabet) {
+		pt2ct[r] = c.rowcol(i)
 	}
 
 	// TODO: substitute characters J=>I, etc.
 	// TODO: option for swapped rows/cols
 	// TODO: alternative side alphabets
 	// TODO: nulls in alphabet
-	var out []int
-	for _, r := range []rune(s) {
+	// TODO: strict mode
+	sRunes := []rune(s)
+	out := make([]string, len(sRunes))
+	for i, r := range sRunes {
 		if o, ok := pt2ct[r]; ok {
-			out = append(out, o)
+			out[i] = o
 		}
 	}
-	return out, nil
+
+	return strings.Join(out, c.Delimiter), nil
 }
 
 // Decipher a message.
-func (ps *Square) Decipher(ii []int) (string, error) {
-	ct2pt := make(map[int]rune)
-	for _, r := range []rune(ps.Alphabet) {
-		rIdx := strings.IndexRune(ps.Alphabet, r)
-		q, m := rIdx/ps.Columns+1, rIdx%ps.Columns+1
-		ct2pt[10*q+m] = r
+func (c *Cipher) Decipher(s string) (string, error) {
+	alphabet := c.Alphabet
+	if alphabet == "" {
+		alphabet = defaultAlphabet
 	}
 
-	var out []rune
-	for _, i := range ii {
-		if o, ok := ct2pt[i]; ok {
-			out = append(out, o)
+	// create rune map
+	ct2pt := make(map[string]rune)
+	for i, r := range []rune(alphabet) {
+		ct2pt[c.rowcol(i)] = r
+	}
+
+	f := strings.Split(s, c.Delimiter)
+	// sRunes := []rune(s)
+	// chunks := make([]string, 0)
+	// for i := 0; i < len(sRunes); i += 2 {
+	// 	chunks = appen
+	// }
+
+	out := make([]rune, len(f))
+	for i, v := range f {
+		if o, ok := ct2pt[v]; ok {
+			out[i] = o
 		}
 	}
 	return string(out), nil
