@@ -15,32 +15,20 @@
 package gronsfeld
 
 import (
-	"bytes"
-	"encoding/json"
-	"flag"
-	"io/ioutil"
-	"path/filepath"
 	"testing"
+
+	"github.com/merenbach/goldbug/internal/fixture"
 )
 
-var update = flag.Bool("update", false, "update .golden files")
-
 func TestCipher_Encipher(t *testing.T) {
-	testdata, err := ioutil.ReadFile(filepath.Join("testdata", t.Name()+".json"))
-	if err != nil {
-		t.Fatal("Could not read testdata fixture:", err)
-	}
-
 	var tables []struct {
 		Cipher
 
 		Input  string
 		Output string
 	}
-	if err := json.Unmarshal(testdata, &tables); err != nil {
-		t.Fatal("Could not unmarshal testdata:", err)
-	}
 
+	fixture.Load(t, &tables)
 	for _, table := range tables {
 		if out, err := table.Encipher(table.Input); err != nil {
 			t.Error("Could not encipher:", err)
@@ -51,21 +39,14 @@ func TestCipher_Encipher(t *testing.T) {
 }
 
 func TestCipher_Decipher(t *testing.T) {
-	testdata, err := ioutil.ReadFile(filepath.Join("testdata", t.Name()+".json"))
-	if err != nil {
-		t.Fatal("Could not read testdata fixture:", err)
-	}
-
 	var tables []struct {
 		Cipher
 
 		Input  string
 		Output string
 	}
-	if err := json.Unmarshal(testdata, &tables); err != nil {
-		t.Fatal("Could not unmarshal testdata:", err)
-	}
 
+	fixture.Load(t, &tables)
 	for _, table := range tables {
 		if out, err := table.Decipher(table.Input); err != nil {
 			t.Error("Could not decipher:", err)
@@ -81,22 +62,5 @@ func TestCipher_Tableau(t *testing.T) {
 	if err != nil {
 		t.Fatal("Error:", err)
 	}
-
-	actual := []byte(tableau)
-	golden := filepath.Join("testdata", t.Name()+".golden")
-	if *update {
-		err := ioutil.WriteFile(golden, actual, 0644)
-		if err != nil {
-			t.Fatalf("Could not write file %q: %v", golden, err)
-		}
-	}
-
-	expected, err := ioutil.ReadFile(golden)
-	if err != nil {
-		t.Fatal("Could not read testdata fixture:", err)
-	}
-
-	if !bytes.Equal(actual, expected) {
-		t.Errorf("Expected %s but got %s", actual, expected)
-	}
+	fixture.Golden(t, []byte(tableau))
 }

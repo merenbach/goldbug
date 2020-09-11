@@ -15,28 +15,20 @@
 package lfg
 
 import (
-	"encoding/json"
-	"io/ioutil"
-	"path/filepath"
 	"reflect"
 	"testing"
+
+	"github.com/merenbach/goldbug/internal/fixture"
 )
 
 func TestAdditive_Slice(t *testing.T) {
-	testdata, err := ioutil.ReadFile(filepath.Join("testdata", t.Name()+".json"))
-	if err != nil {
-		t.Fatal("Could not read testdata fixture:", err)
-	}
-
 	var tables []struct {
 		Additive
 
 		Output []int
 	}
-	if err := json.Unmarshal(testdata, &tables); err != nil {
-		t.Fatal("Could not unmarshal testdata:", err)
-	}
 
+	fixture.Load(t, &tables)
 	for _, table := range tables {
 		if out, err := table.Slice(len(table.Output)); err != nil {
 			t.Error("Error:", err)

@@ -15,29 +15,21 @@
 package railfence
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"path/filepath"
 	"testing"
+
+	"github.com/merenbach/goldbug/internal/fixture"
 )
 
 func TestCipher_row(t *testing.T) {
-	testdata, err := ioutil.ReadFile(filepath.Join("testdata", t.Name()+".json"))
-	if err != nil {
-		t.Fatal("Could not read testdata fixture:", err)
-	}
-
 	var tables []struct {
 		Cipher
 
 		Input  int
 		Output int
 	}
-	if err := json.Unmarshal(testdata, &tables); err != nil {
-		t.Fatal("Could not unmarshal testdata:", err)
-	}
 
+	fixture.Load(t, &tables)
 	for _, table := range tables {
 		if out := table.row(table.Input); out != table.Output {
 			t.Errorf("Expected cipher %+v message character %d in row %d, but instead got row %d", table.Cipher, table.Input, table.Output, out)
@@ -46,21 +38,14 @@ func TestCipher_row(t *testing.T) {
 }
 
 func TestCipher_Encipher(t *testing.T) {
-	testdata, err := ioutil.ReadFile(filepath.Join("testdata", t.Name()+".json"))
-	if err != nil {
-		t.Fatal("Could not read testdata fixture:", err)
-	}
-
 	var tables []struct {
 		Cipher
 
 		Input  string
 		Output string
 	}
-	if err := json.Unmarshal(testdata, &tables); err != nil {
-		t.Fatal("Could not unmarshal testdata:", err)
-	}
 
+	fixture.Load(t, &tables)
 	for _, table := range tables {
 		if out, err := table.Encipher(table.Input); err != nil {
 			t.Error("Could not encipher:", err)
@@ -71,21 +56,14 @@ func TestCipher_Encipher(t *testing.T) {
 }
 
 func TestCipher_Decipher(t *testing.T) {
-	testdata, err := ioutil.ReadFile(filepath.Join("testdata", t.Name()+".json"))
-	if err != nil {
-		t.Fatal("Could not read testdata fixture:", err)
-	}
-
 	var tables []struct {
 		Cipher
 
 		Input  string
 		Output string
 	}
-	if err := json.Unmarshal(testdata, &tables); err != nil {
-		t.Fatal("Could not unmarshal testdata:", err)
-	}
 
+	fixture.Load(t, &tables)
 	for _, table := range tables {
 		if out, err := table.Decipher(table.Input); err != nil {
 			t.Error("Could not decipher:", err)

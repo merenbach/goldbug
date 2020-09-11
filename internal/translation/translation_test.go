@@ -15,28 +15,20 @@
 package translation
 
 import (
-	"encoding/json"
-	"io/ioutil"
-	"path/filepath"
 	"testing"
+
+	"github.com/merenbach/goldbug/internal/fixture"
 )
 
 func TestTable_Translate(t *testing.T) {
-	testdata, err := ioutil.ReadFile(filepath.Join("testdata", t.Name()+".json"))
-	if err != nil {
-		t.Fatal("Could not read testdata fixture:", err)
-	}
-
 	var tables []struct {
 		Table
 
 		Input  string
 		Output string
 	}
-	if err := json.Unmarshal(testdata, &tables); err != nil {
-		t.Fatal("Could not unmarshal testdata:", err)
-	}
 
+	fixture.Load(t, &tables)
 	for _, table := range tables {
 		if out, err := table.Translate(table.Input); err != nil {
 			t.Error("Error:", err)

@@ -15,29 +15,21 @@
 package stringutil
 
 import (
-	"encoding/json"
-	"io/ioutil"
-	"path/filepath"
 	"reflect"
 	"testing"
+
+	"github.com/merenbach/goldbug/internal/fixture"
 )
 
 func TestBackpermute(t *testing.T) {
-	testdata, err := ioutil.ReadFile(filepath.Join("testdata", t.Name()+".json"))
-	if err != nil {
-		t.Fatal("Could not read testdata fixture:", err)
-	}
-
 	var tables []struct {
 		Input   string
 		Output  string
 		Indices []int
 		Success bool
 	}
-	if err := json.Unmarshal(testdata, &tables); err != nil {
-		t.Fatal("Could not unmarshal testdata:", err)
-	}
 
+	fixture.Load(t, &tables)
 	for i, table := range tables {
 		t.Logf("Testing table %d of %d", i+1, len(tables))
 		if out, err := Backpermute(table.Input, table.Indices); err != nil && table.Success {

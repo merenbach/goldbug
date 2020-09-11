@@ -15,29 +15,21 @@
 package translation
 
 import (
-	"encoding/json"
-	"io/ioutil"
-	"path/filepath"
 	"reflect"
 	"testing"
+
+	"github.com/merenbach/goldbug/internal/fixture"
 )
 
 func TestMakeMap(t *testing.T) {
-	testdata, err := ioutil.ReadFile(filepath.Join("testdata", t.Name()+".json"))
-	if err != nil {
-		t.Fatal("Could not read testdata fixture:", err)
-	}
-
 	var tables []struct {
 		Src string
 		Dst string
 		Del string
 		Map map[rune]rune
 	}
-	if err := json.Unmarshal(testdata, &tables); err != nil {
-		t.Fatal("Could not unmarshal testdata:", err)
-	}
 
+	fixture.Load(t, &tables)
 	for _, table := range tables {
 		m, err := makeMap(table.Src, table.Dst, table.Del)
 		if err != nil {
@@ -50,21 +42,14 @@ func TestMakeMap(t *testing.T) {
 }
 
 func TestTranslate(t *testing.T) {
-	testdata, err := ioutil.ReadFile(filepath.Join("testdata", t.Name()+".json"))
-	if err != nil {
-		t.Fatal("Could not read testdata fixture:", err)
-	}
-
 	var tables []struct {
 		Input  string
 		Output string
 		Strict bool
 		Map    map[rune]rune
 	}
-	if err := json.Unmarshal(testdata, &tables); err != nil {
-		t.Fatal("Could not unmarshal testdata:", err)
-	}
 
+	fixture.Load(t, &tables)
 	for _, table := range tables {
 		o := translate(table.Input, table.Map, table.Strict)
 		if o != table.Output {

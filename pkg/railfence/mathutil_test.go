@@ -15,26 +15,18 @@
 package railfence
 
 import (
-	"encoding/json"
-	"io/ioutil"
-	"path/filepath"
 	"testing"
+
+	"github.com/merenbach/goldbug/internal/fixture"
 )
 
 func TestAbs(t *testing.T) {
-	testdata, err := ioutil.ReadFile(filepath.Join("testdata", t.Name()+".json"))
-	if err != nil {
-		t.Fatal("Could not read testdata fixture:", err)
-	}
-
 	var tables []struct {
 		Input  int
 		Output int
 	}
-	if err := json.Unmarshal(testdata, &tables); err != nil {
-		t.Fatal("Could not unmarshal testdata:", err)
-	}
 
+	fixture.Load(t, &tables)
 	for _, table := range tables {
 		if out := abs(table.Input); out != table.Output {
 			t.Errorf("Expected abs(%d)=%d, but instead got abs(%d)=%d", table.Input, table.Output, table.Input, out)
