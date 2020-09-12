@@ -32,18 +32,18 @@ type Tableau struct {
 	Strict   bool
 	Caseless bool
 
-	pt2ct map[rune]rune
-	ct2pt map[rune]rune
+	pt2ct translation.T2
+	ct2pt translation.T2
 }
 
 // New tableau.
 func New(ptAlphabet string, ctAlphabet string) (*Tableau, error) {
-	pt2ct, err := translation.Map(ptAlphabet, ctAlphabet, "")
+	pt2ct, err := translation.New(ptAlphabet, ctAlphabet, "")
 	if err != nil {
 		return nil, err
 	}
 
-	ct2pt, err := translation.Map(ctAlphabet, ptAlphabet, "")
+	ct2pt, err := translation.New(ctAlphabet, ptAlphabet, "")
 	if err != nil {
 		return nil, err
 	}
@@ -61,11 +61,7 @@ func (t *Tableau) EncipherRune(r rune) rune {
 	// 	ctAlphabet = strings.ToUpper(ctAlphabet) + strings.ToLower(ctAlphabet)
 	// }
 
-	if newRune, ok := t.pt2ct[r]; ok {
-		return newRune
-	}
-
-	return (-1)
+	return t.pt2ct.Get(r)
 }
 
 // DecipherRune deciphers a rune.
@@ -75,11 +71,7 @@ func (t *Tableau) DecipherRune(r rune) rune {
 	// 	ctAlphabet = strings.ToUpper(ctAlphabet) + strings.ToLower(ctAlphabet)
 	// }
 
-	if newRune, ok := t.ct2pt[r]; ok {
-		return newRune
-	}
-
-	return (-1)
+	return t.ct2pt.Get(r)
 }
 
 // Encipher a string.

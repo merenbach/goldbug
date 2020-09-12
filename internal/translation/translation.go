@@ -16,6 +16,9 @@ package translation
 
 import "strings"
 
+// TODO: Maybe have config object (a la AWS params) to create a table from? Using existing table?
+
+// A T2 is a revised version of the translation table.
 type T2 map[rune]rune
 
 // New T2.
@@ -25,6 +28,14 @@ func New(src string, dst string, del string) (T2, error) {
 		return nil, err
 	}
 	return T2(m), nil
+}
+
+// Get a transcoded rune or return (-1) if not found.
+func (tt T2) Get(r rune) rune {
+	if o, ok := tt[r]; ok {
+		return o
+	}
+	return (-1)
 }
 
 // Translate a string.
