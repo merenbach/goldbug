@@ -21,7 +21,7 @@ import (
 	"github.com/merenbach/goldbug/internal/fixture"
 )
 
-func TestMakeMap(t *testing.T) {
+func TestMap(t *testing.T) {
 	var tables []struct {
 		Src string
 		Dst string
