@@ -20,7 +20,7 @@ import (
 	"strings"
 	"text/tabwriter"
 
-	"github.com/merenbach/goldbug/internal/translation"
+	"github.com/merenbach/goldbug/internal/masc"
 )
 
 // ReciprocalTable holds a reciprocal table.
@@ -32,38 +32,23 @@ type ReciprocalTable struct {
 	CtAlphabets []string
 }
 
-func makedicts(columnHeaders string, rowHeaders string, rows []string) (map[rune]map[rune]rune, map[rune]map[rune]rune, error) {
-	pt2ct := make(map[rune]map[rune]rune)
-	ct2pt := make(map[rune]map[rune]rune)
+func makedicts(columnHeaders string, rowHeaders string, rows []string) (map[rune]*masc.Tableau, error) {
+	pt2ct := make(map[rune]*masc.Tableau)
 
 	keyRunes := []rune(rowHeaders)
 	if len(keyRunes) != len(rowHeaders) {
-		return nil, nil, errors.New("Row headers must have same rune length as rows slice")
+		return nil, errors.New("Row headers must have same rune length as rows slice")
 	}
 
 	for i, r := range keyRunes {
-		ptTable := translation.Table{
-			Src: columnHeaders,
-			Dst: rows[i],
+		pt2ct[r] = &masc.Tableau{
+			PtAlphabet: columnHeaders,
+			CtAlphabet: rows[i],
+			Strict:     true,
 		}
-		ptCipher, err := ptTable.Map()
-		if err != nil {
-			return nil, nil, err
-		}
-
-		ctTable := translation.Table{
-			Src: rows[i],
-			Dst: columnHeaders,
-		}
-		ctCipher, err := ctTable.Map()
-		if err != nil {
-			return nil, nil, err
-		}
-
-		pt2ct[r], ct2pt[r] = ptCipher, ctCipher
 	}
 
-	return pt2ct, ct2pt, nil
+	return pt2ct, nil
 }
 
 func (tr *ReciprocalTable) String() string {
@@ -129,7 +114,7 @@ func (tr *ReciprocalTable) Printable() (string, error) {
 // Encipher a string.
 // Encipher will invoke the onSuccess function with before and after runes.
 func (tr *ReciprocalTable) Encipher(s string, k string, onSuccess func(rune, rune, *[]rune)) (string, error) {
-	pt2ct, _, err := makedicts(tr.PtAlphabet, tr.KeyAlphabet, tr.CtAlphabets)
+	pt2ct, err := makedicts(tr.PtAlphabet, tr.KeyAlphabet, tr.CtAlphabets)
 	if err != nil {
 		return "", err
 	}
@@ -146,7 +131,7 @@ func (tr *ReciprocalTable) Encipher(s string, k string, onSuccess func(rune, run
 			return (-1)
 		}
 
-		if o, ok := m[r]; ok {
+		if o := m.EncipherRune(r); o != (-1) {
 			// Transcoding successful
 			transcodedCharCount++
 			if onSuccess != nil {
@@ -165,7 +150,7 @@ func (tr *ReciprocalTable) Encipher(s string, k string, onSuccess func(rune, run
 // Decipher a string.
 // Decipher will invoke the onSuccess function with before and after runes.
 func (tr *ReciprocalTable) Decipher(s string, k string, onSuccess func(rune, rune, *[]rune)) (string, error) {
-	_, ct2pt, err := makedicts(tr.PtAlphabet, tr.KeyAlphabet, tr.CtAlphabets)
+	ct2pt, err := makedicts(tr.PtAlphabet, tr.KeyAlphabet, tr.CtAlphabets)
 	if err != nil {
 		return "", err
 	}
@@ -182,7 +167,7 @@ func (tr *ReciprocalTable) Decipher(s string, k string, onSuccess func(rune, run
 			return (-1)
 		}
 
-		if o, ok := m[r]; ok {
+		if o := m.DecipherRune(r); o != (-1) {
 			// Transcoding successful
 			transcodedCharCount++
 			if onSuccess != nil {

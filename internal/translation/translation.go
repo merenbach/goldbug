@@ -14,6 +14,35 @@
 
 package translation
 
+import "strings"
+
+type T2 map[rune]rune
+
+// New T2.
+func New(src string, dst string, del string) (T2, error) {
+	m, err := makeMap(src, dst, del)
+	if err != nil {
+		return nil, err
+	}
+	return T2(m), nil
+}
+
+// Translate a string.
+func (tt T2) Translate(s string, strict bool) string {
+	return strings.Map(func(r rune) rune {
+		if o, ok := tt[r]; ok {
+			// Rune found
+			return o
+		} else if !strict {
+			// Rune not found and strict mode off
+			return r
+		}
+		// Rune not found and strict mode on
+		return (-1)
+	}, s)
+
+}
+
 // A Table to hold translation data.
 type Table struct {
 	Src string
