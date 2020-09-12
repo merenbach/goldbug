@@ -31,7 +31,7 @@ func TestMakeMap(t *testing.T) {
 
 	fixture.Load(t, &tables)
 	for _, table := range tables {
-		m, err := makeMap(table.Src, table.Dst, table.Del)
+		m, err := Map(table.Src, table.Dst, table.Del)
 		if err != nil {
 			t.Error("Error:", err)
 		}

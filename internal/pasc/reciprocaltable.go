@@ -33,7 +33,7 @@ type ReciprocalTable struct {
 }
 
 func makedicts(columnHeaders string, rowHeaders string, rows []string) (map[rune]*masc.Tableau, error) {
-	pt2ct := make(map[rune]*masc.Tableau)
+	m := make(map[rune]*masc.Tableau)
 
 	keyRunes := []rune(rowHeaders)
 	if len(keyRunes) != len(rowHeaders) {
@@ -41,14 +41,14 @@ func makedicts(columnHeaders string, rowHeaders string, rows []string) (map[rune
 	}
 
 	for i, r := range keyRunes {
-		pt2ct[r] = &masc.Tableau{
-			PtAlphabet: columnHeaders,
-			CtAlphabet: rows[i],
-			Strict:     true,
+		t, err := masc.New(columnHeaders, rows[i])
+		if err != nil {
+			return nil, err
 		}
+		m[r] = t
 	}
 
-	return pt2ct, nil
+	return m, nil
 }
 
 func (tr *ReciprocalTable) String() string {

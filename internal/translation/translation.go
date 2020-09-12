@@ -20,7 +20,7 @@ type T2 map[rune]rune
 
 // New T2.
 func New(src string, dst string, del string) (T2, error) {
-	m, err := makeMap(src, dst, del)
+	m, err := Map(src, dst, del)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +54,7 @@ type Table struct {
 
 // Map source runes to destination runes and map to (-1) any runes to delete.
 func (tt *Table) Map() (map[rune]rune, error) {
-	return makeMap(tt.Src, tt.Dst, tt.Del)
+	return Map(tt.Src, tt.Dst, tt.Del)
 }
 
 // Translate a string based on a map of runes.

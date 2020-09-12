@@ -31,23 +31,37 @@ type Tableau struct {
 
 	Strict   bool
 	Caseless bool
+
+	pt2ct map[rune]rune
+	ct2pt map[rune]rune
+}
+
+// New tableau.
+func New(ptAlphabet string, ctAlphabet string) (*Tableau, error) {
+	pt2ct, err := translation.Map(ptAlphabet, ctAlphabet, "")
+	if err != nil {
+		return nil, err
+	}
+
+	ct2pt, err := translation.Map(ctAlphabet, ptAlphabet, "")
+	if err != nil {
+		return nil, err
+	}
+
+	return &Tableau{
+		pt2ct: pt2ct,
+		ct2pt: ct2pt,
+	}, nil
 }
 
 // EncipherRune enciphers a rune.
 func (t *Tableau) EncipherRune(r rune) rune {
-	ptAlphabet := t.PtAlphabet
-	ctAlphabet := t.CtAlphabet
+	// if t.Caseless {
+	// 	ptAlphabet = strings.ToUpper(ptAlphabet) + strings.ToLower(ptAlphabet)
+	// 	ctAlphabet = strings.ToUpper(ctAlphabet) + strings.ToLower(ctAlphabet)
+	// }
 
-	if t.Caseless {
-		ptAlphabet = strings.ToUpper(ptAlphabet) + strings.ToLower(ptAlphabet)
-		ctAlphabet = strings.ToUpper(ctAlphabet) + strings.ToLower(ctAlphabet)
-	}
-
-	tt, err := translation.New(ptAlphabet, ctAlphabet, "")
-	if err != nil {
-		return (-1)
-	}
-	if newRune, ok := tt[r]; ok {
+	if newRune, ok := t.pt2ct[r]; ok {
 		return newRune
 	}
 
@@ -56,20 +70,12 @@ func (t *Tableau) EncipherRune(r rune) rune {
 
 // DecipherRune deciphers a rune.
 func (t *Tableau) DecipherRune(r rune) rune {
-	ptAlphabet := t.PtAlphabet
-	ctAlphabet := t.CtAlphabet
+	// if t.Caseless {
+	// 	ptAlphabet = strings.ToUpper(ptAlphabet) + strings.ToLower(ptAlphabet)
+	// 	ctAlphabet = strings.ToUpper(ctAlphabet) + strings.ToLower(ctAlphabet)
+	// }
 
-	if t.Caseless {
-		ptAlphabet = strings.ToUpper(ptAlphabet) + strings.ToLower(ptAlphabet)
-		ctAlphabet = strings.ToUpper(ctAlphabet) + strings.ToLower(ctAlphabet)
-	}
-
-	tt, err := translation.New(ctAlphabet, ptAlphabet, "")
-	if err != nil {
-		// TODO: this is bad
-		return (-1)
-	}
-	if newRune, ok := tt[r]; ok {
+	if newRune, ok := t.ct2pt[r]; ok {
 		return newRune
 	}
 
