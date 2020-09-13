@@ -1,0 +1,85 @@
+[
+    {
+        "Input": "CABCAB",
+        "Output": "FDEFDE",
+        "Table": {
+            "67": 70,
+            "65": 68,
+            "66": 69
+        },
+        "Strict": false
+    },
+    {
+        "Input": "CabcAB",
+        "Output": "FdefDE",
+        "Table": {
+            "67": 70,
+            "65": 68,
+            "66": 69
+        },
+        "Caseless": true,
+        "Strict": false
+    },
+    {
+        "Input": "DEFACED123XYZ",
+        "Output": "JKLGIKJ123",
+        "Table": {
+            "65": 71,
+            "66": 72,
+            "67": 73,
+            "68": 74,
+            "69": 75,
+            "70": 76,
+            "88": -1,
+            "89": -1,
+            "90": -1
+        },
+        "Strict": false
+    },
+    {
+        "Input": "DEFACED123XYZ",
+        "Output": "JKLGIKJ",
+        "Table": {
+            "65": 71,
+            "66": 72,
+            "67": 73,
+            "68": 74,
+            "69": 75,
+            "70": 76,
+            "88": -1,
+            "89": -1,
+            "90": -1
+        },
+        "Strict": true
+    },
+    {
+        "Input": "DEfaceD123XYZ",
+        "Output": "JKlgikJ",
+        "Table": {
+            "65": 71,
+            "66": 72,
+            "67": 73,
+            "68": 74,
+            "69": 75,
+            "70": 76,
+            "88": -1,
+            "89": -1,
+            "90": -1
+        },
+        "Caseless": true,
+        "Strict": true
+    },
+    {
+        "Input": "ABCFEEDABC",
+        "Output": "LKKJ",
+        "Table": {
+            "65": -1,
+            "66": -1,
+            "67": -1,
+            "68": 74,
+            "69": 75,
+            "70": 76
+        },
+        "Strict": false
+    }
+]
