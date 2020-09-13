@@ -14,7 +14,10 @@
 
 package translation
 
-import "unicode"
+import (
+	"strings"
+	"unicode"
+)
 
 // TODO: Maybe have config object (a la AWS params) to create a table from? Using existing table?
 
@@ -51,4 +54,12 @@ func (tt Table) Get(r rune, strict bool, caseless bool) (rune, bool) {
 	}
 
 	return (-1), false
+}
+
+// Map runes in a string.
+func (tt Table) Map(s string, strict bool, caseless bool) string {
+	return strings.Map(func(r rune) rune {
+		o, _ := tt.Get(r, strict, caseless)
+		return o
+	}, s)
 }

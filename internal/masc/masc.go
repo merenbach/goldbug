@@ -16,7 +16,6 @@ package masc
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/merenbach/goldbug/internal/translation"
 )
@@ -75,25 +74,16 @@ func (t *Tableau) DecipherRune(r rune) (rune, bool) {
 
 // Encipher a string.
 func (t *Tableau) Encipher(s string) (string, error) {
-	return strings.Map(func(r rune) rune {
-		o, _ := t.pt2ct.Get(r, t.Strict, t.Caseless)
-		return o
-	}, s), nil
+	return t.pt2ct.Map(s, t.Strict, t.Caseless), nil
 }
 
 // Decipher a string.
 func (t *Tableau) Decipher(s string) (string, error) {
-	return strings.Map(func(r rune) rune {
-		o, _ := t.ct2pt.Get(r, t.Strict, t.Caseless)
-		return o
-	}, s), nil
+	return t.ct2pt.Map(s, t.Strict, t.Caseless), nil
 }
 
 // Printable representation of this tableau.
 func (t *Tableau) Printable() (string, error) {
-	ctAlphabet := strings.Map(func(r rune) rune {
-		o, _ := t.pt2ct.Get(r, t.Strict, t.Caseless)
-		return o
-	}, t.Alphabet)
+	ctAlphabet := t.pt2ct.Map(t.Alphabet, t.Strict, t.Caseless)
 	return fmt.Sprintf("PT: %s\nCT: %s", t.Alphabet, ctAlphabet), nil
 }
