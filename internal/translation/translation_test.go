@@ -15,24 +15,27 @@
 package translation
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/merenbach/goldbug/internal/fixture"
 )
 
-func TestTable_Translate(t *testing.T) {
+func TestTable_Get(t *testing.T) {
 	var tables []struct {
 		Table
 
 		Input  string
 		Output string
+		Strict bool
 	}
 
 	fixture.Load(t, &tables)
 	for _, table := range tables {
-		if out, err := table.Translate(table.Input); err != nil {
-			t.Error("Error:", err)
-		} else if out != table.Output {
+		out := strings.Map(func(r rune) rune {
+			return table.Get(r, table.Strict)
+		}, table.Input)
+		if out != table.Output {
 			t.Errorf("Expected output %q for input %q, but instead got %q", table.Output, table.Input, out)
 		}
 	}

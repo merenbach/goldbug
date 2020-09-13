@@ -33,8 +33,8 @@ type Tableau struct {
 	Strict   bool
 	Caseless bool
 
-	pt2ct translation.T2
-	ct2pt translation.T2
+	pt2ct translation.Table
+	ct2pt translation.Table
 }
 
 // New tableau.

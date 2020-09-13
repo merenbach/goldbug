@@ -14,69 +14,26 @@
 
 package translation
 
-import "strings"
-
 // TODO: Maybe have config object (a la AWS params) to create a table from? Using existing table?
 
-// A T2 is a revised version of the translation table.
-type T2 map[rune]rune
+// A Table to hold translation data.
+type Table map[rune]rune
 
-// New T2.
-func New(src string, dst string, del string) (T2, error) {
+// New table.
+func New(src string, dst string, del string) (Table, error) {
 	m, err := Map(src, dst, del)
 	if err != nil {
 		return nil, err
 	}
-	return T2(m), nil
+	return Table(m), nil
 }
 
 // Get a transcoded rune or return (-1) if not found.
-func (tt T2) Get(r rune, strict bool) rune {
+func (tt Table) Get(r rune, strict bool) rune {
 	if o, ok := tt[r]; ok {
 		return o
 	} else if !strict {
 		return r
 	}
 	return (-1)
-}
-
-// Translate a string.
-func (tt T2) Translate(s string, strict bool) string {
-	return strings.Map(func(r rune) rune {
-		if o, ok := tt[r]; ok {
-			// Rune found
-			return o
-		} else if !strict {
-			// Rune not found and strict mode off
-			return r
-		}
-		// Rune not found and strict mode on
-		return (-1)
-	}, s)
-
-}
-
-// A Table to hold translation data.
-type Table struct {
-	Src string
-	Dst string
-	Del string
-
-	Strict bool
-}
-
-// Map source runes to destination runes and map to (-1) any runes to delete.
-func (tt *Table) Map() (map[rune]rune, error) {
-	return Map(tt.Src, tt.Dst, tt.Del)
-}
-
-// Translate a string based on a map of runes.
-// Translate returns non-transcodable runes as-is without strict mode.
-// Translate will remove any runes that explicitly map to (-1).
-func (tt *Table) Translate(s string) (string, error) {
-	m, err := tt.Map()
-	if err != nil {
-		return "", err
-	}
-	return translate(s, m, tt.Strict), nil
 }
