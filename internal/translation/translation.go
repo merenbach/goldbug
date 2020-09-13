@@ -30,26 +30,25 @@ func New(src string, dst string, del string) (Table, error) {
 	return Table(m), nil
 }
 
-// Get a transcoded rune or return (-1) if not found.
+// Get a transcoded rune (optionally ignoring case) and a boolean indicating success.
+// Get (-1) instead if strict mode is enabled.
+// Get the original rune back instead if strict mode is disabled.
 func (tt Table) Get(r rune, strict bool, caseless bool) (rune, bool) {
 	if o, ok := tt[r]; ok {
 		return o, true
-	} else if caseless {
+	}
+
+	if caseless {
 		if o, ok := tt[unicode.ToUpper(r)]; ok {
 			return unicode.ToLower(o), true
 		} else if o, ok := tt[unicode.ToLower(r)]; ok {
 			return unicode.ToUpper(o), true
 		}
-	} else if !strict {
+	}
+
+	if !strict {
 		return r, false
 	}
+
 	return (-1), false
 }
-
-// // Contains determines if this table contains a rune.
-// func (tt Table) Contains(r rune) bool {
-// 	if _, ok := tt[r]; ok {
-// 		return true
-// 	}
-// 	return false
-// }

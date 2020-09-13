@@ -66,42 +66,26 @@ func (t *Tableau) DecipherRune(r rune) (rune, bool) {
 
 // Encipher a string.
 func (t *Tableau) Encipher(s string) (string, error) {
-	ptAlphabet := t.PtAlphabet
-	ctAlphabet := t.CtAlphabet
-
-	if t.Caseless {
-		ptAlphabet = strings.ToUpper(ptAlphabet) + strings.ToLower(ptAlphabet)
-		ctAlphabet = strings.ToUpper(ctAlphabet) + strings.ToLower(ctAlphabet)
-	}
-
-	tt, err := translation.New(ptAlphabet, ctAlphabet, "")
+	tt, err := translation.New(t.PtAlphabet, t.CtAlphabet, "")
 	if err != nil {
 		return "", err
 	}
 
 	return strings.Map(func(r rune) rune {
-		o, _ := tt.Get(r, t.Strict, false)
+		o, _ := tt.Get(r, t.Strict, t.Caseless)
 		return o
 	}, s), nil
 }
 
 // Decipher a string.
 func (t *Tableau) Decipher(s string) (string, error) {
-	ptAlphabet := t.PtAlphabet
-	ctAlphabet := t.CtAlphabet
-
-	if t.Caseless {
-		ptAlphabet = strings.ToUpper(ptAlphabet) + strings.ToLower(ptAlphabet)
-		ctAlphabet = strings.ToUpper(ctAlphabet) + strings.ToLower(ctAlphabet)
-	}
-
-	tt, err := translation.New(ctAlphabet, ptAlphabet, "")
+	tt, err := translation.New(t.CtAlphabet, t.PtAlphabet, "")
 	if err != nil {
 		return "", err
 	}
 
 	return strings.Map(func(r rune) rune {
-		o, _ := tt.Get(r, t.Strict, false)
+		o, _ := tt.Get(r, t.Strict, t.Caseless)
 		return o
 	}, s), nil
 }
