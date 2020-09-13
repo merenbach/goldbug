@@ -22,39 +22,32 @@ const slope = 1
 // Cipher implements a Caesar cipher.
 type Cipher struct {
 	Alphabet string
+	Caseless bool
 	Shift    int
 	Strict   bool
 }
 
-// Encipher a message.
-func (c *Cipher) Encipher(s string) (string, error) {
-	c2 := affine.Cipher{
+func (c *Cipher) maketableau() *affine.Cipher {
+	return &affine.Cipher{
 		Alphabet:  c.Alphabet,
+		Caseless:  c.Caseless,
 		Intercept: c.Shift,
 		Slope:     slope,
 		Strict:    c.Strict,
 	}
-	return c2.Encipher(s)
+}
+
+// Encipher a message.
+func (c *Cipher) Encipher(s string) (string, error) {
+	return c.maketableau().Encipher(s)
 }
 
 // Decipher a message.
 func (c *Cipher) Decipher(s string) (string, error) {
-	c2 := affine.Cipher{
-		Alphabet:  c.Alphabet,
-		Intercept: c.Shift,
-		Slope:     slope,
-		Strict:    c.Strict,
-	}
-	return c2.Decipher(s)
+	return c.maketableau().Decipher(s)
 }
 
 // Tableau for encipherment and decipherment.
 func (c *Cipher) Tableau() (string, error) {
-	c2 := affine.Cipher{
-		Alphabet:  c.Alphabet,
-		Intercept: c.Shift,
-		Slope:     slope,
-		Strict:    c.Strict,
-	}
-	return c2.Tableau()
+	return c.maketableau().Tableau()
 }

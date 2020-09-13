@@ -23,10 +23,10 @@ import (
 // Cipher implements an affine cipher.
 type Cipher struct {
 	Alphabet  string
+	Caseless  bool
 	Intercept int
 	Slope     int
 	Strict    bool
-	Caseless  bool
 }
 
 func (c *Cipher) maketableau() (*masc.Tableau, error) {

@@ -21,35 +21,30 @@ const shift = 13
 
 // Cipher implements a ROT13 cipher.
 type Cipher struct {
-	Strict bool
+	Caseless bool
+	Strict   bool
+}
+
+func (c *Cipher) maketableau() *caesar.Cipher {
+	return &caesar.Cipher{
+		Alphabet: "",
+		Caseless: c.Caseless,
+		Shift:    shift,
+		Strict:   c.Strict,
+	}
 }
 
 // Encipher a message.
 func (c *Cipher) Encipher(s string) (string, error) {
-	c2 := caesar.Cipher{
-		Alphabet: "",
-		Shift:    shift,
-		Strict:   c.Strict,
-	}
-	return c2.Encipher(s)
+	return c.maketableau().Encipher(s)
 }
 
 // Decipher a message.
 func (c *Cipher) Decipher(s string) (string, error) {
-	c2 := caesar.Cipher{
-		Alphabet: "",
-		Shift:    shift,
-		Strict:   c.Strict,
-	}
-	return c2.Decipher(s)
+	return c.maketableau().Decipher(s)
 }
 
 // Tableau for encipherment and decipherment.
 func (c *Cipher) Tableau() (string, error) {
-	c2 := caesar.Cipher{
-		Alphabet: "",
-		Shift:    shift,
-		Strict:   c.Strict,
-	}
-	return c2.Tableau()
+	return c.maketableau().Tableau()
 }

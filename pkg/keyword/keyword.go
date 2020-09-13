@@ -24,9 +24,9 @@ import (
 // Cipher implements a keyword cipher.
 type Cipher struct {
 	Alphabet string
+	Caseless bool
 	Keyword  string
 	Strict   bool
-	Caseless bool
 }
 
 func (c *Cipher) maketableau() (*masc.Tableau, error) {
