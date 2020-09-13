@@ -22,7 +22,7 @@ import (
 // Map source runes to destination runes.
 // Map to (-1) any runes to delete.
 // Map is modeled after the Python `str.maketrans` function.
-func Map(a string, b string, c string) (map[rune]rune, error) {
+func makeMap(a string, b string, c string) (map[rune]rune, error) {
 	src := []rune(a)
 	dst := []rune(b)
 	del := []rune(c)

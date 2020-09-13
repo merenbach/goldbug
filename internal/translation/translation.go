@@ -26,7 +26,7 @@ type Table map[rune]rune
 
 // New table.
 func New(src string, dst string, del string) (Table, error) {
-	m, err := Map(src, dst, del)
+	m, err := makeMap(src, dst, del)
 	if err != nil {
 		return nil, err
 	}
