@@ -25,15 +25,16 @@ func TestTable_Get(t *testing.T) {
 	var tables []struct {
 		Table
 
-		Input  string
-		Output string
-		Strict bool
+		Caseless bool
+		Input    string
+		Output   string
+		Strict   bool
 	}
 
 	fixture.Load(t, &tables)
 	for _, table := range tables {
 		out := strings.Map(func(r rune) rune {
-			o, _ := table.Get(r, table.Strict, false)
+			o, _ := table.Get(r, table.Strict, table.Caseless)
 			return o
 		}, table.Input)
 		if out != table.Output {

@@ -16,7 +16,6 @@ package translation
 
 import (
 	"errors"
-	"strings"
 )
 
 // MakeMap maps source runes to destination runes.
@@ -42,21 +41,4 @@ func makeMap(a string, b string, c string) (map[rune]rune, error) {
 	}
 
 	return t, nil
-}
-
-// Translate a string based on a map of runes.
-// Translate returns non-transcodable runes as-is without strict mode.
-// Translate will remove any runes that explicitly map to (-1).
-func translate(s string, m map[rune]rune, strict bool) string {
-	return strings.Map(func(r rune) rune {
-		if o, ok := m[r]; ok {
-			// Rune found
-			return o
-		} else if !strict {
-			// Rune not found and strict mode off
-			return r
-		}
-		// Rune not found and strict mode on
-		return (-1)
-	}, s)
 }

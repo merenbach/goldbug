@@ -40,20 +40,3 @@ func TestMakeMap(t *testing.T) {
 		}
 	}
 }
-
-func TestTranslate(t *testing.T) {
-	var tables []struct {
-		Input  string
-		Output string
-		Strict bool
-		Map    map[rune]rune
-	}
-
-	fixture.Load(t, &tables)
-	for _, table := range tables {
-		o := translate(table.Input, table.Map, table.Strict)
-		if o != table.Output {
-			t.Errorf("Expected %q, but got %q instead", table.Output, o)
-		}
-	}
-}
