@@ -58,15 +58,15 @@ func New(ptAlphabet string, ctAlphabet string) (*Tableau, error) {
 // EncipherRune enciphers a rune.
 func (t *Tableau) EncipherRune(r rune) rune {
 	if !t.Caseless {
-		return t.pt2ct.Get(r)
+		return t.pt2ct.Get(r, true)
 	}
 
 	r1, r2 := unicode.ToUpper(r), unicode.ToLower(r)
 
 	// TODO: Consider putting this in the translation table methods?
-	if out := t.pt2ct.Get(r1); out != (-1) {
+	if out := t.pt2ct.Get(r1, true); out != (-1) {
 		return out
-	} else if out := t.pt2ct.Get(r2); out != (-1) {
+	} else if out := t.pt2ct.Get(r2, true); out != (-1) {
 		return out
 	}
 
@@ -76,14 +76,14 @@ func (t *Tableau) EncipherRune(r rune) rune {
 // DecipherRune deciphers a rune.
 func (t *Tableau) DecipherRune(r rune) rune {
 	if !t.Caseless {
-		return t.ct2pt.Get(r)
+		return t.ct2pt.Get(r, true)
 	}
 
 	r1, r2 := unicode.ToUpper(r), unicode.ToLower(r)
 
-	if out := t.ct2pt.Get(r1); out != (-1) {
+	if out := t.ct2pt.Get(r1, true); out != (-1) {
 		return out
-	} else if out := t.ct2pt.Get(r2); out != (-1) {
+	} else if out := t.ct2pt.Get(r2, true); out != (-1) {
 		return out
 	}
 

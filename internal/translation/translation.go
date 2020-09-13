@@ -31,9 +31,11 @@ func New(src string, dst string, del string) (T2, error) {
 }
 
 // Get a transcoded rune or return (-1) if not found.
-func (tt T2) Get(r rune) rune {
+func (tt T2) Get(r rune, strict bool) rune {
 	if o, ok := tt[r]; ok {
 		return o
+	} else if !strict {
+		return r
 	}
 	return (-1)
 }
