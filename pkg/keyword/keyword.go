@@ -30,14 +30,8 @@ type Cipher struct {
 }
 
 func (c *Cipher) maketableau() (*masc.Tableau, error) {
-	ptAlphabet := c.Alphabet
-	if ptAlphabet == "" {
-		ptAlphabet = masc.Alphabet
-	}
-	ctAlphabet := stringutil.Key(ptAlphabet, c.Keyword)
-
-	t, err := masc.New(ptAlphabet, func(string) (string, error) {
-		return ctAlphabet, nil
+	t, err := masc.New(c.Alphabet, func(s string) (string, error) {
+		return stringutil.Key(s, c.Keyword), nil
 	})
 	if err != nil {
 		return nil, err
