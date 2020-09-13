@@ -41,7 +41,9 @@ func makedicts(columnHeaders string, rowHeaders string, rows []string, strict bo
 	}
 
 	for i, r := range keyRunes {
-		t, err := masc.New(columnHeaders, rows[i])
+		t, err := masc.New(columnHeaders, func(string) (string, error) {
+			return rows[i], nil
+		})
 		if err != nil {
 			return nil, err
 		}

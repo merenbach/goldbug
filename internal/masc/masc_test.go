@@ -22,7 +22,10 @@ import (
 
 func TestTableau_Encipher(t *testing.T) {
 	var tables []struct {
-		Tableau
+		PtAlphabet string
+		CtAlphabet string
+		Caseless   bool
+		Strict     bool
 
 		Input  string
 		Output string
@@ -30,7 +33,16 @@ func TestTableau_Encipher(t *testing.T) {
 
 	fixture.Load(t, &tables)
 	for _, table := range tables {
-		if out, err := table.Encipher(table.Input); err != nil {
+		tableau, err := New(table.PtAlphabet, func(string) (string, error) {
+			return table.CtAlphabet, nil
+		})
+		if err != nil {
+			t.Error("Error:", err)
+		}
+		tableau.Caseless = table.Caseless
+		tableau.Strict = table.Strict
+
+		if out, err := tableau.Encipher(table.Input); err != nil {
 			t.Error("Could not encipher:", err)
 		} else if out != table.Output {
 			t.Errorf("Expected %q to encipher to %q, but instead got %q", table.Input, table.Output, out)
@@ -40,7 +52,10 @@ func TestTableau_Encipher(t *testing.T) {
 
 func TestTableau_Decipher(t *testing.T) {
 	var tables []struct {
-		Tableau
+		PtAlphabet string
+		CtAlphabet string
+		Caseless   bool
+		Strict     bool
 
 		Input  string
 		Output string
@@ -48,7 +63,16 @@ func TestTableau_Decipher(t *testing.T) {
 
 	fixture.Load(t, &tables)
 	for _, table := range tables {
-		if out, err := table.Decipher(table.Input); err != nil {
+		tableau, err := New(table.PtAlphabet, func(string) (string, error) {
+			return table.CtAlphabet, nil
+		})
+		if err != nil {
+			t.Error("Error:", err)
+		}
+		tableau.Caseless = table.Caseless
+		tableau.Strict = table.Strict
+
+		if out, err := tableau.Decipher(table.Input); err != nil {
 			t.Error("Could not decipher:", err)
 		} else if out != table.Output {
 			t.Errorf("Expected %q to decipher to %q, but instead got %q", table.Input, table.Output, out)

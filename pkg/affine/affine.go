@@ -39,12 +39,15 @@ func (c *Cipher) maketableau() (*masc.Tableau, error) {
 		return nil, err
 	}
 
-	return &masc.Tableau{
-		PtAlphabet: ptAlphabet,
-		CtAlphabet: ctAlphabet,
-		Strict:     c.Strict,
-		Caseless:   c.Caseless,
-	}, nil
+	t, err := masc.New(ptAlphabet, func(string) (string, error) {
+		return ctAlphabet, nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	t.Strict = c.Strict
+	t.Caseless = c.Caseless
+	return t, nil
 }
 
 // Encipher a message.

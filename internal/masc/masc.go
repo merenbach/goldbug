@@ -26,8 +26,7 @@ const Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 // A Tableau holds a translation table.
 type Tableau struct {
-	PtAlphabet string
-	CtAlphabet string
+	Alphabet string
 
 	Strict   bool
 	Caseless bool
@@ -37,7 +36,16 @@ type Tableau struct {
 }
 
 // New tableau.
-func New(ptAlphabet string, ctAlphabet string) (*Tableau, error) {
+func New(ptAlphabet string, f func(string) (string, error)) (*Tableau, error) {
+	if ptAlphabet == "" {
+		ptAlphabet = Alphabet
+	}
+
+	ctAlphabet, err := f(ptAlphabet)
+	if err != nil {
+		return nil, err
+	}
+
 	pt2ct, err := translation.New(ptAlphabet, ctAlphabet, "")
 	if err != nil {
 		return nil, err
@@ -49,8 +57,9 @@ func New(ptAlphabet string, ctAlphabet string) (*Tableau, error) {
 	}
 
 	return &Tableau{
-		pt2ct: pt2ct,
-		ct2pt: ct2pt,
+		Alphabet: ptAlphabet,
+		pt2ct:    pt2ct,
+		ct2pt:    ct2pt,
 	}, nil
 }
 
@@ -66,31 +75,25 @@ func (t *Tableau) DecipherRune(r rune) (rune, bool) {
 
 // Encipher a string.
 func (t *Tableau) Encipher(s string) (string, error) {
-	tt, err := translation.New(t.PtAlphabet, t.CtAlphabet, "")
-	if err != nil {
-		return "", err
-	}
-
 	return strings.Map(func(r rune) rune {
-		o, _ := tt.Get(r, t.Strict, t.Caseless)
+		o, _ := t.pt2ct.Get(r, t.Strict, t.Caseless)
 		return o
 	}, s), nil
 }
 
 // Decipher a string.
 func (t *Tableau) Decipher(s string) (string, error) {
-	tt, err := translation.New(t.CtAlphabet, t.PtAlphabet, "")
-	if err != nil {
-		return "", err
-	}
-
 	return strings.Map(func(r rune) rune {
-		o, _ := tt.Get(r, t.Strict, t.Caseless)
+		o, _ := t.ct2pt.Get(r, t.Strict, t.Caseless)
 		return o
 	}, s), nil
 }
 
 // Printable representation of this tableau.
 func (t *Tableau) Printable() (string, error) {
-	return fmt.Sprintf("PT: %s\nCT: %s", t.PtAlphabet, t.CtAlphabet), nil
+	ctAlphabet := strings.Map(func(r rune) rune {
+		o, _ := t.pt2ct.Get(r, t.Strict, t.Caseless)
+		return o
+	}, t.Alphabet)
+	return fmt.Sprintf("PT: %s\nCT: %s", t.Alphabet, ctAlphabet), nil
 }
