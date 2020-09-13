@@ -100,12 +100,14 @@ func (t *Tableau) Encipher(s string) (string, error) {
 		ctAlphabet = strings.ToUpper(ctAlphabet) + strings.ToLower(ctAlphabet)
 	}
 
-	tt := translation.Table{
-		Src:    ptAlphabet,
-		Dst:    ctAlphabet,
-		Strict: t.Strict,
+	tt, err := translation.New(ptAlphabet, ctAlphabet, "")
+	if err != nil {
+		return "", err
 	}
-	return tt.Translate(s)
+
+	return strings.Map(func(r rune) rune {
+		return tt.Get(r, t.Strict)
+	}, s), nil
 }
 
 // Decipher a string.
@@ -118,12 +120,14 @@ func (t *Tableau) Decipher(s string) (string, error) {
 		ctAlphabet = strings.ToUpper(ctAlphabet) + strings.ToLower(ctAlphabet)
 	}
 
-	tt := translation.Table{
-		Src:    ctAlphabet,
-		Dst:    ptAlphabet,
-		Strict: t.Strict,
+	tt, err := translation.New(ctAlphabet, ptAlphabet, "")
+	if err != nil {
+		return "", err
 	}
-	return tt.Translate(s)
+
+	return strings.Map(func(r rune) rune {
+		return tt.Get(r, t.Strict)
+	}, s), nil
 }
 
 // Printable representation of this tableau.
