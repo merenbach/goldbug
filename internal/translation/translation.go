@@ -19,13 +19,11 @@ import (
 	"unicode"
 )
 
-// TODO: Maybe have config object (a la AWS params) to create a table from? Using existing table?
-
 // A Table to hold translation data.
 type Table map[rune]rune
 
-// New table.
-func New(src string, dst string, del string) (Table, error) {
+// NewTable creates a new table.
+func NewTable(src string, dst string, del string) (Table, error) {
 	m, err := makeMap(src, dst, del)
 	if err != nil {
 		return nil, err

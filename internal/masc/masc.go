@@ -45,12 +45,12 @@ func New(ptAlphabet string, f func(string) (string, error)) (*Tableau, error) {
 		return nil, err
 	}
 
-	pt2ct, err := translation.New(ptAlphabet, ctAlphabet, "")
+	pt2ct, err := translation.NewTable(ptAlphabet, ctAlphabet, "")
 	if err != nil {
 		return nil, err
 	}
 
-	ct2pt, err := translation.New(ctAlphabet, ptAlphabet, "")
+	ct2pt, err := translation.NewTable(ctAlphabet, ptAlphabet, "")
 	if err != nil {
 		return nil, err
 	}
