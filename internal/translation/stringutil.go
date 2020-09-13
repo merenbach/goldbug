@@ -23,9 +23,7 @@ import (
 // MakeMap maps to (-1) any runes to delete.
 // MakeMap is modeled after the Python `str.maketrans` function.
 func makeMap(a string, b string, c string) (map[rune]rune, error) {
-	src := []rune(a)
-	dst := []rune(b)
-	del := []rune(c)
+	src, dst, del := []rune(a), []rune(b), []rune(c)
 
 	if len(src) != len(dst) {
 		return nil, errors.New("The first two arguments must have equal length")
