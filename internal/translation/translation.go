@@ -14,6 +14,8 @@
 
 package translation
 
+import "unicode"
+
 // TODO: Maybe have config object (a la AWS params) to create a table from? Using existing table?
 
 // A Table to hold translation data.
@@ -29,11 +31,25 @@ func New(src string, dst string, del string) (Table, error) {
 }
 
 // Get a transcoded rune or return (-1) if not found.
-func (tt Table) Get(r rune, strict bool) rune {
+func (tt Table) Get(r rune, strict bool, caseless bool) (rune, bool) {
 	if o, ok := tt[r]; ok {
-		return o
+		return o, true
+	} else if caseless {
+		if o, ok := tt[unicode.ToUpper(r)]; ok {
+			return unicode.ToLower(o), true
+		} else if o, ok := tt[unicode.ToLower(r)]; ok {
+			return unicode.ToUpper(o), true
+		}
 	} else if !strict {
-		return r
+		return r, false
 	}
-	return (-1)
+	return (-1), false
 }
+
+// // Contains determines if this table contains a rune.
+// func (tt Table) Contains(r rune) bool {
+// 	if _, ok := tt[r]; ok {
+// 		return true
+// 	}
+// 	return false
+// }

@@ -32,7 +32,7 @@ type ReciprocalTable struct {
 	CtAlphabets []string
 }
 
-func makedicts(columnHeaders string, rowHeaders string, rows []string) (map[rune]*masc.Tableau, error) {
+func makedicts(columnHeaders string, rowHeaders string, rows []string, strict bool) (map[rune]*masc.Tableau, error) {
 	m := make(map[rune]*masc.Tableau)
 
 	keyRunes := []rune(rowHeaders)
@@ -45,6 +45,7 @@ func makedicts(columnHeaders string, rowHeaders string, rows []string) (map[rune
 		if err != nil {
 			return nil, err
 		}
+		t.Strict = strict
 		m[r] = t
 	}
 
@@ -114,7 +115,7 @@ func (tr *ReciprocalTable) Printable() (string, error) {
 // Encipher a string.
 // Encipher will invoke the onSuccess function with before and after runes.
 func (tr *ReciprocalTable) Encipher(s string, k string, onSuccess func(rune, rune, *[]rune)) (string, error) {
-	pt2ct, err := makedicts(tr.PtAlphabet, tr.KeyAlphabet, tr.CtAlphabets)
+	pt2ct, err := makedicts(tr.PtAlphabet, tr.KeyAlphabet, tr.CtAlphabets, tr.Strict)
 	if err != nil {
 		return "", err
 	}
@@ -131,26 +132,22 @@ func (tr *ReciprocalTable) Encipher(s string, k string, onSuccess func(rune, run
 			return (-1)
 		}
 
-		if o := m.EncipherRune(r); o != (-1) {
+		o, ok := m.EncipherRune(r)
+		if ok {
 			// Transcoding successful
 			transcodedCharCount++
 			if onSuccess != nil {
 				onSuccess(r, o, &keyRunes)
 			}
-			return o
-		} else if !tr.Strict {
-			// Rune `r` does not exist in ptAlphabet but we are not being struct
-			return r
 		}
-		// Rune `r` does not exist in ptAlphabet
-		return (-1)
+		return o
 	}, s), nil
 }
 
 // Decipher a string.
 // Decipher will invoke the onSuccess function with before and after runes.
 func (tr *ReciprocalTable) Decipher(s string, k string, onSuccess func(rune, rune, *[]rune)) (string, error) {
-	ct2pt, err := makedicts(tr.PtAlphabet, tr.KeyAlphabet, tr.CtAlphabets)
+	ct2pt, err := makedicts(tr.PtAlphabet, tr.KeyAlphabet, tr.CtAlphabets, tr.Strict)
 	if err != nil {
 		return "", err
 	}
@@ -167,18 +164,14 @@ func (tr *ReciprocalTable) Decipher(s string, k string, onSuccess func(rune, run
 			return (-1)
 		}
 
-		if o := m.DecipherRune(r); o != (-1) {
+		o, ok := m.DecipherRune(r)
+		if ok {
 			// Transcoding successful
 			transcodedCharCount++
 			if onSuccess != nil {
 				onSuccess(r, o, &keyRunes)
 			}
-			return o
-		} else if !tr.Strict {
-			// Rune `r` does not exist in ctAlphabet but we are not being strict
-			return r
 		}
-		// Rune `r` does not exist in ctAlphabet
-		return (-1)
+		return o
 	}, s), nil
 }

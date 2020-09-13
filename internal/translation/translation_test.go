@@ -33,7 +33,8 @@ func TestTable_Get(t *testing.T) {
 	fixture.Load(t, &tables)
 	for _, table := range tables {
 		out := strings.Map(func(r rune) rune {
-			return table.Get(r, table.Strict)
+			o, _ := table.Get(r, table.Strict, false)
+			return o
 		}, table.Input)
 		if out != table.Output {
 			t.Errorf("Expected output %q for input %q, but instead got %q", table.Output, table.Input, out)

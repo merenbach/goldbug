@@ -17,7 +17,6 @@ package masc
 import (
 	"fmt"
 	"strings"
-	"unicode"
 
 	"github.com/merenbach/goldbug/internal/translation"
 )
@@ -56,38 +55,13 @@ func New(ptAlphabet string, ctAlphabet string) (*Tableau, error) {
 }
 
 // EncipherRune enciphers a rune.
-func (t *Tableau) EncipherRune(r rune) rune {
-	if !t.Caseless {
-		return t.pt2ct.Get(r, true)
-	}
-
-	r1, r2 := unicode.ToUpper(r), unicode.ToLower(r)
-
-	// TODO: Consider putting this in the translation table methods?
-	if out := t.pt2ct.Get(r1, true); out != (-1) {
-		return out
-	} else if out := t.pt2ct.Get(r2, true); out != (-1) {
-		return out
-	}
-
-	return (-1)
+func (t *Tableau) EncipherRune(r rune) (rune, bool) {
+	return t.pt2ct.Get(r, t.Strict, t.Caseless)
 }
 
 // DecipherRune deciphers a rune.
-func (t *Tableau) DecipherRune(r rune) rune {
-	if !t.Caseless {
-		return t.ct2pt.Get(r, true)
-	}
-
-	r1, r2 := unicode.ToUpper(r), unicode.ToLower(r)
-
-	if out := t.ct2pt.Get(r1, true); out != (-1) {
-		return out
-	} else if out := t.ct2pt.Get(r2, true); out != (-1) {
-		return out
-	}
-
-	return (-1)
+func (t *Tableau) DecipherRune(r rune) (rune, bool) {
+	return t.ct2pt.Get(r, t.Strict, t.Caseless)
 }
 
 // Encipher a string.
@@ -106,7 +80,8 @@ func (t *Tableau) Encipher(s string) (string, error) {
 	}
 
 	return strings.Map(func(r rune) rune {
-		return tt.Get(r, t.Strict)
+		o, _ := tt.Get(r, t.Strict, false)
+		return o
 	}, s), nil
 }
 
@@ -126,7 +101,8 @@ func (t *Tableau) Decipher(s string) (string, error) {
 	}
 
 	return strings.Map(func(r rune) rune {
-		return tt.Get(r, t.Strict)
+		o, _ := tt.Get(r, t.Strict, false)
+		return o
 	}, s), nil
 }
 
