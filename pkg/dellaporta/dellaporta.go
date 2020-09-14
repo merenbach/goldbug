@@ -16,8 +16,10 @@ package dellaporta
 
 import (
 	"errors"
+	"fmt"
 	"unicode/utf8"
 
+	"github.com/merenbach/goldbug/internal/masc"
 	"github.com/merenbach/goldbug/internal/pasc"
 	"github.com/merenbach/goldbug/internal/stringutil"
 )
@@ -29,7 +31,7 @@ type Cipher struct {
 	Strict   bool
 }
 
-func (c *Cipher) maketableau() (*pasc.ReciprocalTable, error) {
+func (c *Cipher) maketableau() (pasc.ReciprocalTable, error) {
 	alphabet := c.Alphabet
 	if alphabet == "" {
 		alphabet = pasc.Alphabet
@@ -70,14 +72,26 @@ func (c *Cipher) maketableau() (*pasc.ReciprocalTable, error) {
 		ctAlphabets[y] = string(out)
 	}
 
-	tr := pasc.ReciprocalTable{
-		PtAlphabet:  ptAlphabet,
-		KeyAlphabet: keyAlphabet,
-		CtAlphabets: ctAlphabets,
-		Strict:      c.Strict,
+	m := make(map[rune]*masc.Tableau)
+
+	keyRunes := []rune(keyAlphabet)
+	if len(keyRunes) != len(keyAlphabet) {
+		return nil, errors.New("Row headers must have same rune length as rows slice")
 	}
 
-	return &tr, nil
+	for i, r := range keyRunes {
+		t, err := masc.New(ptAlphabet, func(string) (string, error) {
+			return ctAlphabets[i], nil
+		})
+		if err != nil {
+			return nil, err
+		}
+		t.Strict = c.Strict
+		// t.Caseless = tr.Caseless // TODO
+		m[r] = t
+	}
+
+	return m, nil
 }
 
 // Encipher a message.
@@ -104,5 +118,6 @@ func (c *Cipher) Tableau() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return t.Printable()
+	// return t.Printable()
+	return fmt.Sprintf("%v", t), nil
 }

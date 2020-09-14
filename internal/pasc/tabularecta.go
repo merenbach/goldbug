@@ -15,7 +15,10 @@
 package pasc
 
 import (
+	"errors"
 	"fmt"
+	"strings"
+	"text/tabwriter"
 	"unicode/utf8"
 
 	"github.com/merenbach/goldbug/internal/masc"
@@ -33,8 +36,29 @@ type TabulaRecta struct {
 	DictFunc func(s string, i int) (*masc.Tableau, error)
 }
 
+func makedictsfromfunc(ptAlphabet string, keyAlphabet string, f func(s string, i int) (*masc.Tableau, error), strict bool, caseless bool) (ReciprocalTable, error) {
+	m := make(map[rune]*masc.Tableau)
+
+	keyRunes := []rune(keyAlphabet)
+	if len(keyRunes) != len(keyAlphabet) {
+		return nil, errors.New("Row headers must have same rune length as rows slice")
+	}
+
+	for i, r := range keyRunes {
+		t, err := f(ptAlphabet, i)
+		if err != nil {
+			return nil, err
+		}
+		t.Caseless = caseless
+		t.Strict = strict
+		m[r] = t
+	}
+
+	return m, nil
+}
+
 // MakeTabulaRecta creates a standard Caesar shift tabula recta.
-func (tr *TabulaRecta) makereciprocaltable() (*ReciprocalTable, error) {
+func (tr *TabulaRecta) makereciprocaltable() (ReciprocalTable, error) {
 	ctAlphabets := make([]string, utf8.RuneCountInString(tr.KeyAlphabet))
 	ctAlphabetLen := utf8.RuneCountInString(tr.CtAlphabet)
 
@@ -52,15 +76,26 @@ func (tr *TabulaRecta) makereciprocaltable() (*ReciprocalTable, error) {
 		ctAlphabets[y] = out
 	}
 
-	rt := ReciprocalTable{
-		PtAlphabet:  tr.PtAlphabet,
-		KeyAlphabet: tr.KeyAlphabet,
-		DictFunc:    tr.DictFunc,
-		CtAlphabets: ctAlphabets,
-		Strict:      tr.Strict,
+	m := make(map[rune]*masc.Tableau)
+
+	keyRunes := []rune(tr.KeyAlphabet)
+	if len(keyRunes) != len(tr.KeyAlphabet) {
+		return nil, errors.New("Row headers must have same rune length as rows slice")
 	}
 
-	return &rt, nil
+	for i, r := range keyRunes {
+		t, err := masc.New(tr.PtAlphabet, func(string) (string, error) {
+			return ctAlphabets[i], nil
+		})
+		if err != nil {
+			return nil, err
+		}
+		t.Strict = tr.Strict
+		// t.Caseless = tr.Caseless // TODO
+		m[r] = t
+	}
+
+	return m, nil
 }
 
 func (tr *TabulaRecta) String() string {
@@ -77,7 +112,29 @@ func (tr *TabulaRecta) Printable() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return rt.Printable()
+
+	var b strings.Builder
+
+	w := tabwriter.NewWriter(&b, 4, 1, 3, ' ', 0)
+
+	formatForPrinting := func(s string) string {
+		spl := strings.Split(s, "")
+		return strings.Join(spl, " ")
+	}
+
+	fmt.Fprintf(w, "\t%s\n", formatForPrinting(tr.PtAlphabet))
+	for _, r := range []rune(tr.KeyAlphabet) {
+		if tableau, ok := rt[r]; ok {
+			out, err := tableau.Encipher(tr.PtAlphabet)
+			if err != nil {
+				return "", err
+			}
+			fmt.Fprintf(w, "\n%c\t%s", r, formatForPrinting(out))
+		}
+	}
+
+	w.Flush()
+	return b.String(), nil
 }
 
 // // Encipher a plaintext rune with a given key alphabet rune.

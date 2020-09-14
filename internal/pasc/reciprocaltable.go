@@ -15,97 +15,42 @@
 package pasc
 
 import (
-	"errors"
-	"fmt"
 	"strings"
-	"text/tabwriter"
 
 	"github.com/merenbach/goldbug/internal/masc"
 )
 
-// ReciprocalTable holds a reciprocal table.
-type ReciprocalTable struct {
-	Strict   bool
-	Caseless bool // NOT USED YET; TODO
+type ReciprocalTable map[rune]*masc.Tableau
 
-	KeyAlphabet string
-	PtAlphabet  string
-	CtAlphabets []string
+// func makedicts(columnHeaders string, rowHeaders string, rows []string, strict bool) (map[rune]*masc.Tableau, error) {
+// 	m := make(map[rune]*masc.Tableau)
 
-	// EXPERIMENTAL
-	DictFunc func(s string, i int) (*masc.Tableau, error)
-}
+// 	keyRunes := []rune(rowHeaders)
+// 	if len(keyRunes) != len(rowHeaders) {
+// 		return nil, errors.New("Row headers must have same rune length as rows slice")
+// 	}
 
-func makedictsfromfunc(columnHeaders string, rowHeaders string, f func(s string, i int) (*masc.Tableau, error), strict bool, caseless bool) (map[rune]*masc.Tableau, error) {
-	m := make(map[rune]*masc.Tableau)
+// 	for i, r := range keyRunes {
+// 		t, err := masc.New(columnHeaders, func(string) (string, error) {
+// 			return rows[i], nil
+// 		})
+// 		if err != nil {
+// 			return nil, err
+// 		}
+// 		t.Strict = strict
+// 		m[r] = t
+// 	}
 
-	keyRunes := []rune(rowHeaders)
-	if len(keyRunes) != len(rowHeaders) {
-		return nil, errors.New("Row headers must have same rune length as rows slice")
-	}
+// 	return m, nil
+// }
 
-	for i, r := range keyRunes {
-		t, err := f(columnHeaders, i)
-		if err != nil {
-			return nil, err
-		}
-		t.Caseless = caseless
-		t.Strict = strict
-		m[r] = t
-	}
-
-	return m, nil
-}
-
-func makedicts(columnHeaders string, rowHeaders string, rows []string, strict bool) (map[rune]*masc.Tableau, error) {
-	m := make(map[rune]*masc.Tableau)
-
-	keyRunes := []rune(rowHeaders)
-	if len(keyRunes) != len(rowHeaders) {
-		return nil, errors.New("Row headers must have same rune length as rows slice")
-	}
-
-	for i, r := range keyRunes {
-		t, err := masc.New(columnHeaders, func(string) (string, error) {
-			return rows[i], nil
-		})
-		if err != nil {
-			return nil, err
-		}
-		t.Strict = strict
-		m[r] = t
-	}
-
-	return m, nil
-}
-
-func (tr *ReciprocalTable) String() string {
-	return fmt.Sprintf("%+v", map[string]interface{}{
-		"k":  tr.KeyAlphabet,
-		"pt": tr.PtAlphabet,
-		"ct": tr.CtAlphabets,
-	})
-}
-
-// Printable representation of this tabula recta.
-func (tr *ReciprocalTable) Printable() (string, error) {
-	var b strings.Builder
-
-	w := tabwriter.NewWriter(&b, 4, 1, 3, ' ', 0)
-
-	formatForPrinting := func(s string) string {
-		spl := strings.Split(s, "")
-		return strings.Join(spl, " ")
-	}
-
-	fmt.Fprintf(w, "\t%s\n", formatForPrinting(tr.PtAlphabet))
-	for i, r := range []rune(tr.KeyAlphabet) {
-		fmt.Fprintf(w, "\n%c\t%s", r, formatForPrinting(tr.CtAlphabets[i]))
-	}
-
-	w.Flush()
-	return b.String(), nil
-}
+// func (tr *ReciprocalTable) String() string {
+// 	return fmt.Sprintf("%+v", map[string]interface{}{
+// 		"k":  tr.KeyAlphabet,
+// 		"pt": tr.PtAlphabet,
+// 		"ct": tr.CtAlphabets,
+// 	})
+// }
 
 // // Encipher a plaintext rune with a given key alphabet rune.
 // // Encipher will return (-1, false) if the key rune is invalid.
@@ -141,17 +86,12 @@ func (tr *ReciprocalTable) Printable() (string, error) {
 
 // Encipher a string.
 // Encipher will invoke the onSuccess function with before and after runes.
-func (tr *ReciprocalTable) encipherOld(s string, k string, onSuccess func(rune, rune, *[]rune)) (string, error) {
-	pt2ct, err := makedicts(tr.PtAlphabet, tr.KeyAlphabet, tr.CtAlphabets, tr.Strict)
-	if err != nil {
-		return "", err
-	}
-
+func (tr ReciprocalTable) Encipher(s string, k string, onSuccess func(rune, rune, *[]rune)) (string, error) {
 	keyRunes := []rune(k)
 	var transcodedCharCount = 0
 	return strings.Map(func(r rune) rune {
 		k := keyRunes[transcodedCharCount%len(keyRunes)]
-		m, ok := pt2ct[k]
+		m, ok := tr[k]
 		if !ok {
 			// Rune `k` does not exist in keyAlphabet
 			// TODO: avoid advancing on invalid key char
@@ -173,17 +113,12 @@ func (tr *ReciprocalTable) encipherOld(s string, k string, onSuccess func(rune, 
 
 // Decipher a string.
 // Decipher will invoke the onSuccess function with before and after runes.
-func (tr *ReciprocalTable) decipherOld(s string, k string, onSuccess func(rune, rune, *[]rune)) (string, error) {
-	ct2pt, err := makedicts(tr.PtAlphabet, tr.KeyAlphabet, tr.CtAlphabets, tr.Strict)
-	if err != nil {
-		return "", err
-	}
-
+func (tr ReciprocalTable) Decipher(s string, k string, onSuccess func(rune, rune, *[]rune)) (string, error) {
 	keyRunes := []rune(k)
 	var transcodedCharCount = 0
 	return strings.Map(func(r rune) rune {
 		k := keyRunes[transcodedCharCount%len(keyRunes)]
-		m, ok := ct2pt[k]
+		m, ok := tr[k]
 		if !ok {
 			// Rune `k` does not exist in keyAlphabet
 			// TODO: avoid advancing on invalid key char
@@ -201,88 +136,4 @@ func (tr *ReciprocalTable) decipherOld(s string, k string, onSuccess func(rune, 
 		}
 		return o
 	}, s), nil
-}
-
-// Encipher a string.
-// Encipher will invoke the onSuccess function with before and after runes.
-func (tr *ReciprocalTable) encipherNew(s string, k string, onSuccess func(rune, rune, *[]rune)) (string, error) {
-	pt2ct, err := makedictsfromfunc(tr.PtAlphabet, tr.KeyAlphabet, tr.DictFunc, tr.Strict, tr.Caseless)
-	if err != nil {
-		return "", err
-	}
-
-	keyRunes := []rune(k)
-	var transcodedCharCount = 0
-	return strings.Map(func(r rune) rune {
-		k := keyRunes[transcodedCharCount%len(keyRunes)]
-		m, ok := pt2ct[k]
-		if !ok {
-			// Rune `k` does not exist in keyAlphabet
-			// TODO: avoid advancing on invalid key char
-			// TODO: avoid infinite loop upon _no_ valid key chars
-			return (-1)
-		}
-
-		o, ok := m.EncipherRune(r)
-		if ok {
-			// Transcoding successful
-			transcodedCharCount++
-			if onSuccess != nil {
-				onSuccess(r, o, &keyRunes)
-			}
-		}
-		return o
-	}, s), nil
-}
-
-// Decipher a string.
-// Decipher will invoke the onSuccess function with before and after runes.
-func (tr *ReciprocalTable) decipherNew(s string, k string, onSuccess func(rune, rune, *[]rune)) (string, error) {
-	ct2pt, err := makedictsfromfunc(tr.PtAlphabet, tr.KeyAlphabet, tr.DictFunc, tr.Strict, tr.Caseless)
-	if err != nil {
-		return "", err
-	}
-
-	keyRunes := []rune(k)
-	var transcodedCharCount = 0
-	return strings.Map(func(r rune) rune {
-		k := keyRunes[transcodedCharCount%len(keyRunes)]
-		m, ok := ct2pt[k]
-		if !ok {
-			// Rune `k` does not exist in keyAlphabet
-			// TODO: avoid advancing on invalid key char
-			// TODO: avoid infinite loop upon _no_ valid key chars
-			return (-1)
-		}
-
-		o, ok := m.DecipherRune(r)
-		if ok {
-			// Transcoding successful
-			transcodedCharCount++
-			if onSuccess != nil {
-				onSuccess(r, o, &keyRunes)
-			}
-		}
-		return o
-	}, s), nil
-}
-
-// Encipher a string.
-// Encipher will invoke the onSuccess function with before and after runes.
-func (tr *ReciprocalTable) Encipher(s string, k string, onSuccess func(rune, rune, *[]rune)) (string, error) {
-	if tr.DictFunc != nil {
-		return tr.encipherNew(s, k, onSuccess)
-	}
-
-	return tr.encipherOld(s, k, onSuccess)
-}
-
-// Decipher a string.
-// Decipher will invoke the onSuccess function with before and after runes.
-func (tr *ReciprocalTable) Decipher(s string, k string, onSuccess func(rune, rune, *[]rune)) (string, error) {
-	if tr.DictFunc != nil {
-		return tr.decipherNew(s, k, onSuccess)
-	}
-
-	return tr.decipherOld(s, k, onSuccess)
 }

@@ -29,7 +29,7 @@ func NewTable(src string, dst string, del string) (Table, error) {
 	if err != nil {
 		return nil, err
 	}
-	return Table(m), nil
+	return m, nil
 }
 
 // Get a transcoded rune (optionally ignoring case) and a boolean indicating success.
