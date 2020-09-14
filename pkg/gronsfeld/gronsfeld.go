@@ -16,6 +16,7 @@ package gronsfeld
 
 import (
 	"github.com/merenbach/goldbug/internal/pasc"
+	"github.com/merenbach/goldbug/pkg/affine"
 )
 
 // Cipher implements a Gronsfeld cipher.
@@ -34,8 +35,14 @@ func (c *Cipher) maketableau() (*pasc.TabulaRecta, error) {
 	}
 
 	return &pasc.TabulaRecta{
-		PtAlphabet:  alphabet,
-		CtAlphabet:  alphabet,
+		PtAlphabet: alphabet,
+		CtAlphabet: alphabet,
+		DictFunc: func(i int) *affine.Cipher {
+			return &affine.Cipher{
+				Slope:     1,
+				Intercept: i,
+			}
+		},
 		KeyAlphabet: digits,
 		Strict:      c.Strict,
 	}, nil

@@ -16,6 +16,7 @@ package vigenere
 
 import (
 	"github.com/merenbach/goldbug/internal/pasc"
+	"github.com/merenbach/goldbug/pkg/affine"
 )
 
 // An AutokeyOption determines the autokey setting for the cipher.
@@ -47,8 +48,14 @@ func (c *Cipher) maketableau() (*pasc.TabulaRecta, error) {
 	}
 
 	return &pasc.TabulaRecta{
-		PtAlphabet:  alphabet,
-		CtAlphabet:  alphabet,
+		PtAlphabet: alphabet,
+		CtAlphabet: alphabet,
+		DictFunc: func(i int) *affine.Cipher {
+			return &affine.Cipher{
+				Slope:     1,
+				Intercept: i,
+			}
+		},
 		KeyAlphabet: alphabet,
 		Strict:      c.Strict,
 	}, nil

@@ -17,6 +17,7 @@ package beaufort
 import (
 	"github.com/merenbach/goldbug/internal/pasc"
 	"github.com/merenbach/goldbug/internal/stringutil"
+	"github.com/merenbach/goldbug/pkg/affine"
 )
 
 // Cipher implements a Beaufort cipher.
@@ -34,8 +35,14 @@ func (c *Cipher) maketableau() (*pasc.TabulaRecta, error) {
 	revAlphabet := stringutil.Reverse(alphabet)
 
 	return &pasc.TabulaRecta{
-		PtAlphabet:  alphabet,
-		CtAlphabet:  revAlphabet,
+		PtAlphabet: alphabet,
+		CtAlphabet: revAlphabet,
+		DictFunc: func(i int) *affine.Cipher {
+			return &affine.Cipher{
+				Slope:     -1,
+				Intercept: -1 - i,
+			}
+		},
 		KeyAlphabet: revAlphabet,
 		Strict:      c.Strict,
 	}, nil

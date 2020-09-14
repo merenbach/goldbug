@@ -61,6 +61,26 @@ func (c *Cipher) Decipher(s string) (string, error) {
 	return t.Decipher(s)
 }
 
+// EncipherRune enciphers a rune.
+func (c *Cipher) EncipherRune(r rune) (rune, bool) {
+	t, err := c.maketableau()
+	if err != nil {
+		log.Println("Could not calculate alphabets")
+		return -1, false
+	}
+	return t.EncipherRune(r)
+}
+
+// DecipherRune deciphers a rune.
+func (c *Cipher) DecipherRune(r rune) (rune, bool) {
+	t, err := c.maketableau()
+	if err != nil {
+		log.Println("Could not calculate alphabets")
+		return -1, false
+	}
+	return t.DecipherRune(r)
+}
+
 // Tableau for this cipher.
 func (c *Cipher) Tableau() (string, error) {
 	t, err := c.maketableau()

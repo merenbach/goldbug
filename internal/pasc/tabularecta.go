@@ -19,6 +19,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/merenbach/goldbug/internal/stringutil"
+	"github.com/merenbach/goldbug/pkg/affine"
 )
 
 // TabulaRecta holds a tabula recta.
@@ -28,6 +29,8 @@ type TabulaRecta struct {
 	PtAlphabet  string
 	CtAlphabet  string
 	KeyAlphabet string
+
+	DictFunc func(i int) *affine.Cipher
 }
 
 // MakeTabulaRecta creates a standard Caesar shift tabula recta.
@@ -52,6 +55,7 @@ func (tr *TabulaRecta) makereciprocaltable() (*ReciprocalTable, error) {
 	rt := ReciprocalTable{
 		PtAlphabet:  tr.PtAlphabet,
 		KeyAlphabet: tr.KeyAlphabet,
+		DictFunc:    tr.DictFunc,
 		CtAlphabets: ctAlphabets,
 		Strict:      tr.Strict,
 	}

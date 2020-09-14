@@ -21,15 +21,38 @@ import (
 	"text/tabwriter"
 
 	"github.com/merenbach/goldbug/internal/masc"
+	"github.com/merenbach/goldbug/pkg/affine"
 )
 
 // ReciprocalTable holds a reciprocal table.
 type ReciprocalTable struct {
-	Strict bool
+	Strict   bool
+	Caseless bool // NOT USED YET; TODO
 
 	KeyAlphabet string
 	PtAlphabet  string
 	CtAlphabets []string
+
+	// EXPERIMENTAL
+	DictFunc func(i int) *affine.Cipher
+}
+
+func makedictsfromfunc(columnHeaders string, rowHeaders string, f func(i int) *affine.Cipher, strict bool, caseless bool) (map[rune]*affine.Cipher, error) {
+	m := make(map[rune]*affine.Cipher)
+
+	keyRunes := []rune(rowHeaders)
+	if len(keyRunes) != len(rowHeaders) {
+		return nil, errors.New("Row headers must have same rune length as rows slice")
+	}
+
+	for i, r := range keyRunes {
+		t := f(i)
+		t.Caseless = caseless
+		t.Strict = strict
+		m[r] = t
+	}
+
+	return m, nil
 }
 
 func makedicts(columnHeaders string, rowHeaders string, rows []string, strict bool) (map[rune]*masc.Tableau, error) {
@@ -116,7 +139,7 @@ func (tr *ReciprocalTable) Printable() (string, error) {
 
 // Encipher a string.
 // Encipher will invoke the onSuccess function with before and after runes.
-func (tr *ReciprocalTable) Encipher(s string, k string, onSuccess func(rune, rune, *[]rune)) (string, error) {
+func (tr *ReciprocalTable) encipherOld(s string, k string, onSuccess func(rune, rune, *[]rune)) (string, error) {
 	pt2ct, err := makedicts(tr.PtAlphabet, tr.KeyAlphabet, tr.CtAlphabets, tr.Strict)
 	if err != nil {
 		return "", err
@@ -148,7 +171,7 @@ func (tr *ReciprocalTable) Encipher(s string, k string, onSuccess func(rune, run
 
 // Decipher a string.
 // Decipher will invoke the onSuccess function with before and after runes.
-func (tr *ReciprocalTable) Decipher(s string, k string, onSuccess func(rune, rune, *[]rune)) (string, error) {
+func (tr *ReciprocalTable) decipherOld(s string, k string, onSuccess func(rune, rune, *[]rune)) (string, error) {
 	ct2pt, err := makedicts(tr.PtAlphabet, tr.KeyAlphabet, tr.CtAlphabets, tr.Strict)
 	if err != nil {
 		return "", err
@@ -176,4 +199,84 @@ func (tr *ReciprocalTable) Decipher(s string, k string, onSuccess func(rune, run
 		}
 		return o
 	}, s), nil
+}
+
+// Encipher a string.
+// Encipher will invoke the onSuccess function with before and after runes.
+func (tr *ReciprocalTable) encipherNew(s string, k string, onSuccess func(rune, rune, *[]rune)) (string, error) {
+	pt2ct, err := makedictsfromfunc(tr.PtAlphabet, tr.KeyAlphabet, tr.DictFunc, tr.Strict, tr.Caseless)
+	if err != nil {
+		return "", err
+	}
+
+	keyRunes := []rune(k)
+	var transcodedCharCount = 0
+	return strings.Map(func(r rune) rune {
+		k := keyRunes[transcodedCharCount%len(keyRunes)]
+		m, ok := pt2ct[k]
+		if !ok {
+			// Rune `k` does not exist in keyAlphabet
+			// TODO: avoid advancing on invalid key char
+			// TODO: avoid infinite loop upon _no_ valid key chars
+			return (-1)
+		}
+
+		o, ok := m.EncipherRune(r)
+		if ok {
+			// Transcoding successful
+			transcodedCharCount++
+			if onSuccess != nil {
+				onSuccess(r, o, &keyRunes)
+			}
+		}
+		return o
+	}, s), nil
+}
+
+// Decipher a string.
+// Decipher will invoke the onSuccess function with before and after runes.
+func (tr *ReciprocalTable) decipherNew(s string, k string, onSuccess func(rune, rune, *[]rune)) (string, error) {
+	ct2pt, err := makedictsfromfunc(tr.PtAlphabet, tr.KeyAlphabet, tr.DictFunc, tr.Strict, tr.Caseless)
+	if err != nil {
+		return "", err
+	}
+
+	keyRunes := []rune(k)
+	var transcodedCharCount = 0
+	return strings.Map(func(r rune) rune {
+		k := keyRunes[transcodedCharCount%len(keyRunes)]
+		m, ok := ct2pt[k]
+		if !ok {
+			// Rune `k` does not exist in keyAlphabet
+			// TODO: avoid advancing on invalid key char
+			// TODO: avoid infinite loop upon _no_ valid key chars
+			return (-1)
+		}
+
+		o, ok := m.DecipherRune(r)
+		if ok {
+			// Transcoding successful
+			transcodedCharCount++
+			if onSuccess != nil {
+				onSuccess(r, o, &keyRunes)
+			}
+		}
+		return o
+	}, s), nil
+}
+
+func (tr *ReciprocalTable) Encipher(s string, k string, onSuccess func(rune, rune, *[]rune)) (string, error) {
+	if tr.DictFunc != nil {
+		return tr.encipherNew(s, k, onSuccess)
+	}
+
+	return tr.encipherOld(s, k, onSuccess)
+}
+
+func (tr *ReciprocalTable) Decipher(s string, k string, onSuccess func(rune, rune, *[]rune)) (string, error) {
+	if tr.DictFunc != nil {
+		return tr.decipherNew(s, k, onSuccess)
+	}
+
+	return tr.decipherOld(s, k, onSuccess)
 }
