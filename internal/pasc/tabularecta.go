@@ -18,8 +18,8 @@ import (
 	"fmt"
 	"unicode/utf8"
 
+	"github.com/merenbach/goldbug/internal/masc"
 	"github.com/merenbach/goldbug/internal/stringutil"
-	"github.com/merenbach/goldbug/pkg/affine"
 )
 
 // TabulaRecta holds a tabula recta.
@@ -30,7 +30,7 @@ type TabulaRecta struct {
 	CtAlphabet  string
 	KeyAlphabet string
 
-	DictFunc func(i int) *affine.Cipher
+	DictFunc func(i int) (*masc.Tableau, error)
 }
 
 // MakeTabulaRecta creates a standard Caesar shift tabula recta.

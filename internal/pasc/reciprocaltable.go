@@ -21,7 +21,6 @@ import (
 	"text/tabwriter"
 
 	"github.com/merenbach/goldbug/internal/masc"
-	"github.com/merenbach/goldbug/pkg/affine"
 )
 
 // ReciprocalTable holds a reciprocal table.
@@ -34,10 +33,10 @@ type ReciprocalTable struct {
 	CtAlphabets []string
 
 	// EXPERIMENTAL
-	DictFunc func(i int) *affine.Cipher
+	DictFunc func(i int) (*masc.Tableau, error)
 }
 
-func makedictsfromfunc(columnHeaders string, rowHeaders string, f func(i int) *affine.Cipher, strict bool, caseless bool) (map[rune]*masc.Tableau, error) {
+func makedictsfromfunc(columnHeaders string, rowHeaders string, f func(i int) (*masc.Tableau, error), strict bool, caseless bool) (map[rune]*masc.Tableau, error) {
 	m := make(map[rune]*masc.Tableau)
 
 	keyRunes := []rune(rowHeaders)
@@ -46,14 +45,13 @@ func makedictsfromfunc(columnHeaders string, rowHeaders string, f func(i int) *a
 	}
 
 	for i, r := range keyRunes {
-		t := f(i)
-		t.Caseless = caseless
-		t.Strict = strict
-		t2, err := t.Tableau()
+		t, err := f(i)
 		if err != nil {
 			return nil, err
 		}
-		m[r] = t2
+		t.Caseless = caseless
+		t.Strict = strict
+		m[r] = t
 	}
 
 	return m, nil
@@ -269,6 +267,8 @@ func (tr *ReciprocalTable) decipherNew(s string, k string, onSuccess func(rune, 
 	}, s), nil
 }
 
+// Encipher a string.
+// Encipher will invoke the onSuccess function with before and after runes.
 func (tr *ReciprocalTable) Encipher(s string, k string, onSuccess func(rune, rune, *[]rune)) (string, error) {
 	if tr.DictFunc != nil {
 		return tr.encipherNew(s, k, onSuccess)
@@ -277,6 +277,8 @@ func (tr *ReciprocalTable) Encipher(s string, k string, onSuccess func(rune, run
 	return tr.encipherOld(s, k, onSuccess)
 }
 
+// Decipher a string.
+// Decipher will invoke the onSuccess function with before and after runes.
 func (tr *ReciprocalTable) Decipher(s string, k string, onSuccess func(rune, rune, *[]rune)) (string, error) {
 	if tr.DictFunc != nil {
 		return tr.decipherNew(s, k, onSuccess)

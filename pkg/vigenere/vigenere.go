@@ -15,6 +15,7 @@
 package vigenere
 
 import (
+	"github.com/merenbach/goldbug/internal/masc"
 	"github.com/merenbach/goldbug/internal/pasc"
 	"github.com/merenbach/goldbug/pkg/affine"
 )
@@ -50,11 +51,12 @@ func (c *Cipher) maketableau() (*pasc.TabulaRecta, error) {
 	return &pasc.TabulaRecta{
 		PtAlphabet: alphabet,
 		CtAlphabet: alphabet,
-		DictFunc: func(i int) *affine.Cipher {
-			return &affine.Cipher{
+		DictFunc: func(i int) (*masc.Tableau, error) {
+			c2 := &affine.Cipher{
 				Slope:     1,
 				Intercept: i,
 			}
+			return c2.Tableau()
 		},
 		KeyAlphabet: alphabet,
 		Strict:      c.Strict,
