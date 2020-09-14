@@ -18,7 +18,7 @@ import (
 	"github.com/merenbach/goldbug/internal/masc"
 	"github.com/merenbach/goldbug/internal/pasc"
 	"github.com/merenbach/goldbug/internal/stringutil"
-	"github.com/merenbach/goldbug/pkg/affine"
+	"github.com/merenbach/goldbug/pkg/caesar"
 )
 
 // Cipher implements a variant Beaufort cipher.
@@ -38,10 +38,10 @@ func (c *Cipher) maketableau() (*pasc.TabulaRecta, error) {
 	return &pasc.TabulaRecta{
 		PtAlphabet: revAlphabet,
 		CtAlphabet: revAlphabet,
-		DictFunc: func(i int) (*masc.Tableau, error) {
-			c2 := &affine.Cipher{
-				Slope:     1,
-				Intercept: -i,
+		DictFunc: func(s string, i int) (*masc.Tableau, error) {
+			c2 := &caesar.Cipher{
+				Alphabet: s,
+				Shift:    i,
 			}
 			return c2.Tableau()
 		},

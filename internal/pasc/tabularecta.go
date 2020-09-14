@@ -30,7 +30,7 @@ type TabulaRecta struct {
 	CtAlphabet  string
 	KeyAlphabet string
 
-	DictFunc func(i int) (*masc.Tableau, error)
+	DictFunc func(s string, i int) (*masc.Tableau, error)
 }
 
 // MakeTabulaRecta creates a standard Caesar shift tabula recta.

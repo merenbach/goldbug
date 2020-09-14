@@ -38,10 +38,11 @@ func (c *Cipher) maketableau() (*pasc.TabulaRecta, error) {
 	return &pasc.TabulaRecta{
 		PtAlphabet: alphabet,
 		CtAlphabet: revAlphabet,
-		DictFunc: func(i int) (*masc.Tableau, error) {
+		DictFunc: func(s string, i int) (*masc.Tableau, error) {
 			c2 := &affine.Cipher{
-				Slope:     -1,
-				Intercept: -1 - i,
+				Alphabet:  s,
+				Slope:     (-1),
+				Intercept: (-1) - i,
 			}
 			return c2.Tableau()
 		},

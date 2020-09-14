@@ -33,10 +33,10 @@ type ReciprocalTable struct {
 	CtAlphabets []string
 
 	// EXPERIMENTAL
-	DictFunc func(i int) (*masc.Tableau, error)
+	DictFunc func(s string, i int) (*masc.Tableau, error)
 }
 
-func makedictsfromfunc(columnHeaders string, rowHeaders string, f func(i int) (*masc.Tableau, error), strict bool, caseless bool) (map[rune]*masc.Tableau, error) {
+func makedictsfromfunc(columnHeaders string, rowHeaders string, f func(s string, i int) (*masc.Tableau, error), strict bool, caseless bool) (map[rune]*masc.Tableau, error) {
 	m := make(map[rune]*masc.Tableau)
 
 	keyRunes := []rune(rowHeaders)
@@ -45,7 +45,7 @@ func makedictsfromfunc(columnHeaders string, rowHeaders string, f func(i int) (*
 	}
 
 	for i, r := range keyRunes {
-		t, err := f(i)
+		t, err := f(columnHeaders, i)
 		if err != nil {
 			return nil, err
 		}
