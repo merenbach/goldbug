@@ -14,7 +14,10 @@
 
 package rot13
 
-import "github.com/merenbach/goldbug/pkg/caesar"
+import (
+	"github.com/merenbach/goldbug/internal/masc"
+	"github.com/merenbach/goldbug/pkg/caesar"
+)
 
 // Shift alphabet by this constant number of characters.
 const shift = 13
@@ -45,6 +48,6 @@ func (c *Cipher) Decipher(s string) (string, error) {
 }
 
 // Tableau for encipherment and decipherment.
-func (c *Cipher) Tableau() (string, error) {
+func (c *Cipher) Tableau() (*masc.Tableau, error) {
 	return c.maketableau().Tableau()
 }

@@ -62,11 +62,6 @@ func (c *Cipher) Decipher(s string) (string, error) {
 }
 
 // Tableau for this cipher.
-func (c *Cipher) Tableau() (string, error) {
-	t, err := c.maketableau()
-	if err != nil {
-		log.Println("Could not calculate alphabets")
-		return "", err
-	}
-	return t.Printable()
+func (c *Cipher) Tableau() (*masc.Tableau, error) {
+	return c.maketableau()
 }

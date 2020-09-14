@@ -14,7 +14,10 @@
 
 package caesar
 
-import "github.com/merenbach/goldbug/pkg/affine"
+import (
+	"github.com/merenbach/goldbug/internal/masc"
+	"github.com/merenbach/goldbug/pkg/affine"
+)
 
 // Slope for the affine cipher.
 const slope = 1
@@ -48,6 +51,6 @@ func (c *Cipher) Decipher(s string) (string, error) {
 }
 
 // Tableau for encipherment and decipherment.
-func (c *Cipher) Tableau() (string, error) {
+func (c *Cipher) Tableau() (*masc.Tableau, error) {
 	return c.maketableau().Tableau()
 }
