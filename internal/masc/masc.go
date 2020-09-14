@@ -82,8 +82,7 @@ func (t *Tableau) Decipher(s string) (string, error) {
 	return t.ct2pt.Map(s, t.Strict, t.Caseless), nil
 }
 
-// Printable representation of this tableau.
-func (t *Tableau) Printable() (string, error) {
+func (t *Tableau) String() string {
 	ctAlphabet := t.pt2ct.Map(t.Alphabet, t.Strict, t.Caseless)
-	return fmt.Sprintf("PT: %s\nCT: %s", t.Alphabet, ctAlphabet), nil
+	return fmt.Sprintf("PT: %s\nCT: %s", t.Alphabet, ctAlphabet)
 }
