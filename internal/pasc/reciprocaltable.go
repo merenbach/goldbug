@@ -37,8 +37,8 @@ type ReciprocalTable struct {
 	DictFunc func(i int) *affine.Cipher
 }
 
-func makedictsfromfunc(columnHeaders string, rowHeaders string, f func(i int) *affine.Cipher, strict bool, caseless bool) (map[rune]*affine.Cipher, error) {
-	m := make(map[rune]*affine.Cipher)
+func makedictsfromfunc(columnHeaders string, rowHeaders string, f func(i int) *affine.Cipher, strict bool, caseless bool) (map[rune]*masc.Tableau, error) {
+	m := make(map[rune]*masc.Tableau)
 
 	keyRunes := []rune(rowHeaders)
 	if len(keyRunes) != len(rowHeaders) {
@@ -49,7 +49,11 @@ func makedictsfromfunc(columnHeaders string, rowHeaders string, f func(i int) *a
 		t := f(i)
 		t.Caseless = caseless
 		t.Strict = strict
-		m[r] = t
+		t2, err := t.Tableau()
+		if err != nil {
+			return nil, err
+		}
+		m[r] = t2
 	}
 
 	return m, nil

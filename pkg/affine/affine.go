@@ -29,48 +29,7 @@ type Cipher struct {
 	Strict    bool
 }
 
-// Encipher a message.
-func (c *Cipher) Encipher(s string) (string, error) {
-	t, err := c.Tableau()
-	if err != nil {
-		log.Println("Could not calculate alphabets")
-		return "", err
-	}
-	return t.Encipher(s)
-}
-
-// Decipher a message.
-func (c *Cipher) Decipher(s string) (string, error) {
-	t, err := c.Tableau()
-	if err != nil {
-		log.Println("Could not calculate alphabets")
-		return "", err
-	}
-	return t.Decipher(s)
-}
-
-// EncipherRune enciphers a rune.
-func (c *Cipher) EncipherRune(r rune) (rune, bool) {
-	t, err := c.Tableau()
-	if err != nil {
-		log.Println("Could not calculate alphabets")
-		return -1, false
-	}
-	return t.EncipherRune(r)
-}
-
-// DecipherRune deciphers a rune.
-func (c *Cipher) DecipherRune(r rune) (rune, bool) {
-	t, err := c.Tableau()
-	if err != nil {
-		log.Println("Could not calculate alphabets")
-		return -1, false
-	}
-	return t.DecipherRune(r)
-}
-
-// Tableau for this cipher.
-func (c *Cipher) Tableau() (*masc.Tableau, error) {
+func (c *Cipher) maketableau() (*masc.Tableau, error) {
 	t, err := masc.New(c.Alphabet, func(s string) (string, error) {
 		return transform(s, c.Slope, c.Intercept)
 	})
@@ -80,4 +39,29 @@ func (c *Cipher) Tableau() (*masc.Tableau, error) {
 	t.Strict = c.Strict
 	t.Caseless = c.Caseless
 	return t, nil
+}
+
+// Encipher a message.
+func (c *Cipher) Encipher(s string) (string, error) {
+	t, err := c.maketableau()
+	if err != nil {
+		log.Println("Could not calculate alphabets")
+		return "", err
+	}
+	return t.Encipher(s)
+}
+
+// Decipher a message.
+func (c *Cipher) Decipher(s string) (string, error) {
+	t, err := c.maketableau()
+	if err != nil {
+		log.Println("Could not calculate alphabets")
+		return "", err
+	}
+	return t.Decipher(s)
+}
+
+// Tableau for this cipher.
+func (c *Cipher) Tableau() (*masc.Tableau, error) {
+	return c.maketableau()
 }
