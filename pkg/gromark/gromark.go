@@ -89,7 +89,10 @@ func (c *Cipher) maketableau() (*pasc.TabulaRecta, error) {
 	}
 
 	return &pasc.TabulaRecta{
-		PtAlphabet:  alphabet,
+		PtAlphabet: alphabet,
+		// DictFunc: func(s string, i int) (*masc.Tableau, error) {
+		// 	return transposedCtAlphabet
+		// },
 		CtAlphabet:  transposedCtAlphabet,
 		KeyAlphabet: digits,
 		Strict:      c.Strict,
