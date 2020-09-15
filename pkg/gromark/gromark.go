@@ -67,10 +67,10 @@ func makekey(k string, msglen int) (string, error) {
 // Cipher key is simply the primer for a running key.
 type Cipher struct {
 	Alphabet string
-	// Caseless bool
-	Key    string
-	Primer string
-	Strict bool
+	Caseless bool
+	Key      string
+	Primer   string
+	Strict   bool
 }
 
 // // ALLOW COMPOUND CIPHER CHAINING:
@@ -136,7 +136,7 @@ func (c *Cipher) maketableau() (*pasc.TabulaRecta, error) {
 		return nil, err
 	}
 
-	// tr.Caseless = c.Caseless
+	tr.Caseless = c.Caseless
 	tr.Strict = c.Strict
 	return tr, nil
 }

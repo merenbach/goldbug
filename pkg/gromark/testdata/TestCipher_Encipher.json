@@ -6,5 +6,14 @@
         "Key": "ENIGMA",
         "Primer": "23452",
         "Strict": false
+    },
+    {
+        "Alphabet": "",
+        "Input": "ThereAreUpToTenSubstitutesPerLetter",
+        "Output": "NfyckBtiJcNwZycAcjnaynlqpwWstWpjqfl",
+        "Key": "ENIGMA",
+        "Primer": "23452",
+        "Caseless": true,
+        "Strict": false
     }
 ]
