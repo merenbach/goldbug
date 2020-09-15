@@ -30,24 +30,21 @@ type Cipher struct {
 }
 
 func (c *Cipher) maketableau() (*pasc.TabulaRecta, error) {
-	alphabet := c.Alphabet
-	if alphabet == "" {
-		alphabet = pasc.Alphabet
+	tr, err := pasc.NewTabulaRectaFromAffineFunction(c.Alphabet, "", func(s string, i int) (*masc.Tableau, error) {
+		c2 := &affine.Cipher{
+			Alphabet:  s,
+			Slope:     (-1),
+			Intercept: i,
+		}
+		return c2.Tableau()
+	})
+	if err != nil {
+		return nil, err
 	}
 
-	return &pasc.TabulaRecta{
-		PtAlphabet: alphabet,
-		DictFunc: func(s string, i int) (*masc.Tableau, error) {
-			c2 := &affine.Cipher{
-				Alphabet:  s,
-				Slope:     (-1),
-				Intercept: i,
-			}
-			return c2.Tableau()
-		},
-		Caseless: c.Caseless,
-		Strict:   c.Strict,
-	}, nil
+	tr.Caseless = c.Caseless
+	tr.Strict = c.Strict
+	return tr, nil
 }
 
 // Encipher a message.

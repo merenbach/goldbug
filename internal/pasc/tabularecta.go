@@ -37,6 +37,25 @@ type TabulaRecta struct {
 	DictFunc func(s string, i int) (*masc.Tableau, error)
 }
 
+// NewTabulaRectaFromAffineFunction creates a new tabula recta from an affine function.
+// NewTabulaRectaFromAffineFunction is probably the easiest option for most typical tabula recta use cases.
+func NewTabulaRectaFromAffineFunction(ptAlphabet string, keyAlphabet string, f func(s string, i int) (*masc.Tableau, error)) (*TabulaRecta, error) {
+	if ptAlphabet == "" {
+		ptAlphabet = Alphabet
+	}
+
+	if keyAlphabet == "" {
+		keyAlphabet = ptAlphabet
+	}
+
+	t := TabulaRecta{
+		PtAlphabet:  ptAlphabet,
+		KeyAlphabet: keyAlphabet,
+		DictFunc:    f,
+	}
+	return &t, nil
+}
+
 func (tr *TabulaRecta) makedictsfromfunc() (ReciprocalTable, error) {
 	ptAlphabet := tr.PtAlphabet
 
