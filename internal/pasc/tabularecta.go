@@ -129,9 +129,7 @@ func (tr *TabulaRecta) makereciprocaltable() (ReciprocalTable, error) {
 	}
 
 	for i, r := range keyRunes {
-		t, err := masc.NewTableau(ptAlphabet, "", func(string) (string, error) {
-			return ctAlphabets[i], nil
-		})
+		t, err := masc.NewTableau(ptAlphabet, ctAlphabets[i], nil)
 		if err != nil {
 			return nil, err
 		}
