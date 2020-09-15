@@ -30,7 +30,7 @@ type Cipher struct {
 }
 
 func (c *Cipher) maketableau() (*masc.Tableau, error) {
-	t, err := masc.New(c.Alphabet, func(s string) (string, error) {
+	t, err := masc.NewTableau(c.Alphabet, func(s string) (string, error) {
 		return transform(s, c.Slope, c.Intercept)
 	})
 	if err != nil {

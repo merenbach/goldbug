@@ -32,7 +32,7 @@ type ReciprocalTable map[rune]*masc.Tableau
 // 	}
 
 // 	for i, r := range keyRunes {
-// 		t, err := masc.New(columnHeaders, func(string) (string, error) {
+// 		t, err := masc.NewTableau(columnHeaders, func(string) (string, error) {
 // 			return rows[i], nil
 // 		})
 // 		if err != nil {

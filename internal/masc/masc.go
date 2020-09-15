@@ -34,8 +34,8 @@ type Tableau struct {
 	ct2pt translation.Table
 }
 
-// New tableau.
-func New(ptAlphabet string, f func(string) (string, error)) (*Tableau, error) {
+// NewTableau creates a new tableau.
+func NewTableau(ptAlphabet string, f func(string) (string, error)) (*Tableau, error) {
 	if ptAlphabet == "" {
 		ptAlphabet = Alphabet
 	}

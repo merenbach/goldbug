@@ -74,12 +74,12 @@ type Cipher struct {
 func (c *Cipher) maketableau() (*pasc.TabulaRecta, error) {
 	const digits = "0123456789"
 
-	alphabet := c.Alphabet
-	if alphabet == "" {
-		alphabet = pasc.Alphabet
+	ptAlphabet := c.Alphabet
+	if ptAlphabet == "" {
+		ptAlphabet = pasc.Alphabet
 	}
 
-	ctAlphabetInput := stringutil.Key(alphabet, c.Key)
+	ctAlphabetInput := stringutil.Key(ptAlphabet, c.Key)
 
 	tc := transposition.Cipher{
 		Keys: []string{c.Key},
@@ -89,10 +89,18 @@ func (c *Cipher) maketableau() (*pasc.TabulaRecta, error) {
 		return nil, err
 	}
 
+	// t, err := masc.NewTableau(ptAlphabet, func(string) (string, error) {
+	// 	return transposedCtAlphabet, nil
+	// })
+
 	return &pasc.TabulaRecta{
-		PtAlphabet: alphabet,
+		PtAlphabet: ptAlphabet,
 		// DictFunc: func(s string, i int) (*masc.Tableau, error) {
-		// 	return transposedCtAlphabet
+		// 	c2 := &caesar.Cipher{
+		// 		Alphabet: s,
+		// 		Shift:    i,
+		// 	}
+		// 	return c2.Tableau()
 		// },
 		CtAlphabet:  transposedCtAlphabet,
 		KeyAlphabet: digits,
