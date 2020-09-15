@@ -22,6 +22,7 @@ Instantiate your deployment pipeline as follows, adapting as necessary the param
 
 ## TODO
 
+* Explore alternative PASC with (slope, intercept) = (-1, -1)
 * Rename reciprocal table because it's not reciprocal
 * Expand tests for custom ciphertext alphabets
 * Improve and enhance test cases overall
