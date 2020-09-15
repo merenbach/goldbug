@@ -37,6 +37,11 @@ func (c *Cipher) maketableau() (*pasc.TabulaRecta, error) {
 	return &pasc.TabulaRecta{
 		PtAlphabet: alphabet,
 		DictFunc: func(s string, i int) (*masc.Tableau, error) {
+			// alternative, which highlights "Beaufort" vs. "variant Beaufort":
+			// c2 := &affine.Cipher{
+			// 	Slope:     1,
+			// 	Intercept: (-i),
+			// }
 			c2 := &caesar.Cipher{
 				Alphabet: s,
 				Shift:    (-i),
