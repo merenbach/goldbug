@@ -20,6 +20,7 @@ import (
 	"github.com/merenbach/goldbug/internal/masc"
 )
 
+// A ReciprocalTable represents a reciprocal table.
 type ReciprocalTable map[rune]*masc.Tableau
 
 // func makedicts(columnHeaders string, rowHeaders string, rows []string, strict bool) (map[rune]*masc.Tableau, error) {

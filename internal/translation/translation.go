@@ -15,7 +15,6 @@
 package translation
 
 import (
-	"log"
 	"strings"
 	"unicode"
 )
@@ -42,7 +41,6 @@ func (tt Table) Get(r rune, strict bool, caseless bool) (rune, bool) {
 
 	if caseless {
 		if o, ok := tt[unicode.ToUpper(r)]; ok {
-			log.Printf("Input %c (strict = %t, caseless = %t) = %c", r, strict, caseless, o)
 			return unicode.ToLower(o), true
 		} else if o, ok := tt[unicode.ToLower(r)]; ok {
 			return unicode.ToUpper(o), true
