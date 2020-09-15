@@ -25,6 +25,7 @@ const intercept = 0
 // Cipher implements a decimation cipher.
 type Cipher struct {
 	Alphabet   string
+	CtAlphabet string
 	Caseless   bool
 	Multiplier int
 	Strict     bool
@@ -32,11 +33,12 @@ type Cipher struct {
 
 func (c *Cipher) maketableau() *affine.Cipher {
 	return &affine.Cipher{
-		Alphabet:  c.Alphabet,
-		Caseless:  c.Caseless,
-		Intercept: intercept,
-		Slope:     c.Multiplier,
-		Strict:    c.Strict,
+		Alphabet:   c.Alphabet,
+		CtAlphabet: c.CtAlphabet,
+		Caseless:   c.Caseless,
+		Intercept:  intercept,
+		Slope:      c.Multiplier,
+		Strict:     c.Strict,
 	}
 }
 

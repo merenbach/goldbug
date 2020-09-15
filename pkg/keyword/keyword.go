@@ -23,14 +23,15 @@ import (
 
 // Cipher implements a keyword cipher.
 type Cipher struct {
-	Alphabet string
-	Caseless bool
-	Keyword  string
-	Strict   bool
+	Alphabet   string
+	CtAlphabet string
+	Caseless   bool
+	Keyword    string
+	Strict     bool
 }
 
 func (c *Cipher) maketableau() (*masc.Tableau, error) {
-	t, err := masc.NewTableau(c.Alphabet, "", func(s string) (string, error) {
+	t, err := masc.NewTableau(c.Alphabet, c.CtAlphabet, func(s string) (string, error) {
 		return stringutil.Key(s, c.Keyword), nil
 	})
 	if err != nil {
