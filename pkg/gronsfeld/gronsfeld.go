@@ -23,6 +23,7 @@ import (
 // Cipher implements a Gronsfeld cipher.
 type Cipher struct {
 	Alphabet string
+	Caseless bool
 	Key      string
 	Strict   bool
 }
@@ -41,6 +42,7 @@ func (c *Cipher) maketableau() (*pasc.TabulaRecta, error) {
 		return nil, err
 	}
 
+	tr.Caseless = c.Caseless
 	tr.Strict = c.Strict
 	return tr, nil
 }

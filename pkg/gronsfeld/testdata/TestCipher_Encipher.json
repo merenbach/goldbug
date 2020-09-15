@@ -22,6 +22,14 @@
     },
     {
         "Alphabet": "",
+        "Input": "Hello, World!",
+        "Output": "Jhmoq, Yrsof!",
+        "Key": "23132",
+        "Caseless": true,
+        "Strict": false
+    },
+    {
+        "Alphabet": "",
         "Input": "HELLO, WORLD!",
         "Output": "JHMOQYRSOF",
         "Key": "23132",
@@ -39,6 +47,14 @@
         "Input": "HELLO, WORLD!",
         "Output": "KMUNXWPRNG",
         "Key": "389290102394957",
+        "Strict": true
+    },
+    {
+        "Alphabet": "",
+        "Input": "Hello, World!",
+        "Output": "KmunxWprng",
+        "Key": "389290102394957",
+        "Caseless": true,
         "Strict": true
     }
 ]
