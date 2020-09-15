@@ -57,6 +57,6 @@ func Golden(t *testing.T, actual []byte) {
 	}
 
 	if !bytes.Equal(actual, expected) {
-		t.Errorf("Expected %s but got %s", actual, expected)
+		t.Errorf("Expected %s but got %s", expected, actual)
 	}
 }
