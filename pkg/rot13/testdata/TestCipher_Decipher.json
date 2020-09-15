@@ -5,6 +5,12 @@
         "Strict": false
     },
     {
+        "Input": "Hello, World!",
+        "Output": "Uryyb, Jbeyq!",
+        "Caseless": true,
+        "Strict": false
+    },
+    {
         "Input": "HELLO, WORLD!",
         "Output": "URYYBJBEYQ",
         "Strict": true
@@ -17,6 +23,12 @@
     {
         "Input": "URYYB, JBEYQ!",
         "Output": "HELLOWORLD",
+        "Strict": true
+    },
+    {
+        "Input": "Uryyb, Jbeyq!",
+        "Output": "HelloWorld",
+        "Caseless": true,
         "Strict": true
     }
 ]
