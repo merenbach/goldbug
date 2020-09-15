@@ -24,6 +24,7 @@ import (
 // Cipher is effectively a Vigenère cipher with the ciphertext and key alphabets both mirrored (back-to-front).
 type Cipher struct {
 	Alphabet string
+	Caseless bool
 	Key      string
 	Strict   bool
 }
@@ -44,7 +45,8 @@ func (c *Cipher) maketableau() (*pasc.TabulaRecta, error) {
 			}
 			return c2.Tableau()
 		},
-		Strict: c.Strict,
+		Caseless: c.Caseless,
+		Strict:   c.Strict,
 	}, nil
 }
 

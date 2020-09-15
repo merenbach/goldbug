@@ -8,6 +8,14 @@
     },
     {
         "Alphabet": "",
+        "Input": "Hytpz, Ssapm!",
+        "Output": "Hello, World!",
+        "Key": "OCEANOGRAPHYWHAT",
+        "Caseless": true,
+        "Strict": false
+    },
+    {
+        "Alphabet": "",
         "Input": "HYTPZ, SSAPM!",
         "Output": "HELLOWORLD",
         "Key": "OCEANOGRAPHYWHAT",
@@ -39,6 +47,14 @@
         "Input": "DWCVM, VAXZX!",
         "Output": "HELLOWORLD",
         "Key": "KANGAROO",
+        "Strict": true
+    },
+    {
+        "Alphabet": "",
+        "Input": "Dwcvm, Vaxzx!",
+        "Output": "HelloWorld",
+        "Key": "KANGAROO",
+        "Caseless": true,
         "Strict": true
     }
 ]

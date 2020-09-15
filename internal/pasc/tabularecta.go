@@ -27,7 +27,8 @@ import (
 
 // TabulaRecta holds a tabula recta.
 type TabulaRecta struct {
-	Strict bool
+	Strict   bool
+	Caseless bool
 
 	PtAlphabet  string
 	CtAlphabet  string
@@ -49,7 +50,6 @@ func (tr *TabulaRecta) makedictsfromfunc() (ReciprocalTable, error) {
 		return tr.makereciprocaltable()
 	}
 
-	strict := tr.Strict
 	m := make(map[rune]*masc.Tableau)
 
 	keyRunes := []rune(keyAlphabet)
@@ -63,8 +63,8 @@ func (tr *TabulaRecta) makedictsfromfunc() (ReciprocalTable, error) {
 		if err != nil {
 			return nil, err
 		}
-		// t.Caseless = caseless // TODO
-		t.Strict = strict
+		t.Caseless = tr.Caseless
+		t.Strict = tr.Strict
 		m[r] = t
 	}
 
