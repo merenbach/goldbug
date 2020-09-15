@@ -36,9 +36,15 @@ type TabulaRecta struct {
 	DictFunc func(s string, i int) (*masc.Tableau, error)
 }
 
-func makedictsfromfunc(ptAlphabet string, keyAlphabet string, f func(s string, i int) (*masc.Tableau, error), strict bool, caseless bool) (ReciprocalTable, error) {
+func (tr *TabulaRecta) makedictsfromfunc() (ReciprocalTable, error) {
+	f := tr.DictFunc
+	if f == nil {
+		return tr.makereciprocaltable()
+	}
+	strict := tr.Strict
 	m := make(map[rune]*masc.Tableau)
-
+	ptAlphabet := tr.PtAlphabet
+	keyAlphabet := tr.KeyAlphabet
 	keyRunes := []rune(keyAlphabet)
 	if len(keyRunes) != len(keyAlphabet) {
 		return nil, errors.New("Row headers must have same rune length as rows slice")
@@ -49,7 +55,7 @@ func makedictsfromfunc(ptAlphabet string, keyAlphabet string, f func(s string, i
 		if err != nil {
 			return nil, err
 		}
-		t.Caseless = caseless
+		// t.Caseless = caseless // TODO
 		t.Strict = strict
 		m[r] = t
 	}
@@ -171,7 +177,7 @@ func (tr *TabulaRecta) Printable() (string, error) {
 
 // Encipher a string.
 func (tr *TabulaRecta) Encipher(s string, k string, onSuccess func(rune, rune, *[]rune)) (string, error) {
-	rt, err := tr.makereciprocaltable()
+	rt, err := tr.makedictsfromfunc()
 	if err != nil {
 		return "", err
 	}
@@ -180,7 +186,7 @@ func (tr *TabulaRecta) Encipher(s string, k string, onSuccess func(rune, rune, *
 
 // Decipher a string.
 func (tr *TabulaRecta) Decipher(s string, k string, onSuccess func(rune, rune, *[]rune)) (string, error) {
-	rt, err := tr.makereciprocaltable()
+	rt, err := tr.makedictsfromfunc()
 	if err != nil {
 		return "", err
 	}
