@@ -44,7 +44,7 @@ type Cipher struct {
 }
 
 func (c *Cipher) maketableau() (*pasc.TabulaRecta, error) {
-	tr, err := pasc.NewTabulaRectaFromAffineFunction(c.Alphabet, "", func(s string, i int) (*masc.Tableau, error) {
+	tr, err := pasc.NewTabulaRecta(c.Alphabet, "", func(s string, i int) (*masc.Tableau, error) {
 		c2 := &caesar.Cipher{
 			Alphabet: s,
 			Shift:    i,

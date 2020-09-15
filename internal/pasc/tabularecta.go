@@ -37,9 +37,9 @@ type TabulaRecta struct {
 	DictFunc func(s string, i int) (*masc.Tableau, error)
 }
 
-// NewTabulaRectaFromAffineFunction creates a new tabula recta from an affine function.
-// NewTabulaRectaFromAffineFunction is probably the easiest option for most typical tabula recta use cases.
-func NewTabulaRectaFromAffineFunction(ptAlphabet string, keyAlphabet string, f func(s string, i int) (*masc.Tableau, error)) (*TabulaRecta, error) {
+// NewTabulaRecta creates a new tabula recta from multiple invocations of a MASC tableau generation function.
+// NewTabulaRecta is the canonical method to generate a typical tabula recta.
+func NewTabulaRecta(ptAlphabet string, keyAlphabet string, f func(s string, i int) (*masc.Tableau, error)) (*TabulaRecta, error) {
 	if ptAlphabet == "" {
 		ptAlphabet = Alphabet
 	}
