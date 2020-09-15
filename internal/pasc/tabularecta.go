@@ -114,7 +114,7 @@ func (tr *TabulaRecta) String() string {
 
 // Printable representation of this tabula recta.
 func (tr *TabulaRecta) Printable() (string, error) {
-	rt, err := tr.makereciprocaltable()
+	rt, err := tr.makedictsfromfunc()
 	if err != nil {
 		return "", err
 	}

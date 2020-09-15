@@ -34,7 +34,7 @@ const (
 	KeyAutokey
 )
 
-// Cipher implements a Vigenere cipher.
+// Cipher implements a Vigenère cipher.
 type Cipher struct {
 	Alphabet string
 	Autokey  autokeyOption

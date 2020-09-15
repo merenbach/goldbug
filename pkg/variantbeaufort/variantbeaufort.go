@@ -21,7 +21,7 @@ import (
 )
 
 // Cipher implements a variant Beaufort cipher.
-// Cipher is effectively a Vigenère cipher with plaintext and ciphertext alphabets both mirrored (back-to-front).
+// Cipher is effectively a Vigenère cipher with the plaintext and ciphertext alphabets both mirrored (back-to-front).
 type Cipher struct {
 	Alphabet string
 	Key      string

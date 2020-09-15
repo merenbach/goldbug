@@ -17,11 +17,11 @@ package beaufort
 import (
 	"github.com/merenbach/goldbug/internal/masc"
 	"github.com/merenbach/goldbug/internal/pasc"
-	"github.com/merenbach/goldbug/internal/stringutil"
 	"github.com/merenbach/goldbug/pkg/affine"
 )
 
 // Cipher implements a Beaufort cipher.
+// Cipher is effectively a Vigenère cipher with the ciphertext and key alphabets both mirrored (back-to-front).
 type Cipher struct {
 	Alphabet string
 	Key      string
@@ -33,20 +33,18 @@ func (c *Cipher) maketableau() (*pasc.TabulaRecta, error) {
 	if alphabet == "" {
 		alphabet = pasc.Alphabet
 	}
-	revAlphabet := stringutil.Reverse(alphabet)
 
 	return &pasc.TabulaRecta{
 		PtAlphabet: alphabet,
-		CtAlphabet: revAlphabet,
 		DictFunc: func(s string, i int) (*masc.Tableau, error) {
 			c2 := &affine.Cipher{
 				Alphabet:  s,
 				Slope:     (-1),
-				Intercept: (-1) - i,
+				Intercept: i,
 			}
 			return c2.Tableau()
 		},
-		KeyAlphabet: revAlphabet,
+		KeyAlphabet: alphabet,
 		Strict:      c.Strict,
 	}, nil
 }
