@@ -35,22 +35,31 @@ type Tableau struct {
 }
 
 // NewTableau creates a new tableau.
-func NewTableau(ptAlphabet string, f func(string) (string, error)) (*Tableau, error) {
+func NewTableau(ptAlphabet string, ctAlphabet string, f func(string) (string, error)) (*Tableau, error) {
 	if ptAlphabet == "" {
 		ptAlphabet = Alphabet
 	}
 
-	ctAlphabet, err := f(ptAlphabet)
+	if ctAlphabet == "" {
+		ctAlphabet = ptAlphabet
+	}
+
+	ctAlphabetTransformed := ctAlphabet
+	if f != nil {
+		// Allow overrides to ctAlphabet mapping
+		var err error
+		ctAlphabetTransformed, err = f(ctAlphabet)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	pt2ct, err := translation.NewTable(ptAlphabet, ctAlphabetTransformed, "")
 	if err != nil {
 		return nil, err
 	}
 
-	pt2ct, err := translation.NewTable(ptAlphabet, ctAlphabet, "")
-	if err != nil {
-		return nil, err
-	}
-
-	ct2pt, err := translation.NewTable(ctAlphabet, ptAlphabet, "")
+	ct2pt, err := translation.NewTable(ctAlphabetTransformed, ptAlphabet, "")
 	if err != nil {
 		return nil, err
 	}
