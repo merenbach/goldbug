@@ -44,8 +44,7 @@ func (c *Cipher) maketableau() (*pasc.TabulaRecta, error) {
 			}
 			return c2.Tableau()
 		},
-		KeyAlphabet: alphabet,
-		Strict:      c.Strict,
+		Strict: c.Strict,
 	}, nil
 }
 

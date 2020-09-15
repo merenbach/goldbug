@@ -37,7 +37,6 @@ func (c *Cipher) maketableau() (*pasc.TabulaRecta, error) {
 
 	return &pasc.TabulaRecta{
 		PtAlphabet: alphabet,
-		CtAlphabet: alphabet,
 		DictFunc: func(s string, i int) (*masc.Tableau, error) {
 			c2 := &caesar.Cipher{
 				Alphabet: s,

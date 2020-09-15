@@ -37,15 +37,23 @@ type TabulaRecta struct {
 }
 
 func (tr *TabulaRecta) makedictsfromfunc() (ReciprocalTable, error) {
+	ptAlphabet := tr.PtAlphabet
+
+	keyAlphabet := tr.KeyAlphabet
+	if keyAlphabet == "" {
+		keyAlphabet = ptAlphabet
+	}
+
 	f := tr.DictFunc
 	if f == nil {
 		return tr.makereciprocaltable()
 	}
+
 	strict := tr.Strict
 	m := make(map[rune]*masc.Tableau)
-	ptAlphabet := tr.PtAlphabet
-	keyAlphabet := tr.KeyAlphabet
+
 	keyRunes := []rune(keyAlphabet)
+
 	if len(keyRunes) != len(keyAlphabet) {
 		return nil, errors.New("Row headers must have same rune length as rows slice")
 	}
@@ -65,8 +73,20 @@ func (tr *TabulaRecta) makedictsfromfunc() (ReciprocalTable, error) {
 
 // MakeTabulaRecta creates a standard Caesar shift tabula recta.
 func (tr *TabulaRecta) makereciprocaltable() (ReciprocalTable, error) {
+	ptAlphabet := tr.PtAlphabet
+
+	ctAlphabet := tr.CtAlphabet
+	if ctAlphabet == "" {
+		ctAlphabet = ptAlphabet
+	}
+
+	keyAlphabet := tr.KeyAlphabet
+	if keyAlphabet == "" {
+		keyAlphabet = ptAlphabet
+	}
+
 	ctAlphabets := make([]string, utf8.RuneCountInString(tr.KeyAlphabet))
-	ctAlphabetLen := utf8.RuneCountInString(tr.CtAlphabet)
+	ctAlphabetLen := utf8.RuneCountInString(ctAlphabet)
 
 	// Cast to []rune to increase index without gaps
 	for y := range ctAlphabets {
@@ -75,7 +95,7 @@ func (tr *TabulaRecta) makereciprocaltable() (ReciprocalTable, error) {
 			ii[x] = (x + y) % ctAlphabetLen
 		}
 
-		out, err := stringutil.Backpermute(tr.CtAlphabet, ii)
+		out, err := stringutil.Backpermute(ctAlphabet, ii)
 		if err != nil {
 			return nil, err
 		}
@@ -84,13 +104,13 @@ func (tr *TabulaRecta) makereciprocaltable() (ReciprocalTable, error) {
 
 	m := make(map[rune]*masc.Tableau)
 
-	keyRunes := []rune(tr.KeyAlphabet)
-	if len(keyRunes) != len(tr.KeyAlphabet) {
+	keyRunes := []rune(keyAlphabet)
+	if len(keyRunes) != len(keyAlphabet) {
 		return nil, errors.New("Row headers must have same rune length as rows slice")
 	}
 
 	for i, r := range keyRunes {
-		t, err := masc.New(tr.PtAlphabet, func(string) (string, error) {
+		t, err := masc.New(ptAlphabet, func(string) (string, error) {
 			return ctAlphabets[i], nil
 		})
 		if err != nil {
@@ -114,6 +134,13 @@ func (tr *TabulaRecta) String() string {
 
 // Printable representation of this tabula recta.
 func (tr *TabulaRecta) Printable() (string, error) {
+	ptAlphabet := tr.PtAlphabet
+
+	keyAlphabet := tr.KeyAlphabet
+	if keyAlphabet == "" {
+		keyAlphabet = ptAlphabet
+	}
+
 	rt, err := tr.makedictsfromfunc()
 	if err != nil {
 		return "", err
@@ -128,10 +155,10 @@ func (tr *TabulaRecta) Printable() (string, error) {
 		return strings.Join(spl, " ")
 	}
 
-	fmt.Fprintf(w, "\t%s\n", formatForPrinting(tr.PtAlphabet))
-	for _, r := range []rune(tr.KeyAlphabet) {
+	fmt.Fprintf(w, "\t%s\n", formatForPrinting(ptAlphabet))
+	for _, r := range []rune(keyAlphabet) {
 		if tableau, ok := rt[r]; ok {
-			out, err := tableau.Encipher(tr.PtAlphabet)
+			out, err := tableau.Encipher(ptAlphabet)
 			if err != nil {
 				return "", err
 			}
