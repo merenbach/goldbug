@@ -17,11 +17,11 @@ package variantbeaufort
 import (
 	"github.com/merenbach/goldbug/internal/masc"
 	"github.com/merenbach/goldbug/internal/pasc"
-	"github.com/merenbach/goldbug/internal/stringutil"
 	"github.com/merenbach/goldbug/pkg/caesar"
 )
 
 // Cipher implements a variant Beaufort cipher.
+// Cipher is effectively a Vigenère cipher with plaintext and ciphertext alphabets both mirrored (back-to-front).
 type Cipher struct {
 	Alphabet string
 	Key      string
@@ -33,15 +33,13 @@ func (c *Cipher) maketableau() (*pasc.TabulaRecta, error) {
 	if alphabet == "" {
 		alphabet = pasc.Alphabet
 	}
-	revAlphabet := stringutil.Reverse(alphabet)
 
 	return &pasc.TabulaRecta{
-		PtAlphabet: revAlphabet,
-		CtAlphabet: revAlphabet,
+		PtAlphabet: alphabet,
 		DictFunc: func(s string, i int) (*masc.Tableau, error) {
 			c2 := &caesar.Cipher{
 				Alphabet: s,
-				Shift:    i,
+				Shift:    (-i),
 			}
 			return c2.Tableau()
 		},
