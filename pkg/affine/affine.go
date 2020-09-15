@@ -22,15 +22,16 @@ import (
 
 // Cipher implements an affine cipher.
 type Cipher struct {
-	Alphabet  string
-	Caseless  bool
-	Intercept int
-	Slope     int
-	Strict    bool
+	Alphabet   string
+	CtAlphabet string
+	Caseless   bool
+	Intercept  int
+	Slope      int
+	Strict     bool
 }
 
 func (c *Cipher) maketableau() (*masc.Tableau, error) {
-	t, err := masc.NewTableau(c.Alphabet, "", func(s string) (string, error) {
+	t, err := masc.NewTableau(c.Alphabet, c.CtAlphabet, func(s string) (string, error) {
 		return transform(s, c.Slope, c.Intercept)
 	})
 	if err != nil {

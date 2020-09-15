@@ -19,8 +19,10 @@ import (
 	"unicode/utf8"
 
 	"github.com/merenbach/goldbug/internal/lfg"
+	"github.com/merenbach/goldbug/internal/masc"
 	"github.com/merenbach/goldbug/internal/pasc"
 	"github.com/merenbach/goldbug/internal/stringutil"
+	"github.com/merenbach/goldbug/pkg/caesar"
 	"github.com/merenbach/goldbug/pkg/transposition"
 )
 
@@ -71,6 +73,25 @@ type Cipher struct {
 	Strict bool
 }
 
+// // ALLOW COMPOUND CIPHER CHAINING:
+// // NewCompoundCipher(keyword.Cipher, transposition.Cipher, caesar.Cipher...).Tableau()
+// type cipher interface {
+// 	Encipher(string) (string, error)
+// 	Decipher(string) (string, error)
+// 	// Tableau(string) (*masc.Tableau, error)
+// }
+
+// func chainedTableauEncipherment(s string, cc ...cipher) (string, error) {
+// 	var err error
+// 	for _, c := range cc {
+// 		s, err = c.Encipher(s)
+// 		if err != nil {
+// 			return "", err
+// 		}
+// 	}
+// 	return s, nil
+// }
+
 func (c *Cipher) maketableau() (*pasc.TabulaRecta, error) {
 	const digits = "0123456789"
 
@@ -79,6 +100,17 @@ func (c *Cipher) maketableau() (*pasc.TabulaRecta, error) {
 		ptAlphabet = pasc.Alphabet
 	}
 
+	// 	c1 := keyword.Cipher{
+	// 		Alphabet: ptAlphabet,
+	// 		// Caseless: ...,
+	// 		Keyword: c.Key,
+	// 		// Strict: ...,
+	// 	}
+	// 	c2 := transposition.Cipher{
+	// 		Keys: []string{c.Key},
+	// 	}
+	// 	c3 := caesar.Cipher
+	// ...
 	ctAlphabetInput := stringutil.Key(ptAlphabet, c.Key)
 
 	tc := transposition.Cipher{
@@ -89,23 +121,24 @@ func (c *Cipher) maketableau() (*pasc.TabulaRecta, error) {
 		return nil, err
 	}
 
-	// t, err := masc.NewTableau(ptAlphabet, func(string) (string, error) {
+	// t, err := masc.NewTableau(ptAlphabet, transposedCtAlphabet, func(string) (string, error) {
 	// 	return transposedCtAlphabet, nil
 	// })
+	tr, err := pasc.NewTabulaRecta(c.Alphabet, digits, func(s string, i int) (*masc.Tableau, error) {
+		c2 := &caesar.Cipher{
+			Alphabet:   s,
+			CtAlphabet: transposedCtAlphabet,
+			Shift:      i,
+		}
+		return c2.Tableau()
+	})
+	if err != nil {
+		return nil, err
+	}
 
-	return &pasc.TabulaRecta{
-		PtAlphabet: ptAlphabet,
-		// DictFunc: func(s string, i int) (*masc.Tableau, error) {
-		// 	c2 := &caesar.Cipher{
-		// 		Alphabet: s,
-		// 		Shift:    i,
-		// 	}
-		// 	return c2.Tableau()
-		// },
-		CtAlphabet:  transposedCtAlphabet,
-		KeyAlphabet: digits,
-		Strict:      c.Strict,
-	}, nil
+	// tr.Caseless = c.Caseless
+	tr.Strict = c.Strict
+	return tr, nil
 }
 
 // Encipher a message.

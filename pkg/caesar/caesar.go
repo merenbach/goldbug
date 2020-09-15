@@ -24,19 +24,21 @@ const slope = 1
 
 // Cipher implements a Caesar cipher.
 type Cipher struct {
-	Alphabet string
-	Caseless bool
-	Shift    int
-	Strict   bool
+	Alphabet   string
+	CtAlphabet string
+	Caseless   bool
+	Shift      int
+	Strict     bool
 }
 
 func (c *Cipher) maketableau() *affine.Cipher {
 	return &affine.Cipher{
-		Alphabet:  c.Alphabet,
-		Caseless:  c.Caseless,
-		Intercept: c.Shift,
-		Slope:     slope,
-		Strict:    c.Strict,
+		Alphabet:   c.Alphabet,
+		CtAlphabet: c.CtAlphabet,
+		Caseless:   c.Caseless,
+		Intercept:  c.Shift,
+		Slope:      slope,
+		Strict:     c.Strict,
 	}
 }
 
