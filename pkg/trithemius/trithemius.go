@@ -22,7 +22,8 @@ import (
 // Cipher implements a Trithemius cipher.
 type Cipher struct {
 	Alphabet string
-	Strict   bool
+	// Caseless bool
+	Strict bool
 }
 
 // Encipher a message.
@@ -34,8 +35,9 @@ func (c *Cipher) Encipher(s string) (string, error) {
 
 	c2 := vigenere.Cipher{
 		Alphabet: alphabet,
-		Key:      alphabet,
-		Strict:   c.Strict,
+		// Caseless: c.Caseless,
+		Key:    alphabet,
+		Strict: c.Strict,
 	}
 	return c2.Encipher(s)
 }

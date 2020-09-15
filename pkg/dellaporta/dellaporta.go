@@ -27,8 +27,9 @@ import (
 // Cipher implements a Della Porta cipher.
 type Cipher struct {
 	Alphabet string
-	Key      string
-	Strict   bool
+	// Caseless bool
+	Key    string
+	Strict bool
 }
 
 func (c *Cipher) maketableau() (pasc.ReciprocalTable, error) {

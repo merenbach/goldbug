@@ -65,9 +65,10 @@ func makekey(k string, msglen int) (string, error) {
 // Cipher key is simply the primer for a running key.
 type Cipher struct {
 	Alphabet string
-	Key      string
-	Primer   string
-	Strict   bool
+	// Caseless bool
+	Key    string
+	Primer string
+	Strict bool
 }
 
 func (c *Cipher) maketableau() (*pasc.TabulaRecta, error) {
