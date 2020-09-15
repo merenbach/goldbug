@@ -22,6 +22,7 @@ Instantiate your deployment pipeline as follows, adapting as necessary the param
 
 ## TODO
 
+* Rename reciprocal table because it's not reciprocal
 * Expand tests for custom ciphertext alphabets
 * Improve and enhance test cases overall
 * Expand tests for tabula recta to catch cases with reversed or alternate alphabets
