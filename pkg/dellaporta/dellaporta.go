@@ -16,7 +16,6 @@ package dellaporta
 
 import (
 	"errors"
-	"fmt"
 	"unicode/utf8"
 
 	"github.com/merenbach/goldbug/internal/pasc"
@@ -107,6 +106,5 @@ func (c *Cipher) Tableau() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	// return t.Printable()
-	return fmt.Sprintf("%v", t), nil
+	return t.Printable()
 }
