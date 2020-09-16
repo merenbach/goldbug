@@ -56,11 +56,11 @@ func TestCipher_Decipher(t *testing.T) {
 	}
 }
 
-// func TestCipher_Tableau(t *testing.T) {
-// 	c := Cipher{}
-// 	tableau, err := c.Tableau()
-// 	if err != nil {
-// 		t.Fatal("Error:", err)
-// 	}
-// 	fixture.Golden(t, []byte(tableau))
-// }
+func TestCipher_Tableau(t *testing.T) {
+	c := Cipher{}
+	tableau, err := c.Tableau()
+	if err != nil {
+		t.Fatal("Error:", err)
+	}
+	fixture.Golden(t, []byte(tableau))
+}

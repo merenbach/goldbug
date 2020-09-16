@@ -27,7 +27,6 @@ Instantiate your deployment pipeline as follows, adapting as necessary the param
 * Expand tests for custom ciphertext alphabets
 * Improve and enhance test cases overall
 * Expand tests for tabula recta to catch cases with reversed or alternate alphabets
-* Re-enable Della Porta tableau printout test
 * Allow grouping/delimiters
 * Make grids one-based instead of zero-based in some contexts? (e.g., Polybius)
 * Allow transposition cipher key to be for columns directly, rather than relative ordering
