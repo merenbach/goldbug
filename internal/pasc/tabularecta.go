@@ -72,16 +72,16 @@ func NewTabulaRecta2(ptAlphabet string, keyAlphabet string, ctAlphabets []string
 	return &t, nil
 }
 
-func (tr *TabulaRecta) makedictsfromfunc() (map[rune]*masc.Tableau, error) {
+func (tr *TabulaRecta) maketableau() (map[rune]*masc.Tableau, error) {
+	f := tr.dictFunc
+	if f == nil {
+		return tr.maketableaulegacy()
+	}
+
 	ptAlphabet, keyAlphabet := tr.PtAlphabet, tr.KeyAlphabet
 
 	if keyAlphabet == "" {
 		keyAlphabet = ptAlphabet
-	}
-
-	f := tr.dictFunc
-	if f == nil {
-		return tr.makereciprocaltable()
 	}
 
 	m := make(map[rune]*masc.Tableau)
@@ -105,8 +105,9 @@ func (tr *TabulaRecta) makedictsfromfunc() (map[rune]*masc.Tableau, error) {
 	return m, nil
 }
 
-// MakeTabulaRecta creates a standard Caesar shift tabula recta.
-func (tr *TabulaRecta) makereciprocaltable() (map[rune]*masc.Tableau, error) {
+// Maketableaulegacy creates a standard Caesar shift tabula recta.
+// Maketableaulegacy is mainly for the benefit of the Della Porta cipher.
+func (tr *TabulaRecta) maketableaulegacy() (map[rune]*masc.Tableau, error) {
 	ptAlphabet := tr.PtAlphabet
 
 	ctAlphabet := tr.CtAlphabet
@@ -156,7 +157,7 @@ func (tr *TabulaRecta) Printable() (string, error) {
 		keyAlphabet = ptAlphabet
 	}
 
-	rt, err := tr.makedictsfromfunc()
+	rt, err := tr.maketableau()
 	if err != nil {
 		return "", err
 	}
@@ -220,7 +221,7 @@ func (tr *TabulaRecta) Printable() (string, error) {
 // Encipher a string.
 // Encipher will invoke the onSuccess function with before and after runes.
 func (tr *TabulaRecta) Encipher(s string, k string, onSuccess func(rune, rune, *[]rune)) (string, error) {
-	tableau, err := tr.makedictsfromfunc()
+	tableau, err := tr.maketableau()
 	if err != nil {
 		return "", err
 	}
@@ -240,6 +241,7 @@ func (tr *TabulaRecta) Encipher(s string, k string, onSuccess func(rune, rune, *
 			// Rune `k` does not exist in keyAlphabet
 			// TODO: avoid advancing on invalid key char
 			// TODO: avoid infinite loop upon _no_ valid key chars
+
 			return (-1)
 		}
 
@@ -258,7 +260,7 @@ func (tr *TabulaRecta) Encipher(s string, k string, onSuccess func(rune, rune, *
 // Decipher a string.
 // Decipher will invoke the onSuccess function with before and after runes.
 func (tr *TabulaRecta) Decipher(s string, k string, onSuccess func(rune, rune, *[]rune)) (string, error) {
-	tableau, err := tr.makedictsfromfunc()
+	tableau, err := tr.maketableau()
 	if err != nil {
 		return "", err
 	}
