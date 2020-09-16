@@ -71,7 +71,7 @@ func NewTabulaRecta2(ptAlphabet string, keyAlphabet string, ctAlphabets []string
 	return &t, nil
 }
 
-func (tr *TabulaRecta) makedictsfromfunc() (ReciprocalTable, error) {
+func (tr *TabulaRecta) makedictsfromfunc() (map[rune]*masc.Tableau, error) {
 	ptAlphabet, keyAlphabet := tr.PtAlphabet, tr.KeyAlphabet
 
 	if keyAlphabet == "" {
@@ -105,7 +105,7 @@ func (tr *TabulaRecta) makedictsfromfunc() (ReciprocalTable, error) {
 }
 
 // MakeTabulaRecta creates a standard Caesar shift tabula recta.
-func (tr *TabulaRecta) makereciprocaltable() (ReciprocalTable, error) {
+func (tr *TabulaRecta) makereciprocaltable() (map[rune]*masc.Tableau, error) {
 	ptAlphabet := tr.PtAlphabet
 
 	ctAlphabet := tr.CtAlphabet
@@ -217,19 +217,65 @@ func (tr *TabulaRecta) Printable() (string, error) {
 // }
 
 // Encipher a string.
+// Encipher will invoke the onSuccess function with before and after runes.
 func (tr *TabulaRecta) Encipher(s string, k string, onSuccess func(rune, rune, *[]rune)) (string, error) {
-	rt, err := tr.makedictsfromfunc()
+	tableau, err := tr.makedictsfromfunc()
 	if err != nil {
 		return "", err
 	}
-	return rt.Encipher(s, k, onSuccess)
+
+	keyRunes := []rune(k)
+	var transcodedCharCount = 0
+	return strings.Map(func(r rune) rune {
+		k := keyRunes[transcodedCharCount%len(keyRunes)]
+		m, ok := tableau[k]
+		if !ok {
+			// Rune `k` does not exist in keyAlphabet
+			// TODO: avoid advancing on invalid key char
+			// TODO: avoid infinite loop upon _no_ valid key chars
+			return (-1)
+		}
+
+		o, ok := m.EncipherRune(r)
+		if ok {
+			// Transcoding successful
+			transcodedCharCount++
+			if onSuccess != nil {
+				onSuccess(r, o, &keyRunes)
+			}
+		}
+		return o
+	}, s), nil
 }
 
 // Decipher a string.
+// Decipher will invoke the onSuccess function with before and after runes.
 func (tr *TabulaRecta) Decipher(s string, k string, onSuccess func(rune, rune, *[]rune)) (string, error) {
 	rt, err := tr.makedictsfromfunc()
 	if err != nil {
 		return "", err
 	}
-	return rt.Decipher(s, k, onSuccess)
+
+	keyRunes := []rune(k)
+	var transcodedCharCount = 0
+	return strings.Map(func(r rune) rune {
+		k := keyRunes[transcodedCharCount%len(keyRunes)]
+		m, ok := rt[k]
+		if !ok {
+			// Rune `k` does not exist in keyAlphabet
+			// TODO: avoid advancing on invalid key char
+			// TODO: avoid infinite loop upon _no_ valid key chars
+			return (-1)
+		}
+
+		o, ok := m.DecipherRune(r)
+		if ok {
+			// Transcoding successful
+			transcodedCharCount++
+			if onSuccess != nil {
+				onSuccess(r, o, &keyRunes)
+			}
+		}
+		return o
+	}, s), nil
 }
