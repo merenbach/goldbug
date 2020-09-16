@@ -71,7 +71,7 @@ func TestIntersect(t *testing.T) {
 	}
 }
 
-func TestReverse(t *testing.T) {
+/*func TestReverse(t *testing.T) {
 	table := map[string]string{
 		"hello": "olleh",
 		"world": "dlrow",
@@ -82,7 +82,7 @@ func TestReverse(t *testing.T) {
 			t.Errorf("Reverse of string %q was %q; expected %q", k, o, v)
 		}
 	}
-}
+}*/
 
 // func TestWrapString(t *testing.T) {
 // 	tables := []struct {

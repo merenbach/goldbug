@@ -16,7 +16,6 @@ package stringutil
 
 import (
 	"fmt"
-	"sort"
 	"strings"
 	"unicode/utf8"
 )
@@ -71,13 +70,13 @@ func intersect(s, charset string) string {
 }
 
 // Reverse the order of runes in a string.
-func Reverse(s string) string {
+/*func Reverse(s string) string {
 	r := []rune(s)
 	sort.SliceStable(r, func(i, j int) bool {
 		return true
 	})
 	return string(r)
-}
+}*/
 
 // Chunk divides a string into groups.
 func chunk(s string, size int, delimiter rune) string {
