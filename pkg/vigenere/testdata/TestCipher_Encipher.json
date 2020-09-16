@@ -49,10 +49,28 @@
     },
     {
         "Alphabet": "",
+        "Input": "Hello, World!",
+        "Output": "Vgplb, Kuils!",
+        "Key": "OCEANOGRAPHYWHAT",
+        "Autokey": 0,
+        "Caseless": true,
+        "Strict": false
+    },
+    {
+        "Alphabet": "",
         "Input": "HELLO, WORLD!",
         "Output": "VGPLBKUILS",
         "Key": "OCEANOGRAPHYWHAT",
         "Autokey": 0,
+        "Strict": true
+    },
+    {
+        "Alphabet": "",
+        "Input": "Hello, World!",
+        "Output": "VgplbKuils",
+        "Key": "OCEANOGRAPHYWHAT",
+        "Autokey": 0,
+        "Caseless": true,
         "Strict": true
     },
     {

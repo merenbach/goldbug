@@ -38,9 +38,9 @@ const (
 type Cipher struct {
 	Alphabet string
 	Autokey  autokeyOption
-	// Caseless bool
-	Key    string
-	Strict bool
+	Caseless bool
+	Key      string
+	Strict   bool
 }
 
 func (c *Cipher) maketableau() (*pasc.TabulaRecta, error) {
@@ -55,7 +55,7 @@ func (c *Cipher) maketableau() (*pasc.TabulaRecta, error) {
 		return nil, err
 	}
 
-	// tr.Caseless = c.Caseless
+	tr.Caseless = c.Caseless
 	tr.Strict = c.Strict
 	return tr, nil
 }

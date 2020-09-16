@@ -22,52 +22,35 @@ import (
 // Cipher implements a Trithemius cipher.
 type Cipher struct {
 	Alphabet string
-	// Caseless bool
-	Strict bool
+	Caseless bool
+	Strict   bool
+}
+
+func (c *Cipher) makecipher() *vigenere.Cipher {
+	alphabet := c.Alphabet
+	if alphabet == "" {
+		alphabet = pasc.Alphabet
+	}
+
+	return &vigenere.Cipher{
+		Alphabet: alphabet,
+		Caseless: c.Caseless,
+		Key:      alphabet,
+		Strict:   c.Strict,
+	}
 }
 
 // Encipher a message.
 func (c *Cipher) Encipher(s string) (string, error) {
-	alphabet := c.Alphabet
-	if alphabet == "" {
-		alphabet = pasc.Alphabet
-	}
-
-	c2 := vigenere.Cipher{
-		Alphabet: alphabet,
-		// Caseless: c.Caseless,
-		Key:    alphabet,
-		Strict: c.Strict,
-	}
-	return c2.Encipher(s)
+	return c.makecipher().Encipher(s)
 }
 
 // Decipher a message.
 func (c *Cipher) Decipher(s string) (string, error) {
-	alphabet := c.Alphabet
-	if alphabet == "" {
-		alphabet = pasc.Alphabet
-	}
-
-	c2 := vigenere.Cipher{
-		Alphabet: alphabet,
-		Key:      alphabet,
-		Strict:   c.Strict,
-	}
-	return c2.Decipher(s)
+	return c.makecipher().Decipher(s)
 }
 
 // Tableau for encipherment and decipherment.
 func (c *Cipher) Tableau() (string, error) {
-	alphabet := c.Alphabet
-	if alphabet == "" {
-		alphabet = pasc.Alphabet
-	}
-
-	c2 := vigenere.Cipher{
-		Alphabet: alphabet,
-		Key:      alphabet,
-		Strict:   c.Strict,
-	}
-	return c2.Tableau()
+	return c.makecipher().Tableau()
 }

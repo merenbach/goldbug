@@ -7,8 +7,22 @@
     },
     {
         "Alphabet": "",
+        "Input": "Hfnos, Buytm!",
+        "Output": "Hello, World!",
+        "Caseless": true,
+        "Strict": false
+    },
+    {
+        "Alphabet": "",
         "Input": "HFNOS, BUYTM!",
         "Output": "HELLOWORLD",
+        "Strict": true
+    },
+    {
+        "Alphabet": "",
+        "Input": "Hfnos, Buytm!",
+        "Output": "HelloWorld",
+        "Caseless": true,
         "Strict": true
     }
 ]
