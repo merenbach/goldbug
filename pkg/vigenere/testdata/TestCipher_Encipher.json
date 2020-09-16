@@ -1,6 +1,108 @@
 [
     {
         "Alphabet": "",
+        "Input": "WE ARE DISCOVERED. FLEE AT ONCE! YOU WILL KNOW ME WHEN YOU SEE ME.",
+        "Output": "BS RKM IQUCHDSEJR. WEMJ IV OGKS! LTI NBTQ SPOP US JMSE RWZ AGE FM.",
+        "Key": "FORTIFICATION",
+        "Autokey": 0,
+        "Strict": false
+    },
+    {
+        "Alphabet": "",
+        "Input": "WE ARE DISCOVERED. FLEE AT ONCE! YOU WILL KNOW ME WHEN YOU SEE ME.",
+        "Output": "BSRKMIQUCHDSEJRWEMJIVOGKSLTINBTQSPOPUSJMSERWZAGEFM",
+        "Key": "FORTIFICATION",
+        "Autokey": 0,
+        "Strict": true
+    },
+    {
+        "Alphabet": "",
+        "Input": "We are discovered. Flee AT ONCE! You will know me when you see me.",
+        "Output": "Bs rkm iquchdsejr. Wemj IV OGKS! Lti nbtq spop us jmse rwz age fm.",
+        "Key": "Fortification",
+        "Autokey": 0,
+        "Caseless": true,
+        "Strict": false
+    },
+    {
+        "Alphabet": "",
+        "Input": "We are discovered. Flee AT ONCE! You will know me when you see me.",
+        "Output": "BsrkmiquchdsejrWemjIVOGKSLtinbtqspopusjmserwzagefm",
+        "Key": "Fortification",
+        "Autokey": 0,
+        "Caseless": true,
+        "Strict": true
+    },
+    {
+        "Alphabet": "",
+        "Input": "WE ARE DISCOVERED. FLEE AT ONCE! YOU WILL KNOW ME WHEN YOU SEE ME.",
+        "Output": "BS RKM IQUCHDSEAH. FCIH IL QBXI! PSX BTPP KGCJ OI UVYJ GZF CRS IQ.",
+        "Key": "FORTIFICATION",
+        "Autokey": 1,
+        "Strict": false
+    },
+    {
+        "Alphabet": "",
+        "Input": "WE ARE DISCOVERED. FLEE AT ONCE! YOU WILL KNOW ME WHEN YOU SEE ME.",
+        "Output": "BSRKMIQUCHDSEAHFCIHILQBXIPSXBTPPKGCJOIUVYJGZFCRSIQ",
+        "Key": "FORTIFICATION",
+        "Autokey": 1,
+        "Strict": true
+    },
+    {
+        "Alphabet": "",
+        "Input": "We are discovered. Flee AT ONCE! You will know me when you see me.",
+        "Output": "Bs rkm iquchdseah. Fcih IL QBXI! Psx btpp kgcj oi uvyj gzf crs iq.",
+        "Key": "Fortification",
+        "Autokey": 1,
+        "Caseless": true,
+        "Strict": false
+    },
+    {
+        "Alphabet": "",
+        "Input": "We are discovered. Flee AT ONCE! You will know me when you see me.",
+        "Output": "BsrkmiquchdseahFcihILQBXIPsxbtppkgcjoiuvyjgzfcrsiq",
+        "Key": "Fortification",
+        "Autokey": 1,
+        "Caseless": true,
+        "Strict": true
+    },
+    {
+        "Alphabet": "",
+        "Input": "WE ARE DISCOVERED. FLEE AT ONCE! YOU WILL KNOW ME WHEN YOU SEE ME.",
+        "Output": "BS RKM IQUCHDSEFV. WVQM QN QUFW! CTP SDBX AAEQ RA YATF BPR SEI CV.",
+        "Key": "FORTIFICATION",
+        "Autokey": 2,
+        "Strict": false
+    },
+    {
+        "Alphabet": "",
+        "Input": "WE ARE DISCOVERED. FLEE AT ONCE! YOU WILL KNOW ME WHEN YOU SEE ME.",
+        "Output": "BSRKMIQUCHDSEFVWVQMQNQUFWCTPSDBXAAEQRAYATFBPRSEICV",
+        "Key": "FORTIFICATION",
+        "Autokey": 2,
+        "Strict": true
+    },
+    {
+        "Alphabet": "",
+        "Input": "We are discovered. Flee AT ONCE! You will know me when you see me.",
+        "Output": "Bs rkm iquchdsefv. Wvqm QN QUFW! Ctp sdbx aaeq ra yatf bpr sei cv.",
+        "Key": "Fortification",
+        "Autokey": 2,
+        "Caseless": true,
+        "Strict": false
+    },
+    {
+        "Alphabet": "",
+        "Input": "We are discovered. Flee AT ONCE! You will know me when you see me.",
+        "Output": "BsrkmiquchdsefvWvqmQNQUFWCtpsdbxaaeqrayatfbprseicv",
+        "Key": "Fortification",
+        "Autokey": 2,
+        "Caseless": true,
+        "Strict": true
+    },
+    {
+        "Alphabet": "",
         "Input": "",
         "Output": "",
         "Key": "",
@@ -152,14 +254,6 @@
         "Key": "Q",
         "Autokey": 1,
         "Strict": true
-    },
-    {
-        "Alphabet": "",
-        "Input": "HELLO, WORLD!",
-        "Output": "REYRO, NCFSH!",
-        "Key": "KANGAROO",
-        "Autokey": 1,
-        "Strict": false
     },
     {
         "Alphabet": "",

@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"strings"
 	"text/tabwriter"
+	"unicode"
 
 	"github.com/merenbach/goldbug/internal/masc"
 )
@@ -229,6 +230,12 @@ func (tr *TabulaRecta) Encipher(s string, k string, onSuccess func(rune, rune, *
 	return strings.Map(func(r rune) rune {
 		k := keyRunes[transcodedCharCount%len(keyRunes)]
 		m, ok := tableau[k]
+		if !ok && tr.Caseless {
+			m, ok = tableau[unicode.ToUpper(k)]
+		}
+		if !ok && tr.Caseless {
+			m, ok = tableau[unicode.ToLower(k)]
+		}
 		if !ok {
 			// Rune `k` does not exist in keyAlphabet
 			// TODO: avoid advancing on invalid key char
@@ -251,7 +258,7 @@ func (tr *TabulaRecta) Encipher(s string, k string, onSuccess func(rune, rune, *
 // Decipher a string.
 // Decipher will invoke the onSuccess function with before and after runes.
 func (tr *TabulaRecta) Decipher(s string, k string, onSuccess func(rune, rune, *[]rune)) (string, error) {
-	rt, err := tr.makedictsfromfunc()
+	tableau, err := tr.makedictsfromfunc()
 	if err != nil {
 		return "", err
 	}
@@ -260,7 +267,13 @@ func (tr *TabulaRecta) Decipher(s string, k string, onSuccess func(rune, rune, *
 	var transcodedCharCount = 0
 	return strings.Map(func(r rune) rune {
 		k := keyRunes[transcodedCharCount%len(keyRunes)]
-		m, ok := rt[k]
+		m, ok := tableau[k]
+		if !ok && tr.Caseless {
+			m, ok = tableau[unicode.ToUpper(k)]
+		}
+		if !ok && tr.Caseless {
+			m, ok = tableau[unicode.ToLower(k)]
+		}
 		if !ok {
 			// Rune `k` does not exist in keyAlphabet
 			// TODO: avoid advancing on invalid key char
