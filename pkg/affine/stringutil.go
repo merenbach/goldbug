@@ -26,6 +26,10 @@ import (
 
 // Transform a string according to an affine equation.
 func transform(s string, slope int, intercept int) (string, error) {
+	if s == "" {
+		return "", nil
+	}
+
 	m := utf8.RuneCountInString(s)
 
 	for slope < 0 {
