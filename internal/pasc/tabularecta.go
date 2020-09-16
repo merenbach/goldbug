@@ -34,7 +34,7 @@ type TabulaRecta struct {
 	CtAlphabet  string
 	KeyAlphabet string
 
-	DictFunc func(s string, i int) (*masc.Tableau, error)
+	dictFunc func(s string, i int) (*masc.Tableau, error)
 }
 
 // NewTabulaRecta creates a new tabula recta from multiple invocations of a MASC tableau generation function.
@@ -51,7 +51,7 @@ func NewTabulaRecta(ptAlphabet string, keyAlphabet string, f func(s string, i in
 	t := TabulaRecta{
 		PtAlphabet:  ptAlphabet,
 		KeyAlphabet: keyAlphabet,
-		DictFunc:    f,
+		dictFunc:    f,
 	}
 	return &t, nil
 }
@@ -64,7 +64,7 @@ func (tr *TabulaRecta) makedictsfromfunc() (ReciprocalTable, error) {
 		keyAlphabet = ptAlphabet
 	}
 
-	f := tr.DictFunc
+	f := tr.dictFunc
 	if f == nil {
 		return tr.makereciprocaltable()
 	}
