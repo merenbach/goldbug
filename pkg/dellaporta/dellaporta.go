@@ -19,7 +19,6 @@ import (
 	"fmt"
 	"unicode/utf8"
 
-	"github.com/merenbach/goldbug/internal/masc"
 	"github.com/merenbach/goldbug/internal/pasc"
 	"github.com/merenbach/goldbug/internal/stringutil"
 )
@@ -32,7 +31,7 @@ type Cipher struct {
 	Strict   bool
 }
 
-func (c *Cipher) maketableau() (pasc.ReciprocalTable, error) {
+func (c *Cipher) maketableau() (*pasc.TabulaRecta, error) {
 	alphabet := c.Alphabet
 	if alphabet == "" {
 		alphabet = pasc.Alphabet
@@ -73,24 +72,15 @@ func (c *Cipher) maketableau() (pasc.ReciprocalTable, error) {
 		ctAlphabets[y] = string(out)
 	}
 
-	m := make(map[rune]*masc.Tableau)
-
-	keyRunes := []rune(keyAlphabet)
-	if len(keyRunes) != len(keyAlphabet) {
-		return nil, errors.New("Row headers must have same rune length as rows slice")
+	tr, err := pasc.NewTabulaRecta2(ptAlphabet, keyAlphabet, ctAlphabets)
+	if err != nil {
+		return nil, err
 	}
 
-	for i, r := range keyRunes {
-		t, err := masc.NewTableau(ptAlphabet, ctAlphabets[i], nil)
-		if err != nil {
-			return nil, err
-		}
-		t.Caseless = c.Caseless
-		t.Strict = c.Strict
-		m[r] = t
-	}
+	tr.Caseless = c.Caseless
+	tr.Strict = c.Strict
 
-	return m, nil
+	return tr, nil
 }
 
 // Encipher a message.

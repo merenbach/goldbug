@@ -19,10 +19,8 @@ import (
 	"fmt"
 	"strings"
 	"text/tabwriter"
-	"unicode/utf8"
 
 	"github.com/merenbach/goldbug/internal/masc"
-	"github.com/merenbach/goldbug/internal/stringutil"
 )
 
 // TabulaRecta holds a tabula recta.
@@ -34,12 +32,29 @@ type TabulaRecta struct {
 	CtAlphabet  string
 	KeyAlphabet string
 
+	ctAlphabets []string
+
 	dictFunc func(s string, i int) (*masc.Tableau, error)
 }
 
 // NewTabulaRecta creates a new tabula recta from multiple invocations of a MASC tableau generation function.
 // NewTabulaRecta is the canonical method to generate a typical tabula recta.
 func NewTabulaRecta(ptAlphabet string, keyAlphabet string, f func(s string, i int) (*masc.Tableau, error)) (*TabulaRecta, error) {
+	if ptAlphabet == "" {
+		ptAlphabet = Alphabet
+	}
+
+	t := TabulaRecta{
+		PtAlphabet:  ptAlphabet,
+		KeyAlphabet: keyAlphabet,
+		dictFunc:    f,
+	}
+	return &t, nil
+}
+
+// NewTabulaRecta2 creates a new tabula recta from multiple invocations of a MASC tableau generation function.
+// NewTabulaRecta2 is the canonical method to generate a typical tabula recta.
+func NewTabulaRecta2(ptAlphabet string, keyAlphabet string, ctAlphabets []string) (*TabulaRecta, error) {
 	if ptAlphabet == "" {
 		ptAlphabet = Alphabet
 	}
@@ -51,15 +66,14 @@ func NewTabulaRecta(ptAlphabet string, keyAlphabet string, f func(s string, i in
 	t := TabulaRecta{
 		PtAlphabet:  ptAlphabet,
 		KeyAlphabet: keyAlphabet,
-		dictFunc:    f,
+		ctAlphabets: ctAlphabets,
 	}
 	return &t, nil
 }
 
 func (tr *TabulaRecta) makedictsfromfunc() (ReciprocalTable, error) {
-	ptAlphabet := tr.PtAlphabet
+	ptAlphabet, keyAlphabet := tr.PtAlphabet, tr.KeyAlphabet
 
-	keyAlphabet := tr.KeyAlphabet
 	if keyAlphabet == "" {
 		keyAlphabet = ptAlphabet
 	}
@@ -104,23 +118,6 @@ func (tr *TabulaRecta) makereciprocaltable() (ReciprocalTable, error) {
 		keyAlphabet = ptAlphabet
 	}
 
-	ctAlphabets := make([]string, utf8.RuneCountInString(tr.KeyAlphabet))
-	ctAlphabetLen := utf8.RuneCountInString(ctAlphabet)
-
-	// Cast to []rune to increase index without gaps
-	for y := range ctAlphabets {
-		ii := make([]int, ctAlphabetLen)
-		for x := range ii {
-			ii[x] = (x + y) % ctAlphabetLen
-		}
-
-		out, err := stringutil.Backpermute(ctAlphabet, ii)
-		if err != nil {
-			return nil, err
-		}
-		ctAlphabets[y] = out
-	}
-
 	m := make(map[rune]*masc.Tableau)
 
 	keyRunes := []rune(keyAlphabet)
@@ -129,12 +126,12 @@ func (tr *TabulaRecta) makereciprocaltable() (ReciprocalTable, error) {
 	}
 
 	for i, r := range keyRunes {
-		t, err := masc.NewTableau(ptAlphabet, ctAlphabets[i], nil)
+		t, err := masc.NewTableau(ptAlphabet, tr.ctAlphabets[i], nil)
 		if err != nil {
 			return nil, err
 		}
+		t.Caseless = tr.Caseless
 		t.Strict = tr.Strict
-		// t.Caseless = tr.Caseless // TODO
 		m[r] = t
 	}
 

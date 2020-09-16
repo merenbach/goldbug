@@ -8,6 +8,14 @@
     },
     {
         "Alphabet": "",
+        "Input": "Osnyi, Cljyx!",
+        "Output": "Hello, World!",
+        "Key": "OCEANOGRAPHYWHAT",
+        "Caseless": true,
+        "Strict": false
+    },
+    {
+        "Alphabet": "",
         "Input": "OSNYI, CLJYX!",
         "Output": "HELLOWORLD",
         "Key": "OCEANOGRAPHYWHAT",
@@ -39,6 +47,14 @@
         "Input": "ZRROB, BHKQQ!",
         "Output": "HELLOWORLD",
         "Key": "KANGAROO",
+        "Strict": true
+    },
+    {
+        "Alphabet": "",
+        "Input": "Zrrob, Bhkqq!",
+        "Output": "HelloWorld",
+        "Key": "KANGAROO",
+        "Caseless": true,
         "Strict": true
     }
 ]
