@@ -34,9 +34,9 @@ Instantiate your deployment pipeline as follows, adapting as necessary the param
 * Allow number duplicates to be ordered backwards when creating lexicographic key
 * Add more to-string printable options to transposition and other ciphers
 * Add printout option to columnar transposition ciphers--and use tab writer
-* Include primer at beginning of GROMARK text and end with check digit per https://www.cryptogram.org/downloads/aca.info/ciphers/Gromark.pdf?
+* Include primer at beginning of GROMARK text and end with check digit per <https://www.cryptogram.org/downloads/aca.info/ciphers/Gromark.pdf>?
 * Add null options to transposition cipher? Special null adder utility module?
-* Add PASC caseless option to Della Porta, Gromark, Trithemius, and Vigenere ciphers
+* Add PASC caseless option to Trithemius and Vigenere ciphers
 * Add more MASC variant caseless tests
 * Add shift and directionality to Trithemius?
 * Nulls for rail fence?
