@@ -14,7 +14,12 @@
 
 package pasc
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/merenbach/goldbug/internal/masc"
+	"github.com/merenbach/goldbug/pkg/caesar"
+)
 
 func TestTabulaRecta(t *testing.T) {
 	const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -37,10 +42,15 @@ func TestTabulaRecta(t *testing.T) {
 	}
 
 	for _, table := range tables {
-		tr := TabulaRecta{
-			PtAlphabet:  table.ptAlphabet,
-			KeyAlphabet: table.keyAlphabet,
-			CtAlphabet:  table.ctAlphabet,
+		tr, err := NewTabulaRecta(table.ptAlphabet, table.ctAlphabet, func(s string, i int) (*masc.Tableau, error) {
+			c := caesar.Cipher{
+				Alphabet: s,
+				Shift:    i,
+			}
+			return c.Tableau()
+		})
+		if err != nil {
+			t.Error("Could not create tabula recta:", err)
 		}
 
 		dst, err := tr.Encipher(table.srcRune, table.keyRune, nil)
