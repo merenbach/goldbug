@@ -140,14 +140,6 @@ func (tr *TabulaRecta) maketableaulegacy() (map[rune]*masc.Tableau, error) {
 	return m, nil
 }
 
-func (tr *TabulaRecta) String() string {
-	return fmt.Sprintf("%+v", map[string]interface{}{
-		"k":  tr.KeyAlphabet,
-		"pt": tr.PtAlphabet,
-		"ct": tr.CtAlphabet,
-	})
-}
-
 // Printable representation of this tabula recta.
 func (tr *TabulaRecta) Printable() (string, error) {
 	ptAlphabet := tr.PtAlphabet
