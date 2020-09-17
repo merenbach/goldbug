@@ -13,3 +13,30 @@
 // limitations under the License.
 
 package affine
+
+import (
+	"testing"
+
+	"github.com/merenbach/goldbug/internal/fixture"
+)
+
+func TestBackpermute(t *testing.T) {
+	var tables []struct {
+		Input   string
+		Output  string
+		Indices []int
+		Success bool
+	}
+
+	fixture.Load(t, &tables)
+	for i, table := range tables {
+		t.Logf("Testing table %d of %d", i+1, len(tables))
+		if out, err := Backpermute(table.Input, table.Indices); err != nil && table.Success {
+			t.Error("Unexpected backpermute failure:", err)
+		} else if err == nil && !table.Success {
+			t.Error("Unexpected backpermute success")
+		} else if string(out) != table.Output {
+			t.Error("Received incorrect output:", out)
+		}
+	}
+}
