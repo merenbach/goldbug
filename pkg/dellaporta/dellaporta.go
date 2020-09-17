@@ -15,11 +15,10 @@
 package dellaporta
 
 import (
-	"errors"
 	"unicode/utf8"
 
+	"github.com/merenbach/goldbug/internal/masc"
 	"github.com/merenbach/goldbug/internal/pasc"
-	"github.com/merenbach/goldbug/internal/stringutil"
 )
 
 // Cipher implements a Della Porta cipher.
@@ -30,55 +29,56 @@ type Cipher struct {
 	Strict   bool
 }
 
+// WrapString wraps a string a specified number of indices.
+// WrapString will error out if the provided offset is negative.
+func wrapString(s string, i int) string {
+	// if we simply `return s[i:] + s[:i]`, we're operating on bytes, not runes
+	rr := []rune(s)
+	return string(rr[i:]) + string(rr[:i])
+}
+
+// WrapString wraps a string a specified number of indices.
+// WrapString will error out if the provided offset is negative.
+func owrapString(s string, i int) (string, error) {
+	sLen := utf8.RuneCountInString(s)
+
+	if sLen%2 != 0 {
+		panic("owrapString sequence length must be divisible by two")
+	}
+
+	s = wrapString(s, sLen/2)
+
+	// if we simply `return s[i:] + s[:i]`, we're operating on bytes, not runes
+	sRunes := []rune(s)
+	u, v := sRunes[:len(sRunes)/2], sRunes[len(sRunes)/2:]
+	return wrapString(string(u), i) + wrapString(string(v), len(v)-i), nil
+}
+
 func (c *Cipher) maketableau() (*pasc.TabulaRecta, error) {
 	alphabet := c.Alphabet
 	if alphabet == "" {
 		alphabet = pasc.Alphabet
 	}
 
-	ptAlphabet, ctAlphabet, keyAlphabet := alphabet, alphabet, alphabet
-
-	ctAlphabets := make([]string, utf8.RuneCountInString(keyAlphabet))
-	ctAlphabetLen := utf8.RuneCountInString(ctAlphabet)
-
-	if ctAlphabetLen%2 != 0 {
-		return nil, errors.New("Della Porta cipher alphabets must have even length")
-	}
-
-	halfCtAlphabetLen := ctAlphabetLen / 2
-
-	for y := range ctAlphabets {
-		ii := make([]int, ctAlphabetLen)
-		for x := range ii {
-			if x < halfCtAlphabetLen {
-				// 	// v = 13 - x + x%13 + (x+y/2)%13
-				// v = 13 + (x+y/2)%13 // <--- THIS IS THE MOST BASIC VERSION
-				ii[x] = halfCtAlphabetLen + (x+y/2)%halfCtAlphabetLen
-			} else {
-				// v = (x - y/2) % 13 // <--- THIS IS THE MOST BASIC VERSION
-				ii[x] = (x - y/2) % halfCtAlphabetLen
-				// v2 := mod(x, 13) - y/2 + 13
-				// log.Printf("v = %d and v2 = %d", v, v2)
-				// 	// v = 13 - x + x%13 + (13+x-y/2)%13
-			}
-			// ii[x] = (13-x)%13 + x%13 + (x-y*sign(x-13)/2)%13
-		}
-
-		out, err := stringutil.Backpermute(ctAlphabet, ii)
+	tr, err := pasc.NewTabulaRecta(c.Alphabet, "", func(s string, i int) (*masc.Tableau, error) {
+		ctAlphabet2, err := owrapString(s, i/2)
 		if err != nil {
 			return nil, err
 		}
-		ctAlphabets[y] = string(out)
-	}
 
-	tr, err := pasc.NewTabulaRecta2(ptAlphabet, keyAlphabet, ctAlphabets)
+		t, err := masc.NewTableau(alphabet, ctAlphabet2, nil)
+		if err != nil {
+			return nil, err
+		}
+		t.Strict = c.Strict
+		t.Caseless = c.Caseless
+		return t, nil
+	})
 	if err != nil {
 		return nil, err
 	}
 
 	tr.Caseless = c.Caseless
-	tr.Strict = c.Strict
-
 	return tr, nil
 }
 

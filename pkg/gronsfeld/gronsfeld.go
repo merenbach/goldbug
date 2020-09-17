@@ -34,7 +34,9 @@ func (c *Cipher) maketableau() (*pasc.TabulaRecta, error) {
 	tr, err := pasc.NewTabulaRecta(c.Alphabet, digits, func(s string, i int) (*masc.Tableau, error) {
 		c2 := &caesar.Cipher{
 			Alphabet: s,
+			Caseless: c.Caseless,
 			Shift:    i,
+			Strict:   c.Strict,
 		}
 		return c2.Tableau()
 	})
@@ -43,7 +45,6 @@ func (c *Cipher) maketableau() (*pasc.TabulaRecta, error) {
 	}
 
 	tr.Caseless = c.Caseless
-	tr.Strict = c.Strict
 	return tr, nil
 }
 

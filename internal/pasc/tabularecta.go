@@ -26,14 +26,11 @@ import (
 
 // TabulaRecta holds a tabula recta.
 type TabulaRecta struct {
-	Strict   bool
 	Caseless bool
 
 	PtAlphabet  string
 	CtAlphabet  string
 	KeyAlphabet string
-
-	ctAlphabets []string
 
 	dictFunc func(s string, i int) (*masc.Tableau, error)
 }
@@ -53,30 +50,8 @@ func NewTabulaRecta(ptAlphabet string, keyAlphabet string, f func(s string, i in
 	return &t, nil
 }
 
-// NewTabulaRecta2 creates a new tabula recta from multiple invocations of a MASC tableau generation function.
-// NewTabulaRecta2 is the canonical method to generate a typical tabula recta.
-func NewTabulaRecta2(ptAlphabet string, keyAlphabet string, ctAlphabets []string) (*TabulaRecta, error) {
-	if ptAlphabet == "" {
-		ptAlphabet = Alphabet
-	}
-
-	if keyAlphabet == "" {
-		keyAlphabet = ptAlphabet
-	}
-
-	t := TabulaRecta{
-		PtAlphabet:  ptAlphabet,
-		KeyAlphabet: keyAlphabet,
-		ctAlphabets: ctAlphabets,
-	}
-	return &t, nil
-}
-
 func (tr *TabulaRecta) maketableau() (map[rune]*masc.Tableau, error) {
 	f := tr.dictFunc
-	if f == nil {
-		return tr.maketableaulegacy()
-	}
 
 	ptAlphabet, keyAlphabet := tr.PtAlphabet, tr.KeyAlphabet
 
@@ -97,43 +72,6 @@ func (tr *TabulaRecta) maketableau() (map[rune]*masc.Tableau, error) {
 		if err != nil {
 			return nil, err
 		}
-		t.Caseless = tr.Caseless
-		t.Strict = tr.Strict
-		m[r] = t
-	}
-
-	return m, nil
-}
-
-// Maketableaulegacy creates a standard Caesar shift tabula recta.
-// Maketableaulegacy is mainly for the benefit of the Della Porta cipher.
-func (tr *TabulaRecta) maketableaulegacy() (map[rune]*masc.Tableau, error) {
-	ptAlphabet := tr.PtAlphabet
-
-	ctAlphabet := tr.CtAlphabet
-	if ctAlphabet == "" {
-		ctAlphabet = ptAlphabet
-	}
-
-	keyAlphabet := tr.KeyAlphabet
-	if keyAlphabet == "" {
-		keyAlphabet = ptAlphabet
-	}
-
-	m := make(map[rune]*masc.Tableau)
-
-	keyRunes := []rune(keyAlphabet)
-	if len(keyRunes) != len(keyAlphabet) {
-		return nil, errors.New("Row headers must have same rune length as rows slice")
-	}
-
-	for i, r := range keyRunes {
-		t, err := masc.NewTableau(ptAlphabet, tr.ctAlphabets[i], nil)
-		if err != nil {
-			return nil, err
-		}
-		t.Caseless = tr.Caseless
-		t.Strict = tr.Strict
 		m[r] = t
 	}
 
