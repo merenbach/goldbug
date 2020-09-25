@@ -75,7 +75,7 @@ func take(n int, f func() int) []int {
 // type LFG struct {
 // 	Modulus int
 // 	Seed    []int
-// 	Taps    []int
+// 	Taps    []int // "tap mask"
 // }
 
 // // Validate the settings for this LFG.
