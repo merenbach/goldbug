@@ -33,7 +33,7 @@ func TestTableau_Encipher(t *testing.T) {
 
 	fixture.Load(t, &tables)
 	for _, table := range tables {
-		tableau, err := NewTableau(Configuration{Alphabet: table.PtAlphabet}, table.CtAlphabet, nil)
+		tableau, err := NewTableau(&Configuration{Alphabet: table.PtAlphabet}, table.CtAlphabet, nil)
 		if err != nil {
 			t.Error("Error:", err)
 		}
@@ -61,7 +61,7 @@ func TestTableau_Decipher(t *testing.T) {
 
 	fixture.Load(t, &tables)
 	for _, table := range tables {
-		tableau, err := NewTableau(Configuration{Alphabet: table.PtAlphabet}, table.CtAlphabet, nil)
+		tableau, err := NewTableau(&Configuration{Alphabet: table.PtAlphabet}, table.CtAlphabet, nil)
 		if err != nil {
 			t.Error("Error:", err)
 		}

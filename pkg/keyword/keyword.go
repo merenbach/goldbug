@@ -31,7 +31,7 @@ type Cipher struct {
 }
 
 func (c *Cipher) maketableau() (*masc.Tableau, error) {
-	config := masc.Configuration{
+	config := &masc.Configuration{
 		Alphabet: c.Alphabet,
 		Strict:   c.Strict,
 		Caseless: c.Caseless,

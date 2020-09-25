@@ -33,14 +33,14 @@ type Configuration struct {
 
 // A Tableau holds a translation table.
 type Tableau struct {
-	Configuration
+	*Configuration
 
 	pt2ct translation.Table
 	ct2pt translation.Table
 }
 
 // NewTableau creates a new tableau.
-func NewTableau(config Configuration, ctAlphabet string, f func(string) (string, error)) (*Tableau, error) {
+func NewTableau(config *Configuration, ctAlphabet string, f func(string) (string, error)) (*Tableau, error) {
 	if config.Alphabet == "" {
 		config.Alphabet = Alphabet
 	}

@@ -66,7 +66,7 @@ func (c *Cipher) maketableau() (*pasc.TabulaRecta, error) {
 			return nil, err
 		}
 
-		t, err := masc.NewTableau(masc.Configuration{Alphabet: alphabet}, ctAlphabet2, nil)
+		t, err := masc.NewTableau(&masc.Configuration{Alphabet: alphabet}, ctAlphabet2, nil)
 		if err != nil {
 			return nil, err
 		}
