@@ -19,12 +19,6 @@ import (
 	"github.com/merenbach/goldbug/pkg/affine"
 )
 
-// Intercept for the affine cipher.
-const intercept = (-1)
-
-// Slope for the affine cipher.
-const slope = (-1)
-
 // Cipher implements an Atbash cipher.
 type Cipher struct {
 	Alphabet string
@@ -33,6 +27,7 @@ type Cipher struct {
 }
 
 func (c *Cipher) maketableau() *affine.Cipher {
+	const slope, intercept = (-1), (-1)
 	return &affine.Cipher{
 		Alphabet:  c.Alphabet,
 		Caseless:  c.Caseless,

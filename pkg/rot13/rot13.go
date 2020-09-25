@@ -19,9 +19,6 @@ import (
 	"github.com/merenbach/goldbug/pkg/caesar"
 )
 
-// Shift alphabet by this constant number of characters.
-const shift = 13
-
 // Cipher implements a ROT13 cipher.
 type Cipher struct {
 	Caseless bool
@@ -29,6 +26,7 @@ type Cipher struct {
 }
 
 func (c *Cipher) maketableau() *caesar.Cipher {
+	const shift = 13
 	return &caesar.Cipher{
 		Alphabet: "",
 		Caseless: c.Caseless,

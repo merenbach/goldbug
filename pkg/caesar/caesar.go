@@ -19,9 +19,6 @@ import (
 	"github.com/merenbach/goldbug/pkg/affine"
 )
 
-// Slope for the affine cipher.
-const slope = 1
-
 // Cipher implements a Caesar cipher.
 type Cipher struct {
 	Alphabet   string
@@ -32,6 +29,7 @@ type Cipher struct {
 }
 
 func (c *Cipher) maketableau() *affine.Cipher {
+	const slope = 1
 	return &affine.Cipher{
 		Alphabet:   c.Alphabet,
 		CtAlphabet: c.CtAlphabet,

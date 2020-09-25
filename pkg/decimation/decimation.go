@@ -19,9 +19,6 @@ import (
 	"github.com/merenbach/goldbug/pkg/affine"
 )
 
-// Intercept for the affine cipher.
-const intercept = 0
-
 // Cipher implements a decimation cipher.
 type Cipher struct {
 	Alphabet   string
@@ -32,6 +29,7 @@ type Cipher struct {
 }
 
 func (c *Cipher) maketableau() *affine.Cipher {
+	const intercept = 0
 	return &affine.Cipher{
 		Alphabet:   c.Alphabet,
 		CtAlphabet: c.CtAlphabet,
