@@ -31,14 +31,17 @@ type Cipher struct {
 }
 
 func (c *Cipher) maketableau() (*masc.Tableau, error) {
-	t, err := masc.NewTableau(c.Alphabet, c.CtAlphabet, func(s string) (string, error) {
+	config := masc.Configuration{
+		Alphabet: c.Alphabet,
+		Strict:   c.Strict,
+		Caseless: c.Caseless,
+	}
+	t, err := masc.NewTableau(config, c.CtAlphabet, func(s string) (string, error) {
 		return transform(s, c.Slope, c.Intercept)
 	})
 	if err != nil {
 		return nil, err
 	}
-	t.Strict = c.Strict
-	t.Caseless = c.Caseless
 	return t, nil
 }
 

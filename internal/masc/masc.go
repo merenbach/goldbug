@@ -23,25 +23,30 @@ import (
 // Alphabet to use by default for substitution ciphers
 const Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-// A Tableau holds a translation table.
-type Tableau struct {
+// A Configuration for a tableau.
+type Configuration struct {
 	Alphabet string
 
 	Strict   bool
 	Caseless bool
+}
+
+// A Tableau holds a translation table.
+type Tableau struct {
+	Configuration
 
 	pt2ct translation.Table
 	ct2pt translation.Table
 }
 
 // NewTableau creates a new tableau.
-func NewTableau(ptAlphabet string, ctAlphabet string, f func(string) (string, error)) (*Tableau, error) {
-	if ptAlphabet == "" {
-		ptAlphabet = Alphabet
+func NewTableau(config Configuration, ctAlphabet string, f func(string) (string, error)) (*Tableau, error) {
+	if config.Alphabet == "" {
+		config.Alphabet = Alphabet
 	}
 
 	if ctAlphabet == "" {
-		ctAlphabet = ptAlphabet
+		ctAlphabet = config.Alphabet
 	}
 
 	ctAlphabetTransformed := ctAlphabet
@@ -54,21 +59,22 @@ func NewTableau(ptAlphabet string, ctAlphabet string, f func(string) (string, er
 		}
 	}
 
-	pt2ct, err := translation.NewTable(ptAlphabet, ctAlphabetTransformed, "")
+	pt2ct, err := translation.NewTable(config.Alphabet, ctAlphabetTransformed, "")
 	if err != nil {
 		return nil, err
 	}
 
-	ct2pt, err := translation.NewTable(ctAlphabetTransformed, ptAlphabet, "")
+	ct2pt, err := translation.NewTable(ctAlphabetTransformed, config.Alphabet, "")
 	if err != nil {
 		return nil, err
 	}
 
-	return &Tableau{
-		Alphabet: ptAlphabet,
-		pt2ct:    pt2ct,
-		ct2pt:    ct2pt,
-	}, nil
+	t := &Tableau{
+		Configuration: config,
+		pt2ct:         pt2ct,
+		ct2pt:         ct2pt,
+	}
+	return t, nil
 }
 
 // EncipherRune enciphers a rune.
