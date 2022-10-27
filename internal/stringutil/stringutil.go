@@ -16,8 +16,11 @@ package stringutil
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 	"unicode/utf8"
+
+	"golang.org/x/exp/constraints"
 )
 
 // Backpermute a data slice based on a slice of index values.
@@ -32,6 +35,29 @@ func Backpermute[T any](xs []T, by []int) ([]T, error) {
 		ys = append(ys, xs[i])
 	}
 	return ys, nil
+}
+
+/// Argsort returns the indices that would sort an array.
+/// The naming is based on the numpy extension's name for this concept.
+///
+/// <https://numpy.org/doc/stable/reference/generated/numpy.argsort.html>
+///
+/// This is effectively a Schwartzian transform or decorate-sort-undecorate.
+///
+///   1. Attach numbers to each item in the collection.
+///   2. Rearrange the collection such that it is now sorted lexically. This will scramble the numbers.
+///   3. Return only the numbers now.
+func Argsort[T constraints.Ordered](xs []T) []int {
+	ys := make([]int, len(xs))
+	for i := range ys {
+		ys[i] = i
+	}
+
+	sort.SliceStable(ys, func(i int, j int) bool {
+		return xs[ys[i]] < xs[ys[j]]
+	})
+
+	return ys
 }
 
 // Key a string with prefix text.
