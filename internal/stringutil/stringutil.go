@@ -20,25 +20,24 @@ import (
 	"unicode/utf8"
 )
 
+// Backpermute a data slice based on a slice of index values.
+// Backpermute will return [E E O H L O] for inputs [H E L L O] and [1 1 4 0 2 4]
+// Backpermute will return an error if the transform function returns any invalid string index values.
+func Backpermute[T any](xs []T, by []int) ([]T, error) {
+	var ys []T
+	for _, i := range by {
+		if i < 0 || i >= len(xs) {
+			return nil, fmt.Errorf("slice index %d out of range [0, %d)", i, len(xs))
+		}
+		ys = append(ys, xs[i])
+	}
+	return ys, nil
+}
+
 // Key a string with prefix text.
 // TODO: rename Prefix? or something to allow semantically for suffix counterpart?
 func Key(s string, k string) string {
 	return Deduplicate(k + s)
-}
-
-// Backpermute a string based on a slice of index values.
-// Backpermute will return [E E O H L O] for inputs [H E L L O] and [1 1 4 0 2 4]
-// Backpermute will return an error if the transform function returns any invalid string index values.
-func Backpermute(s string, ii []int) (string, error) {
-	var b strings.Builder
-	rr := []rune(s)
-	for _, i := range ii {
-		if i < 0 || i >= len(rr) {
-			return "", fmt.Errorf("Index %d out of bounds of interval [0, %d)", i, len(rr))
-		}
-		b.WriteRune(rr[i])
-	}
-	return b.String(), nil
 }
 
 // Deduplicate removes recurrences for runes from a string, preserving order of first appearance.

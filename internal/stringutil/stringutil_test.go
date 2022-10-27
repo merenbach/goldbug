@@ -17,7 +17,30 @@ package stringutil
 import (
 	"reflect"
 	"testing"
+
+	"github.com/merenbach/goldbug/internal/fixture"
 )
+
+func TestBackpermute(t *testing.T) {
+	var tables []struct {
+		Input   []rune
+		Output  []rune
+		Indices []int
+		Success bool
+	}
+
+	fixture.Load(t, &tables)
+	for i, table := range tables {
+		t.Logf("Testing table %d of %d", i+1, len(tables))
+		if out, err := Backpermute(table.Input, table.Indices); err != nil && table.Success {
+			t.Error("Unexpected backpermute failure:", err)
+		} else if err == nil && !table.Success {
+			t.Error("Unexpected backpermute success")
+		} else if reflect.DeepEqual(out, table.Output) {
+			t.Error("Received incorrect output:", out)
+		}
+	}
+}
 
 func TestDeduplicate(t *testing.T) {
 	table := map[string]string{
