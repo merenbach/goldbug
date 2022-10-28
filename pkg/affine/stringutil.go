@@ -16,7 +16,7 @@ package affine
 
 import (
 	"errors"
-	"log"
+	"fmt"
 	"unicode/utf8"
 
 	"github.com/merenbach/goldbug/internal/mathutil"
@@ -52,14 +52,12 @@ func transform(s string, slope int, intercept int) (string, error) {
 
 	positions, err := lcg.Slice(m)
 	if err != nil {
-		log.Println("Couldn't initialize LCG")
-		return "", err
+		return "", fmt.Errorf("couldn't initialize LCG: %w", err)
 	}
 
 	out, err := sliceutil.Backpermute([]rune(s), positions)
 	if err != nil {
-		log.Println("Couldn't backpermute input")
-		return "", err
+		return "", fmt.Errorf("couldn't backpermute input: %w", err)
 	}
 
 	return string(out), nil
