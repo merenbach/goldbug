@@ -15,39 +15,80 @@
 package atbash
 
 import (
+	"fmt"
+
 	"github.com/merenbach/goldbug/internal/masc"
+	"github.com/merenbach/goldbug/internal/translation"
 	"github.com/merenbach/goldbug/pkg/affine"
 )
 
-// Cipher implements an Atbash cipher.
-type Cipher struct {
-	Alphabet string
-	Caseless bool
-	Strict   bool
+// adapted from: https://www.sohamkamani.com/golang/options-pattern/
+
+type CipherOption func(*Cipher)
+
+func WithStrict() CipherOption {
+	return func(c *Cipher) {
+		c.strict = true
+	}
 }
 
-func (c *Cipher) maketableau() *affine.Cipher {
-	const slope, intercept = (-1), (-1)
-	return &affine.Cipher{
-		Alphabet:  c.Alphabet,
-		Caseless:  c.Caseless,
-		Intercept: intercept,
-		Slope:     slope,
-		Strict:    c.Strict,
+func WithCaseless() CipherOption {
+	return func(c *Cipher) {
+		c.caseless = true
 	}
+}
+
+func WithAlphabet(alphabet string) CipherOption {
+	return func(c *Cipher) {
+		c.alphabet = alphabet
+	}
+}
+
+func NewCipher(opts ...CipherOption) (*Cipher, err) {
+	c := &Cipher{alphabet: masc.Alphabet}
+	for _, opt := range opts {
+		opt(c)
+	}
+
+	ctAlphabet, err := affine.Transform(c.Alphabet, (-1), (-1))
+	if err != nil {
+		return nil, fmt.Errorf("could not transform alphabet: %w", err)
+	}
+
+	c.pt2ct, err := translation.NewTable(c.Alphabet, ctAlphabet, "")
+	if err != nil {
+		return nil, fmt.Errorf("could not create pt2ct table: %w", err)
+	}
+
+	c.ct2pt,err := translation.NewTable(ctAlphabet, c.Alphabet, "")
+	if err != nil {
+		return nil, fmt.Errorf("could not create ct2pt table: %w", err)
+	}
+
+	return c, nil
+}
+
+// Cipher implements an Atbash cipher.
+type Cipher struct {
+	alphabet string
+	caseless bool
+	strict   bool
+
+	pt2ct translation.Table
+	ct2pt translation.Table
 }
 
 // Encipher a message.
 func (c *Cipher) Encipher(s string) (string, error) {
-	return c.maketableau().Encipher(s)
+	return c.pt2ct.Encipher(s)
 }
 
 // Decipher a message.
 func (c *Cipher) Decipher(s string) (string, error) {
-	return c.maketableau().Decipher(s)
+	return c.ct2pt().Decipher(s)
 }
 
 // Tableau for encipherment and decipherment.
-func (c *Cipher) Tableau() (*masc.Tableau, error) {
-	return c.maketableau().Tableau()
-}
+// func (c *Cipher) Tableau() (*masc.Tableau, error) {
+// 	return c.maketableau().Tableau()
+// }

@@ -37,7 +37,7 @@ func (c *Cipher) maketableau() (*masc.Tableau, error) {
 		Caseless: c.Caseless,
 	}
 	t, err := masc.NewTableau(config, c.CtAlphabet, func(s string) (string, error) {
-		out, err := transform([]rune(s), c.Slope, c.Intercept)
+		out, err := Transform([]rune(s), c.Slope, c.Intercept)
 		if err != nil {
 			return "", err
 		}

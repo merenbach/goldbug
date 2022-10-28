@@ -24,7 +24,7 @@ import (
 )
 
 // Transform a slice according to an affine equation.
-func transform[T any](xs []T, slope int, intercept int) ([]T, error) {
+func Transform[T any](xs []T, slope int, intercept int) ([]T, error) {
 	m := len(xs)
 
 	if m == 0 {
