@@ -17,20 +17,19 @@ package affine
 import (
 	"errors"
 	"fmt"
-	"unicode/utf8"
 
 	"github.com/merenbach/goldbug/internal/mathutil"
 	"github.com/merenbach/goldbug/internal/prng"
 	"github.com/merenbach/goldbug/internal/sliceutil"
 )
 
-// Transform a string according to an affine equation.
-func transform(s string, slope int, intercept int) (string, error) {
-	if s == "" {
-		return "", nil
-	}
+// Transform a slice according to an affine equation.
+func transform[T any](xs []T, slope int, intercept int) ([]T, error) {
+	m := len(xs)
 
-	m := utf8.RuneCountInString(s)
+	if m == 0 {
+		return xs, nil
+	}
 
 	for slope < 0 {
 		slope += m
@@ -40,7 +39,7 @@ func transform(s string, slope int, intercept int) (string, error) {
 	}
 
 	if !mathutil.Coprime(m, slope) {
-		return "", errors.New("slope and string length must be coprime")
+		return nil, errors.New("slope and string length must be coprime")
 	}
 
 	lcg := &prng.LCG{
@@ -52,13 +51,13 @@ func transform(s string, slope int, intercept int) (string, error) {
 
 	positions, err := lcg.Slice(m)
 	if err != nil {
-		return "", fmt.Errorf("couldn't initialize LCG: %w", err)
+		return nil, fmt.Errorf("couldn't initialize LCG: %w", err)
 	}
 
-	out, err := sliceutil.Backpermute([]rune(s), positions)
+	ys, err := sliceutil.Backpermute(xs, positions)
 	if err != nil {
-		return "", fmt.Errorf("couldn't backpermute input: %w", err)
+		return nil, fmt.Errorf("couldn't backpermute input: %w", err)
 	}
 
-	return string(out), nil
+	return ys, nil
 }

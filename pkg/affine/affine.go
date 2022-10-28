@@ -15,7 +15,7 @@
 package affine
 
 import (
-	"log"
+	"fmt"
 
 	"github.com/merenbach/goldbug/internal/masc"
 )
@@ -37,7 +37,11 @@ func (c *Cipher) maketableau() (*masc.Tableau, error) {
 		Caseless: c.Caseless,
 	}
 	t, err := masc.NewTableau(config, c.CtAlphabet, func(s string) (string, error) {
-		return transform(s, c.Slope, c.Intercept)
+		out, err := transform([]rune(s), c.Slope, c.Intercept)
+		if err != nil {
+			return "", err
+		}
+		return string(out), nil
 	})
 	if err != nil {
 		return nil, err
@@ -49,8 +53,7 @@ func (c *Cipher) maketableau() (*masc.Tableau, error) {
 func (c *Cipher) Encipher(s string) (string, error) {
 	t, err := c.maketableau()
 	if err != nil {
-		log.Println("Could not calculate alphabets")
-		return "", err
+		return "", fmt.Errorf("could not calculate encipherment alphabets: %w", err)
 	}
 	return t.Encipher(s)
 }
@@ -59,8 +62,7 @@ func (c *Cipher) Encipher(s string) (string, error) {
 func (c *Cipher) Decipher(s string) (string, error) {
 	t, err := c.maketableau()
 	if err != nil {
-		log.Println("Could not calculate alphabets")
-		return "", err
+		return "", fmt.Errorf("could not calculate decipherment alphabets: %w", err)
 	}
 	return t.Decipher(s)
 }
