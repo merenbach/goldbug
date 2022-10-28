@@ -95,3 +95,8 @@ func (c *Cipher) Decipher(s string) (string, error) {
 // func (c *Cipher) Tableau() (*masc.Tableau, error) {
 // 	return c.maketableau().Tableau()
 // }
+
+func (c *Cipher) Tableau() string {
+	ctAlphabet, _ := c.Encipher(c.alphabet)
+	return fmt.Sprintf("PT: %s\nCT: %s", c.alphabet, ctAlphabet)
+}
