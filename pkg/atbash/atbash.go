@@ -19,7 +19,6 @@ import (
 
 	"github.com/merenbach/goldbug/internal/masc"
 	"github.com/merenbach/goldbug/internal/translation"
-	"github.com/merenbach/goldbug/pkg/affine"
 )
 
 // adapted from: https://www.sohamkamani.com/golang/options-pattern/
@@ -50,7 +49,7 @@ func NewCipher(opts ...CipherOption) (*Cipher, error) {
 		opt(c)
 	}
 
-	ctAlphabet, err := affine.Transform([]rune(c.alphabet), (-1), (-1))
+	ctAlphabet, err := Transform([]rune(c.alphabet))
 	if err != nil {
 		return nil, fmt.Errorf("could not transform alphabet: %w", err)
 	}

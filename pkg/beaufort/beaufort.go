@@ -15,7 +15,8 @@
 package beaufort
 
 import (
-	"github.com/merenbach/goldbug/internal/masc"
+	"fmt"
+
 	"github.com/merenbach/goldbug/internal/pasc"
 	"github.com/merenbach/goldbug/pkg/affine"
 )
@@ -30,15 +31,22 @@ type Cipher struct {
 }
 
 func (c *Cipher) maketableau() (*pasc.TabulaRecta, error) {
-	tr, err := pasc.NewTabulaRecta(c.Alphabet, "", func(s string, i int) (*masc.Tableau, error) {
-		c2 := &affine.Cipher{
-			Alphabet:  s,
-			Caseless:  c.Caseless,
-			Slope:     (-1),
-			Intercept: i,
-			Strict:    c.Strict,
+	tr, err := pasc.NewTabulaRecta(c.Alphabet, "", func(s string, i int) (*affine.Cipher, error) {
+		params := []affine.CipherOption{
+			affine.WithAlphabet(s),
+			affine.WithSlope(-1),
+			affine.WithIntercept(i),
 		}
-		return c2.Tableau()
+		if c.Caseless {
+			params = append(params, affine.WithCaseless())
+		}
+		if c.Strict {
+			params = append(params, affine.WithStrict())
+		}
+		c2, err := &affine.NewCipher(params...)
+		if err != nil {
+			return nil, fmt.Errorf("could not create cipher: %w", err)
+		}
 	})
 	if err != nil {
 		return nil, err
