@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package decimation
+package rot13
 
-import "github.com/merenbach/goldbug/pkg/affine"
+import "github.com/merenbach/goldbug/pkg/caesar"
 
-// Transform a slice according to a decimation-specific affine equation.
-func Transform[T any](xs []T, slope int) ([]T, error) {
-	const intercept = 0
-	return affine.Transform(xs, slope, intercept)
+// Transform a slice according to a ROT13-specific affine equation.
+func Transform[T any](xs []T) ([]T, error) {
+	const intercept = 13
+	return caesar.Transform(xs, intercept)
 }

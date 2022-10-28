@@ -12,12 +12,4 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package decimation
-
-import "github.com/merenbach/goldbug/pkg/affine"
-
-// Transform a slice according to a decimation-specific affine equation.
-func Transform[T any](xs []T, slope int) ([]T, error) {
-	const intercept = 0
-	return affine.Transform(xs, slope, intercept)
-}
+package rot13

@@ -15,37 +15,94 @@
 package rot13
 
 import (
+	"fmt"
+
 	"github.com/merenbach/goldbug/internal/masc"
-	"github.com/merenbach/goldbug/pkg/caesar"
+	"github.com/merenbach/goldbug/internal/translation"
 )
 
-// Cipher implements a ROT13 cipher.
-type Cipher struct {
-	Caseless bool
-	Strict   bool
+// adapted from: https://www.sohamkamani.com/golang/options-pattern/
+
+type CipherOption func(*Cipher)
+
+func WithStrict() CipherOption {
+	return func(c *Cipher) {
+		c.strict = true
+	}
 }
 
-func (c *Cipher) maketableau() *caesar.Cipher {
-	const shift = 13
-	return &caesar.Cipher{
-		Alphabet: "",
-		Caseless: c.Caseless,
-		Shift:    shift,
-		Strict:   c.Strict,
+func WithCaseless() CipherOption {
+	return func(c *Cipher) {
+		c.caseless = true
 	}
+}
+
+func WithAlphabet(s string) CipherOption {
+	return func(c *Cipher) {
+		c.alphabet = s
+	}
+}
+
+func WithKeyword(s string) CipherOption {
+	return func(c *Cipher) {
+		c.keyword = s
+	}
+}
+
+func NewCipher(opts ...CipherOption) (*Cipher, error) {
+	c := &Cipher{alphabet: masc.Alphabet}
+	for _, opt := range opts {
+		opt(c)
+	}
+
+	ctAlphabet, err := Transform([]rune(c.alphabet))
+	if err != nil {
+		return nil, fmt.Errorf("could not transform alphabet: %w", err)
+	}
+
+	pt2ct, err := translation.NewTable(c.alphabet, string(ctAlphabet), "")
+	if err != nil {
+		return nil, fmt.Errorf("could not create pt2ct table: %w", err)
+	}
+
+	ct2pt, err := translation.NewTable(string(ctAlphabet), c.alphabet, "")
+	if err != nil {
+		return nil, fmt.Errorf("could not create ct2pt table: %w", err)
+	}
+
+	c.pt2ct = pt2ct
+	c.ct2pt = ct2pt
+
+	return c, nil
+}
+
+// Cipher implements an Atbash cipher.
+type Cipher struct {
+	alphabet string
+	caseless bool
+	strict   bool
+	keyword  string
+
+	pt2ct translation.Table
+	ct2pt translation.Table
 }
 
 // Encipher a message.
 func (c *Cipher) Encipher(s string) (string, error) {
-	return c.maketableau().Encipher(s)
+	return c.pt2ct.Map(s, c.strict, c.caseless), nil
 }
 
 // Decipher a message.
 func (c *Cipher) Decipher(s string) (string, error) {
-	return c.maketableau().Decipher(s)
+	return c.ct2pt.Map(s, c.strict, c.caseless), nil
 }
 
 // Tableau for encipherment and decipherment.
-func (c *Cipher) Tableau() (*masc.Tableau, error) {
-	return c.maketableau().Tableau()
+// func (c *Cipher) Tableau() (*masc.Tableau, error) {
+// 	return c.maketableau().Tableau()
+// }
+
+func (c *Cipher) Tableau() string {
+	ctAlphabet, _ := c.Encipher(c.alphabet)
+	return fmt.Sprintf("PT: %s\nCT: %s", c.alphabet, ctAlphabet)
 }
