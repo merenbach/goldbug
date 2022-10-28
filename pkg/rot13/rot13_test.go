@@ -89,13 +89,11 @@ func TestCipher_Decipher(t *testing.T) {
 }
 
 func ExampleCipher_Tableau() {
-	c, err := NewCipher(WithKeyword("CIPHER"))
+	c, err := NewCipher()
 	if err != nil {
 		fmt.Println("Error:", err)
 	}
-
-	out := c.Tableau()
-	fmt.Println(out)
+	fmt.Println(c)
 
 	// Output:
 	// PT: ABCDEFGHIJKLMNOPQRSTUVWXYZ

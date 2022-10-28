@@ -29,7 +29,6 @@ type Tableau struct {
 	ctAlphabet string
 	strict     bool
 	caseless   bool
-	transform  func(string) (string, error)
 
 	pt2ct translation.Table
 	ct2pt translation.Table
@@ -67,12 +66,6 @@ func WithCtAlphabet(s string) TableauOption {
 	}
 }
 
-func WithTransform(f func(string) (string, error)) TableauOption {
-	return func(c *Tableau) {
-		c.transform = f
-	}
-}
-
 func NewTableau(opts ...TableauOption) (*Tableau, error) {
 	t := &Tableau{
 		ptAlphabet: Alphabet,
@@ -82,21 +75,12 @@ func NewTableau(opts ...TableauOption) (*Tableau, error) {
 		opt(t)
 	}
 
-	ctAlphabetTransformed := t.ctAlphabet
-	if t.transform != nil {
-		ctAlphabet2, err := t.transform(t.ctAlphabet)
-		if err != nil {
-			return nil, fmt.Errorf("could not transform alphabet: %w", err)
-		}
-		ctAlphabetTransformed = ctAlphabet2
-	}
-
-	pt2ct, err := translation.NewTable(t.ptAlphabet, ctAlphabetTransformed, "")
+	pt2ct, err := translation.NewTable(t.ptAlphabet, t.ctAlphabet, "")
 	if err != nil {
 		return nil, fmt.Errorf("could not generate pt2ct table: %w", err)
 	}
 
-	ct2pt, err := translation.NewTable(ctAlphabetTransformed, t.ptAlphabet, "")
+	ct2pt, err := translation.NewTable(t.ctAlphabet, t.ptAlphabet, "")
 	if err != nil {
 		return nil, fmt.Errorf("could not generate ct2pt table: %w", err)
 	}

@@ -18,8 +18,17 @@ import (
 	"fmt"
 
 	"github.com/merenbach/goldbug/internal/masc"
-	"github.com/merenbach/goldbug/internal/translation"
 )
+
+// A Cipher implements a decimation cipher.
+type Cipher struct {
+	alphabet   string
+	caseless   bool
+	strict     bool
+	multiplier int
+
+	*masc.Tableau
+}
 
 // adapted from: https://www.sohamkamani.com/golang/options-pattern/
 
@@ -60,49 +69,16 @@ func NewCipher(opts ...CipherOption) (*Cipher, error) {
 		return nil, fmt.Errorf("could not transform alphabet: %w", err)
 	}
 
-	pt2ct, err := translation.NewTable(c.alphabet, string(ctAlphabet), "")
+	tableau, err := masc.NewTableau(
+		masc.WithPtAlphabet(c.alphabet),
+		masc.WithCtAlphabet(string(ctAlphabet)),
+		masc.WithStrict(c.strict),
+		masc.WithCaseless(c.caseless),
+	)
 	if err != nil {
-		return nil, fmt.Errorf("could not create pt2ct table: %w", err)
+		return nil, fmt.Errorf("could not create tableau: %w", err)
 	}
-
-	ct2pt, err := translation.NewTable(string(ctAlphabet), c.alphabet, "")
-	if err != nil {
-		return nil, fmt.Errorf("could not create ct2pt table: %w", err)
-	}
-
-	c.pt2ct = pt2ct
-	c.ct2pt = ct2pt
+	c.Tableau = tableau
 
 	return c, nil
-}
-
-// Cipher implements a decimation cipher.
-type Cipher struct {
-	alphabet   string
-	caseless   bool
-	strict     bool
-	multiplier int
-
-	pt2ct translation.Table
-	ct2pt translation.Table
-}
-
-// Encipher a message.
-func (c *Cipher) Encipher(s string) (string, error) {
-	return c.pt2ct.Map(s, c.strict, c.caseless), nil
-}
-
-// Decipher a message.
-func (c *Cipher) Decipher(s string) (string, error) {
-	return c.ct2pt.Map(s, c.strict, c.caseless), nil
-}
-
-// Tableau for encipherment and decipherment.
-// func (c *Cipher) Tableau() (*masc.Tableau, error) {
-// 	return c.maketableau().Tableau()
-// }
-
-func (c *Cipher) Tableau() string {
-	ctAlphabet, _ := c.Encipher(c.alphabet)
-	return fmt.Sprintf("PT: %s\nCT: %s", c.alphabet, ctAlphabet)
 }

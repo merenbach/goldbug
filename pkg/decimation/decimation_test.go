@@ -104,9 +104,7 @@ func ExampleCipher_Tableau() {
 	if err != nil {
 		fmt.Println("Error:", err)
 	}
-
-	out := c.Tableau()
-	fmt.Println(out)
+	fmt.Println(c)
 
 	// Output:
 	// PT: ABCDEFGHIJKLMNOPQRSTUVWXYZ
