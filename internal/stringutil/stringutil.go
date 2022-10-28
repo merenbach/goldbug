@@ -53,7 +53,7 @@ func Argsort[T constraints.Ordered](xs []T) []int {
 		ys[i] = i
 	}
 
-	sort.Slice(ys, func(i int, j int) bool {
+	sort.SliceStable(ys, func(i int, j int) bool {
 		return xs[ys[i]] < xs[ys[j]]
 	})
 
