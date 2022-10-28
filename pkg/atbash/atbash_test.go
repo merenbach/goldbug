@@ -23,7 +23,9 @@ import (
 
 func TestCipher_Encipher(t *testing.T) {
 	var tables []struct {
-		Cipher
+		Alphabet string
+		Caseless bool
+		Strict   bool
 
 		Input  string
 		Output string

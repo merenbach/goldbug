@@ -31,18 +31,18 @@ type Cipher struct {
 }
 
 func (c *Cipher) maketableau() (*masc.Tableau, error) {
-	config := &masc.Configuration{
-		Alphabet: c.Alphabet,
-		Strict:   c.Strict,
-		Caseless: c.Caseless,
-	}
-	t, err := masc.NewTableau(config, c.CtAlphabet, func(s string) (string, error) {
-		out, err := Transform([]rune(s), c.Slope, c.Intercept)
-		if err != nil {
-			return "", err
-		}
-		return string(out), nil
-	})
+	t, err := masc.NewTableau(
+		masc.WithPtAlphabet(c.Alphabet),
+		masc.WithStrict(c.Strict),
+		masc.WithCaseless(c.Caseless),
+		masc.WithTransform(func(s string) (string, error) {
+			out, err := Transform([]rune(s), c.Slope, c.Intercept)
+			if err != nil {
+				return "", err
+			}
+			return string(out), nil
+		}),
+	)
 	if err != nil {
 		return nil, err
 	}

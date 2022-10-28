@@ -44,26 +44,29 @@ func WithAlphabet(alphabet string) CipherOption {
 	}
 }
 
-func NewCipher(opts ...CipherOption) (*Cipher, err) {
+func NewCipher(opts ...CipherOption) (*Cipher, error) {
 	c := &Cipher{alphabet: masc.Alphabet}
 	for _, opt := range opts {
 		opt(c)
 	}
 
-	ctAlphabet, err := affine.Transform(c.Alphabet, (-1), (-1))
+	ctAlphabet, err := affine.Transform([]rune(c.alphabet), (-1), (-1))
 	if err != nil {
 		return nil, fmt.Errorf("could not transform alphabet: %w", err)
 	}
 
-	c.pt2ct, err := translation.NewTable(c.Alphabet, ctAlphabet, "")
+	pt2ct, err := translation.NewTable(c.alphabet, string(ctAlphabet), "")
 	if err != nil {
 		return nil, fmt.Errorf("could not create pt2ct table: %w", err)
 	}
 
-	c.ct2pt,err := translation.NewTable(ctAlphabet, c.Alphabet, "")
+	ct2pt, err := translation.NewTable(string(ctAlphabet), c.alphabet, "")
 	if err != nil {
 		return nil, fmt.Errorf("could not create ct2pt table: %w", err)
 	}
+
+	c.pt2ct = pt2ct
+	c.ct2pt = ct2pt
 
 	return c, nil
 }
@@ -80,12 +83,12 @@ type Cipher struct {
 
 // Encipher a message.
 func (c *Cipher) Encipher(s string) (string, error) {
-	return c.pt2ct.Encipher(s)
+	return c.pt2ct.Map(s, c.strict, c.caseless), nil
 }
 
 // Decipher a message.
 func (c *Cipher) Decipher(s string) (string, error) {
-	return c.ct2pt().Decipher(s)
+	return c.ct2pt.Map(s, c.strict, c.caseless), nil
 }
 
 // Tableau for encipherment and decipherment.

@@ -33,12 +33,15 @@ func TestTableau_Encipher(t *testing.T) {
 
 	fixture.Load(t, &tables)
 	for _, table := range tables {
-		tableau, err := NewTableau(&Configuration{Alphabet: table.PtAlphabet}, table.CtAlphabet, nil)
+		tableau, err := NewTableau(
+			WithPtAlphabet(table.PtAlphabet),
+			WithCtAlphabet(table.CtAlphabet),
+			WithStrict(table.Strict),
+			WithCaseless(table.Caseless),
+		)
 		if err != nil {
 			t.Error("Error:", err)
 		}
-		tableau.Caseless = table.Caseless
-		tableau.Strict = table.Strict
 
 		if out, err := tableau.Encipher(table.Input); err != nil {
 			t.Error("Could not encipher:", err)
@@ -61,12 +64,15 @@ func TestTableau_Decipher(t *testing.T) {
 
 	fixture.Load(t, &tables)
 	for _, table := range tables {
-		tableau, err := NewTableau(&Configuration{Alphabet: table.PtAlphabet}, table.CtAlphabet, nil)
+		tableau, err := NewTableau(
+			WithPtAlphabet(table.PtAlphabet),
+			WithCtAlphabet(table.CtAlphabet),
+			WithStrict(table.Strict),
+			WithCaseless(table.Caseless),
+		)
 		if err != nil {
 			t.Error("Error:", err)
 		}
-		tableau.Caseless = table.Caseless
-		tableau.Strict = table.Strict
 
 		if out, err := tableau.Decipher(table.Input); err != nil {
 			t.Error("Could not decipher:", err)

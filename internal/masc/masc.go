@@ -23,81 +23,111 @@ import (
 // Alphabet to use by default for substitution ciphers
 const Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-// A Configuration for a tableau.
-type Configuration struct {
-	Alphabet string
-
-	Strict   bool
-	Caseless bool
-}
-
 // A Tableau holds a translation table.
 type Tableau struct {
-	*Configuration
+	ptAlphabet string
+	ctAlphabet string
+	strict     bool
+	caseless   bool
+	transform  func(string) (string, error)
 
 	pt2ct translation.Table
 	ct2pt translation.Table
 }
 
-// NewTableau creates a new tableau.
-func NewTableau(config *Configuration, ctAlphabet string, f func(string) (string, error)) (*Tableau, error) {
-	if config.Alphabet == "" {
-		config.Alphabet = Alphabet
-	}
+// adapted from: https://www.sohamkamani.com/golang/options-pattern/
 
-	if ctAlphabet == "" {
-		ctAlphabet = config.Alphabet
-	}
+type TableauOption func(*Tableau)
 
-	ctAlphabetTransformed := ctAlphabet
-	if f != nil {
-		// Allow overrides to ctAlphabet mapping
-		var err error
-		ctAlphabetTransformed, err = f(ctAlphabet)
-		if err != nil {
-			return nil, err
+func WithStrict(b bool) TableauOption {
+	return func(c *Tableau) {
+		c.strict = b
+	}
+}
+
+func WithCaseless(b bool) TableauOption {
+	return func(c *Tableau) {
+		c.caseless = b
+	}
+}
+
+func WithPtAlphabet(s string) TableauOption {
+	return func(c *Tableau) {
+		if s != "" {
+			c.ptAlphabet = s
 		}
 	}
+}
 
-	pt2ct, err := translation.NewTable(config.Alphabet, ctAlphabetTransformed, "")
-	if err != nil {
-		return nil, err
+func WithCtAlphabet(s string) TableauOption {
+	return func(c *Tableau) {
+		if s != "" {
+			c.ctAlphabet = s
+		}
 	}
+}
 
-	ct2pt, err := translation.NewTable(ctAlphabetTransformed, config.Alphabet, "")
-	if err != nil {
-		return nil, err
+func WithTransform(f func(string) (string, error)) TableauOption {
+	return func(c *Tableau) {
+		c.transform = f
 	}
+}
 
+func NewTableau(opts ...TableauOption) (*Tableau, error) {
 	t := &Tableau{
-		Configuration: config,
-		pt2ct:         pt2ct,
-		ct2pt:         ct2pt,
+		ptAlphabet: Alphabet,
+		ctAlphabet: Alphabet,
 	}
+	for _, opt := range opts {
+		opt(t)
+	}
+
+	ctAlphabetTransformed := t.ctAlphabet
+	if t.transform != nil {
+		ctAlphabet2, err := t.transform(t.ctAlphabet)
+		if err != nil {
+			return nil, fmt.Errorf("could not transform alphabet: %w", err)
+		}
+		ctAlphabetTransformed = ctAlphabet2
+	}
+
+	pt2ct, err := translation.NewTable(t.ptAlphabet, ctAlphabetTransformed, "")
+	if err != nil {
+		return nil, fmt.Errorf("could not generate pt2ct table: %w", err)
+	}
+
+	ct2pt, err := translation.NewTable(ctAlphabetTransformed, t.ptAlphabet, "")
+	if err != nil {
+		return nil, fmt.Errorf("could not generate ct2pt table: %w", err)
+	}
+
+	t.pt2ct = pt2ct
+	t.ct2pt = ct2pt
+
 	return t, nil
 }
 
 // EncipherRune enciphers a rune.
 func (t *Tableau) EncipherRune(r rune) (rune, bool) {
-	return t.pt2ct.Get(r, t.Strict, t.Caseless)
+	return t.pt2ct.Get(r, t.strict, t.caseless)
 }
 
 // DecipherRune deciphers a rune.
 func (t *Tableau) DecipherRune(r rune) (rune, bool) {
-	return t.ct2pt.Get(r, t.Strict, t.Caseless)
+	return t.ct2pt.Get(r, t.strict, t.caseless)
 }
 
 // Encipher a string.
 func (t *Tableau) Encipher(s string) (string, error) {
-	return t.pt2ct.Map(s, t.Strict, t.Caseless), nil
+	return t.pt2ct.Map(s, t.strict, t.caseless), nil
 }
 
 // Decipher a string.
 func (t *Tableau) Decipher(s string) (string, error) {
-	return t.ct2pt.Map(s, t.Strict, t.Caseless), nil
+	return t.ct2pt.Map(s, t.strict, t.caseless), nil
 }
 
 func (t *Tableau) String() string {
-	ctAlphabet := t.pt2ct.Map(t.Alphabet, t.Strict, t.Caseless)
-	return fmt.Sprintf("PT: %s\nCT: %s", t.Alphabet, ctAlphabet)
+	ctAlphabet, _ := t.Encipher(t.ptAlphabet)
+	return fmt.Sprintf("PT: %s\nCT: %s", t.ptAlphabet, ctAlphabet)
 }
