@@ -21,7 +21,7 @@ import (
 
 	"github.com/merenbach/goldbug/internal/mathutil"
 	"github.com/merenbach/goldbug/internal/prng"
-	"github.com/merenbach/goldbug/internal/stringutil"
+	"github.com/merenbach/goldbug/internal/sliceutil"
 )
 
 // Transform a string according to an affine equation.
@@ -56,7 +56,7 @@ func transform(s string, slope int, intercept int) (string, error) {
 		return "", err
 	}
 
-	out, err := stringutil.Backpermute([]rune(s), positions)
+	out, err := sliceutil.Backpermute([]rune(s), positions)
 	if err != nil {
 		log.Println("Couldn't backpermute input")
 		return "", err
