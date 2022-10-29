@@ -42,18 +42,25 @@ func TestTabulaRecta(t *testing.T) {
 	}
 
 	for _, table := range tables {
-		tr, err := NewTabulaRecta(table.ptAlphabet, table.ctAlphabet, func(s string, i int) (*masc.Tableau, error) {
-			c := caesar.Cipher{
-				Alphabet: s,
-				Shift:    i,
-			}
-			return c.Tableau()
-		})
+		tr, err := NewTabulaRecta(
+			WithPtAlphabet(table.ptAlphabet),
+			WithDictFunc(func(s string, i int) (*masc.Tableau, error) {
+				c, err := caesar.NewCipher(
+					caesar.WithAlphabet(s),
+					caesar.WithShift(i),
+				)
+				if err != nil {
+					t.Error("could not create cipher:", err)
+				}
+				return c.Tableau, nil
+			}),
+			WithKey(table.keyRune),
+		)
 		if err != nil {
 			t.Error("Could not create tabula recta:", err)
 		}
 
-		dst, err := tr.Encipher(table.srcRune, table.keyRune, nil)
+		dst, err := tr.Encipher(table.srcRune)
 		if err != nil {
 			t.Errorf("Expected encipherment key rune %s to be in key alphabet, but it was not", table.keyRune)
 		}
@@ -61,7 +68,7 @@ func TestTabulaRecta(t *testing.T) {
 			t.Errorf("Expected E(p=%s,k=%s)=%s but got %s instead", table.srcRune, table.keyRune, table.dstRune, dst)
 		}
 
-		src, err := tr.Decipher(dst, table.keyRune, nil)
+		src, err := tr.Decipher(dst)
 		if err != nil {
 			t.Errorf("Expected decipherment key rune %s to be in key alphabet, but it was not", table.keyRune)
 		}

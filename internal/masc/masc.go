@@ -52,17 +52,13 @@ func WithCaseless(b bool) TableauOption {
 
 func WithPtAlphabet(s string) TableauOption {
 	return func(c *Tableau) {
-		if s != "" {
-			c.ptAlphabet = s
-		}
+		c.ptAlphabet = s
 	}
 }
 
 func WithCtAlphabet(s string) TableauOption {
 	return func(c *Tableau) {
-		if s != "" {
-			c.ctAlphabet = s
-		}
+		c.ctAlphabet = s
 	}
 }
 

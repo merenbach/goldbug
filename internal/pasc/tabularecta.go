@@ -24,36 +24,106 @@ import (
 	"github.com/merenbach/goldbug/internal/masc"
 )
 
-// TabulaRecta holds a tabula recta.
-type TabulaRecta struct {
-	Caseless bool
-
-	PtAlphabet  string
-	CtAlphabet  string
-	KeyAlphabet string
-
-	dictFunc func(s string, i int) (*masc.Tableau, error)
+// A Cipher tranforms strings through encipherment and decipherment.
+type MyCipher interface {
+	Encipher(string) (string, error)
+	Decipher(string) (string, error)
 }
 
-// NewTabulaRecta creates a new tabula recta from multiple invocations of a MASC tableau generation function.
-// NewTabulaRecta is the canonical method to generate a typical tabula recta.
-func NewTabulaRecta(ptAlphabet string, keyAlphabet string, f func(s string, i int) (*masc.Tableau, error)) (*TabulaRecta, error) {
-	if ptAlphabet == "" {
-		ptAlphabet = Alphabet
+// TabulaRecta holds a tabula recta.
+type TabulaRecta struct {
+	caseless bool
+
+	ptAlphabet string
+	// CtAlphabet  string
+	keyAlphabet string
+
+	key string
+
+	dictFunc    func(s string, i int) (*masc.Tableau, error)
+	autokeyFunc func(rune, rune, *[]rune)
+
+	tableau map[rune]*masc.Tableau
+}
+
+// adapted from: https://www.sohamkamani.com/golang/options-pattern/
+
+type TabulaRectaOption func(*TabulaRecta)
+
+// func WithStrict(b bool) TabulaRectaOption {
+// 	return func(c *TabulaRecta) {
+// 		c.strict = b
+// 	}
+// }
+
+func WithCaseless(b bool) TabulaRectaOption {
+	return func(c *TabulaRecta) {
+		c.caseless = b
+	}
+}
+
+func WithPtAlphabet(s string) TabulaRectaOption {
+	return func(c *TabulaRecta) {
+		c.ptAlphabet = s
+	}
+}
+
+// func WithCtAlphabet(s string) TableauOption {
+// 	return func(c *TabulaRecta) {
+// 		if s != "" {
+// 			c.ctAlphabet = s
+// 		}
+// 	}
+// }
+
+func WithKeyAlphabet(s string) TabulaRectaOption {
+	return func(c *TabulaRecta) {
+		c.keyAlphabet = s
+	}
+}
+
+func WithKey(s string) TabulaRectaOption {
+	return func(c *TabulaRecta) {
+		c.key = s
+	}
+}
+
+func WithDictFunc(f func(s string, i int) (*masc.Tableau, error)) TabulaRectaOption {
+	return func(c *TabulaRecta) {
+		c.dictFunc = f
+	}
+}
+
+func WithAutokeyFunc(f func(rune, rune, *[]rune)) TabulaRectaOption {
+	return func(c *TabulaRecta) {
+		c.autokeyFunc = f
+	}
+}
+
+func NewTabulaRecta(opts ...TabulaRectaOption) (*TabulaRecta, error) {
+	t := &TabulaRecta{
+		ptAlphabet:  Alphabet,
+		keyAlphabet: Alphabet,
+		// ctAlphabet: Alphabet,
+	}
+	for _, opt := range opts {
+		opt(t)
 	}
 
-	t := TabulaRecta{
-		PtAlphabet:  ptAlphabet,
-		KeyAlphabet: keyAlphabet,
-		dictFunc:    f,
+	tableau, err := t.maketableau()
+	if err != nil {
+		return nil, fmt.Errorf("could not create tableau: %w", err)
 	}
-	return &t, nil
+
+	t.tableau = tableau
+
+	return t, nil
 }
 
 func (tr *TabulaRecta) maketableau() (map[rune]*masc.Tableau, error) {
 	f := tr.dictFunc
 
-	ptAlphabet, keyAlphabet := tr.PtAlphabet, tr.KeyAlphabet
+	ptAlphabet, keyAlphabet := tr.ptAlphabet, tr.keyAlphabet
 
 	if keyAlphabet == "" {
 		keyAlphabet = ptAlphabet
@@ -64,7 +134,7 @@ func (tr *TabulaRecta) maketableau() (map[rune]*masc.Tableau, error) {
 	keyRunes := []rune(keyAlphabet)
 
 	if len(keyRunes) != len(keyAlphabet) {
-		return nil, errors.New("Row headers must have same rune length as rows slice")
+		return nil, errors.New("row headers must have same rune length as rows slice")
 	}
 
 	for i, r := range keyRunes {
@@ -80,17 +150,14 @@ func (tr *TabulaRecta) maketableau() (map[rune]*masc.Tableau, error) {
 
 // Printable representation of this tabula recta.
 func (tr *TabulaRecta) Printable() (string, error) {
-	ptAlphabet := tr.PtAlphabet
+	ptAlphabet := tr.ptAlphabet
 
-	keyAlphabet := tr.KeyAlphabet
+	keyAlphabet := tr.keyAlphabet
 	if keyAlphabet == "" {
 		keyAlphabet = ptAlphabet
 	}
 
-	rt, err := tr.maketableau()
-	if err != nil {
-		return "", err
-	}
+	rt := tr.tableau
 
 	var b strings.Builder
 
@@ -102,7 +169,7 @@ func (tr *TabulaRecta) Printable() (string, error) {
 	}
 
 	fmt.Fprintf(w, "\t%s\n", formatForPrinting(ptAlphabet))
-	for _, r := range []rune(keyAlphabet) {
+	for _, r := range keyAlphabet {
 		if tableau, ok := rt[r]; ok {
 			out, err := tableau.Encipher(ptAlphabet)
 			if err != nil {
@@ -150,21 +217,22 @@ func (tr *TabulaRecta) Printable() (string, error) {
 
 // Encipher a string.
 // Encipher will invoke the onSuccess function with before and after runes.
-func (tr *TabulaRecta) Encipher(s string, k string, onSuccess func(rune, rune, *[]rune)) (string, error) {
-	tableau, err := tr.maketableau()
-	if err != nil {
-		return "", err
+func (tr *TabulaRecta) Encipher(s string) (string, error) {
+	if len(tr.key) == 0 {
+		return s, nil
 	}
 
-	keyRunes := []rune(k)
+	tableau := tr.tableau
+
+	keyRunes := []rune(tr.key)
 	var transcodedCharCount = 0
 	return strings.Map(func(r rune) rune {
 		k := keyRunes[transcodedCharCount%len(keyRunes)]
 		m, ok := tableau[k]
-		if !ok && tr.Caseless {
+		if !ok && tr.caseless {
 			m, ok = tableau[unicode.ToUpper(k)]
 		}
-		if !ok && tr.Caseless {
+		if !ok && tr.caseless {
 			m, ok = tableau[unicode.ToLower(k)]
 		}
 		if !ok {
@@ -179,8 +247,8 @@ func (tr *TabulaRecta) Encipher(s string, k string, onSuccess func(rune, rune, *
 		if ok {
 			// Transcoding successful
 			transcodedCharCount++
-			if onSuccess != nil {
-				onSuccess(r, o, &keyRunes)
+			if tr.autokeyFunc != nil {
+				tr.autokeyFunc(r, o, &keyRunes)
 			}
 		}
 		return o
@@ -189,21 +257,22 @@ func (tr *TabulaRecta) Encipher(s string, k string, onSuccess func(rune, rune, *
 
 // Decipher a string.
 // Decipher will invoke the onSuccess function with before and after runes.
-func (tr *TabulaRecta) Decipher(s string, k string, onSuccess func(rune, rune, *[]rune)) (string, error) {
-	tableau, err := tr.maketableau()
-	if err != nil {
-		return "", err
+func (tr *TabulaRecta) Decipher(s string) (string, error) {
+	if len(tr.key) == 0 {
+		return s, nil
 	}
 
-	keyRunes := []rune(k)
+	tableau := tr.tableau
+
+	keyRunes := []rune(tr.key)
 	var transcodedCharCount = 0
 	return strings.Map(func(r rune) rune {
 		k := keyRunes[transcodedCharCount%len(keyRunes)]
 		m, ok := tableau[k]
-		if !ok && tr.Caseless {
+		if !ok && tr.caseless {
 			m, ok = tableau[unicode.ToUpper(k)]
 		}
-		if !ok && tr.Caseless {
+		if !ok && tr.caseless {
 			m, ok = tableau[unicode.ToLower(k)]
 		}
 		if !ok {
@@ -217,8 +286,8 @@ func (tr *TabulaRecta) Decipher(s string, k string, onSuccess func(rune, rune, *
 		if ok {
 			// Transcoding successful
 			transcodedCharCount++
-			if onSuccess != nil {
-				onSuccess(r, o, &keyRunes)
+			if tr.autokeyFunc != nil {
+				tr.autokeyFunc(r, o, &keyRunes)
 			}
 		}
 		return o
