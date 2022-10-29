@@ -15,19 +15,13 @@
 package dellaporta
 
 import (
+	"fmt"
 	"unicode/utf8"
 
 	"github.com/merenbach/goldbug/internal/masc"
 	"github.com/merenbach/goldbug/internal/pasc"
+	"github.com/merenbach/goldbug/pkg/simple"
 )
-
-// Cipher implements a Della Porta cipher.
-type Cipher struct {
-	Alphabet string
-	Caseless bool
-	Key      string
-	Strict   bool
-}
 
 // WrapString wraps a string a specified number of indices.
 // WrapString will error out if the provided offset is negative.
@@ -54,57 +48,91 @@ func owrapString(s string, i int) (string, error) {
 	return wrapString(string(u), i) + wrapString(string(v), len(v)-i), nil
 }
 
-func (c *Cipher) maketableau() (*pasc.TabulaRecta, error) {
-	alphabet := c.Alphabet
-	if alphabet == "" {
-		alphabet = pasc.Alphabet
-	}
+// Cipher implements a Della Porta cipher.
+type Cipher struct {
+	alphabet string
+	caseless bool
+	key      string
+	strict   bool
 
-	tr, err := pasc.NewTabulaRecta(c.Alphabet, "", func(s string, i int) (*masc.Tableau, error) {
-		ctAlphabet2, err := owrapString(s, i/2)
-		if err != nil {
-			return nil, err
-		}
-
-		t, err := masc.NewTableau(&masc.Configuration{Alphabet: alphabet}, ctAlphabet2, nil)
-		if err != nil {
-			return nil, err
-		}
-		t.Strict = c.Strict
-		t.Caseless = c.Caseless
-		return t, nil
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	tr.Caseless = c.Caseless
-	return tr, nil
+	*pasc.TabulaRecta
 }
 
-// Encipher a message.
-func (c *Cipher) Encipher(s string) (string, error) {
-	t, err := c.maketableau()
-	if err != nil {
-		return "", err
+// adapted from: https://www.sohamkamani.com/golang/options-pattern/
+
+type CipherOption func(*Cipher)
+
+func WithStrict() CipherOption {
+	return func(c *Cipher) {
+		c.strict = true
 	}
-	return t.Encipher(s, c.Key, nil)
 }
 
-// Decipher a message.
-func (c *Cipher) Decipher(s string) (string, error) {
-	t, err := c.maketableau()
-	if err != nil {
-		return "", err
+func WithCaseless() CipherOption {
+	return func(c *Cipher) {
+		c.caseless = true
 	}
-	return t.Decipher(s, c.Key, nil)
 }
 
-// Tableau for encipherment and decipherment.
-func (c *Cipher) Tableau() (string, error) {
-	t, err := c.maketableau()
-	if err != nil {
-		return "", err
+func WithAlphabet(s string) CipherOption {
+	return func(c *Cipher) {
+		c.alphabet = s
 	}
-	return t.Printable()
+}
+
+func WithKey(s string) CipherOption {
+	return func(c *Cipher) {
+		c.key = s
+	}
+}
+
+func NewCipher(opts ...CipherOption) (*Cipher, error) {
+	c := &Cipher{alphabet: masc.Alphabet}
+	for _, opt := range opts {
+		opt(c)
+	}
+
+	// ctAlphabet, err := Transform([]rune(c.alphabet))
+	// if err != nil {
+	// 	return nil, fmt.Errorf("could not transform alphabet: %w", err)
+	// }
+
+	tableau, err := pasc.NewTabulaRecta(
+		pasc.WithCaseless(c.caseless),
+		pasc.WithPtAlphabet(c.alphabet),
+		pasc.WithKeyAlphabet(c.alphabet),
+		pasc.WithKey(c.key),
+		// pasc.WithCtAlphabet(string(ctAlphabet)),
+		// pasc.WithStrict(c.strict),
+		pasc.WithDictFunc(func(s string, i int) (*masc.Tableau, error) {
+			ctAlphabet2, err := owrapString(s, i/2)
+			if err != nil {
+				return nil, err
+			}
+
+			params := []simple.CipherOption{
+				simple.WithPtAlphabet(s),
+				simple.WithCtAlphabet(ctAlphabet2),
+			}
+			if c.caseless {
+				params = append(params, simple.WithCaseless())
+			}
+			if c.strict {
+				params = append(params, simple.WithStrict())
+			}
+
+			c2, err := simple.NewCipher(params...)
+			if err != nil {
+				return nil, fmt.Errorf("could not create cipher: %w", err)
+			}
+
+			return c2.Tableau, nil
+		}),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("could not create tableau: %w", err)
+	}
+	c.TabulaRecta = tableau
+
+	return c, nil
 }
