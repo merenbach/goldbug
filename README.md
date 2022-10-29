@@ -22,6 +22,8 @@ Instantiate your deployment pipeline as follows, adapting as necessary the param
 
 ## TODO
 
+* Explore making MASC String() into Printable()
+* Put tests in for MASC transforms
 * Explore alternative PASC with (slope, intercept) = (-1, -1)
 * Expand tests for custom ciphertext alphabets
 * Improve and enhance test cases overall

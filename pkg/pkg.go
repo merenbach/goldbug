@@ -36,7 +36,6 @@ import (
 type cipher interface {
 	Encipher(string) (string, error)
 	Decipher(string) (string, error)
-	// Tableau(string) (*masc.Tableau, error)
 }
 
 // Validate against this interface
