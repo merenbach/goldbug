@@ -15,6 +15,8 @@
 package vigenere
 
 import (
+	"fmt"
+
 	"github.com/merenbach/goldbug/internal/masc"
 	"github.com/merenbach/goldbug/internal/pasc"
 	"github.com/merenbach/goldbug/pkg/caesar"
@@ -36,68 +38,96 @@ const (
 
 // Cipher implements a Vigenère cipher.
 type Cipher struct {
-	Alphabet string
-	Autokey  autokeyOption
-	Caseless bool
-	Key      string
-	Strict   bool
+	autokey  autokeyOption
+	alphabet string
+	caseless bool
+	key      string
+	strict   bool
+
+	*pasc.TabulaRecta
 }
 
-func (c *Cipher) maketableau() (*pasc.TabulaRecta, error) {
-	tr, err := pasc.NewTabulaRecta(c.Alphabet, "", func(s string, i int) (*masc.Tableau, error) {
-		c2 := &caesar.Cipher{
-			Alphabet: s,
-			Caseless: c.Caseless,
-			Shift:    i,
-			Strict:   c.Strict,
-		}
-		return c2.Tableau()
-	})
-	if err != nil {
-		return nil, err
-	}
+// adapted from: https://www.sohamkamani.com/golang/options-pattern/
 
-	tr.Caseless = c.Caseless
-	return tr, nil
+type CipherOption func(*Cipher)
+
+func WithStrict() CipherOption {
+	return func(c *Cipher) {
+		c.strict = true
+	}
 }
 
-// Encipher a message.
-func (c *Cipher) Encipher(s string) (string, error) {
-	t, err := c.maketableau()
-	if err != nil {
-		return "", err
+func WithCaseless() CipherOption {
+	return func(c *Cipher) {
+		c.caseless = true
 	}
-	return t.Encipher(s, c.Key, func(a rune, b rune, keystream *[]rune) {
-		switch c.Autokey {
-		case TextAutokey:
-			*keystream = append(*keystream, a)
-		case KeyAutokey:
-			*keystream = append(*keystream, b)
-		}
-	})
 }
 
-// Decipher a message.
-func (c *Cipher) Decipher(s string) (string, error) {
-	t, err := c.maketableau()
-	if err != nil {
-		return "", err
+func WithAlphabet(s string) CipherOption {
+	return func(c *Cipher) {
+		c.alphabet = s
 	}
-	return t.Decipher(s, c.Key, func(a rune, b rune, keystream *[]rune) {
-		switch c.Autokey {
-		case TextAutokey:
-			*keystream = append(*keystream, b)
-		case KeyAutokey:
-			*keystream = append(*keystream, a)
-		}
-	})
 }
 
-// Tableau for encipherment and decipherment.
-func (c *Cipher) Tableau() (string, error) {
-	t, err := c.maketableau()
-	if err != nil {
-		return "", err
+func WithKey(s string) CipherOption {
+	return func(c *Cipher) {
+		c.key = s
 	}
-	return t.Printable()
+}
+
+func NewCipher(opts ...CipherOption) (*Cipher, error) {
+	c := &Cipher{alphabet: masc.Alphabet}
+	for _, opt := range opts {
+		opt(c)
+	}
+
+	// ctAlphabet, err := Transform([]rune(c.alphabet))
+	// if err != nil {
+	// 	return nil, fmt.Errorf("could not transform alphabet: %w", err)
+	// }
+
+	params := []pasc.TabulaRectaOption{
+		pasc.WithCaseless(c.caseless),
+		pasc.WithPtAlphabet(c.alphabet),
+		pasc.WithKeyAlphabet(c.alphabet),
+		pasc.WithKey(c.key),
+		// pasc.WithCtAlphabet(string(ctAlphabet)),
+		// pasc.WithStrict(c.strict),
+		pasc.WithDictFunc(func(s string, i int) (*masc.Tableau, error) {
+			params2 := []caesar.CipherOption{
+				caesar.WithAlphabet(s),
+				caesar.WithShift(i),
+			}
+			if c.caseless {
+				params2 = append(params2, caesar.WithCaseless())
+			}
+			if c.strict {
+				params2 = append(params2, caesar.WithStrict())
+			}
+			c2, err := caesar.NewCipher(params2...)
+			if err != nil {
+				return nil, fmt.Errorf("could not create cipher: %w", err)
+			}
+
+			return c2.Tableau, nil
+		}),
+	}
+	if c.autokey != NoAutokey {
+		params = append(params, pasc.WithAutokeyFunc(func(a rune, b rune, keystream *[]rune) {
+			switch c.autokey {
+			case TextAutokey:
+				*keystream = append(*keystream, a)
+			case KeyAutokey:
+				*keystream = append(*keystream, b)
+			}
+		}))
+	}
+
+	tableau, err := pasc.NewTabulaRecta(params...)
+	if err != nil {
+		return nil, fmt.Errorf("could not create tableau: %w", err)
+	}
+	c.TabulaRecta = tableau
+
+	return c, nil
 }

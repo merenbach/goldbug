@@ -26,6 +26,7 @@ Instantiate your deployment pipeline as follows, adapting as necessary the param
 * Put tests in for MASC transforms
 * Make MASC Tableau vars nonexported
 * Implement PASC transforms and tests
+* Refactor testing methodology for MASC and PASC to reduce duplication
 * Explore alternative PASC with (slope, intercept) = (-1, -1)
 * Expand tests for custom ciphertext alphabets
 * Improve and enhance test cases overall

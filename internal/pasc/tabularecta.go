@@ -287,7 +287,7 @@ func (tr *TabulaRecta) Decipher(s string) (string, error) {
 			// Transcoding successful
 			transcodedCharCount++
 			if tr.autokeyFunc != nil {
-				tr.autokeyFunc(r, o, &keyRunes)
+				tr.autokeyFunc(o, r, &keyRunes)
 			}
 		}
 		return o

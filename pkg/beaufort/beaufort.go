@@ -106,30 +106,3 @@ func NewCipher(opts ...CipherOption) (*Cipher, error) {
 
 	return c, nil
 }
-
-// // Encipher a message.
-// func (c *Cipher) Encipher(s string) (string, error) {
-// 	t, err := c.maketableau()
-// 	if err != nil {
-// 		return "", err
-// 	}
-// 	return t.Encipher(s, c.Key, nil)
-// }
-
-// // Decipher a message.
-// func (c *Cipher) Decipher(s string) (string, error) {
-// 	t, err := c.maketableau()
-// 	if err != nil {
-// 		return "", err
-// 	}
-// 	return t.Decipher(s, c.Key, nil)
-// }
-
-// // Tableau for encipherment and decipherment.
-// func (c *Cipher) Tableau() (string, error) {
-// 	t, err := c.maketableau()
-// 	if err != nil {
-// 		return "", err
-// 	}
-// 	return t.Printable()
-// }
