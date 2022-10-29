@@ -15,62 +15,122 @@
 package gronsfeld
 
 import (
+	"fmt"
+
 	"github.com/merenbach/goldbug/internal/masc"
 	"github.com/merenbach/goldbug/internal/pasc"
 	"github.com/merenbach/goldbug/pkg/caesar"
 )
 
 // Cipher implements a Gronsfeld cipher.
+// Cipher is effectively a Vigenère cipher with 0-9 standing in for the key alphabet.
 type Cipher struct {
-	Alphabet string
-	Caseless bool
-	Key      string
-	Strict   bool
+	alphabet string
+	caseless bool
+	key      string
+	strict   bool
+
+	*pasc.TabulaRecta
 }
 
-func (c *Cipher) maketableau() (*pasc.TabulaRecta, error) {
+// adapted from: https://www.sohamkamani.com/golang/options-pattern/
+
+type CipherOption func(*Cipher)
+
+func WithStrict() CipherOption {
+	return func(c *Cipher) {
+		c.strict = true
+	}
+}
+
+func WithCaseless() CipherOption {
+	return func(c *Cipher) {
+		c.caseless = true
+	}
+}
+
+func WithAlphabet(s string) CipherOption {
+	return func(c *Cipher) {
+		c.alphabet = s
+	}
+}
+
+func WithKey(s string) CipherOption {
+	return func(c *Cipher) {
+		c.key = s
+	}
+}
+
+func NewCipher(opts ...CipherOption) (*Cipher, error) {
 	const digits = "0123456789"
 
-	tr, err := pasc.NewTabulaRecta(c.Alphabet, digits, func(s string, i int) (*masc.Tableau, error) {
-		c2 := &caesar.Cipher{
-			Alphabet: s,
-			Caseless: c.Caseless,
-			Shift:    i,
-			Strict:   c.Strict,
-		}
-		return c2.Tableau()
-	})
-	if err != nil {
-		return nil, err
+	c := &Cipher{alphabet: masc.Alphabet}
+	for _, opt := range opts {
+		opt(c)
 	}
 
-	tr.Caseless = c.Caseless
-	return tr, nil
+	// ctAlphabet, err := Transform([]rune(c.alphabet))
+	// if err != nil {
+	// 	return nil, fmt.Errorf("could not transform alphabet: %w", err)
+	// }
+
+	tableau, err := pasc.NewTabulaRecta(
+		pasc.WithCaseless(c.caseless),
+		pasc.WithPtAlphabet(c.alphabet),
+		pasc.WithKeyAlphabet(digits),
+		pasc.WithKey(c.key),
+		// pasc.WithCtAlphabet(string(ctAlphabet)),
+		// pasc.WithStrict(c.strict),
+		pasc.WithDictFunc(func(s string, i int) (*masc.Tableau, error) {
+			params := []caesar.CipherOption{
+				caesar.WithAlphabet(s),
+				caesar.WithShift(i),
+			}
+			if c.caseless {
+				params = append(params, caesar.WithCaseless())
+			}
+			if c.strict {
+				params = append(params, caesar.WithStrict())
+			}
+			c2, err := caesar.NewCipher(params...)
+			if err != nil {
+				return nil, fmt.Errorf("could not create cipher: %w", err)
+			}
+
+			return c2.Tableau, nil
+		}),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("could not create tableau: %w", err)
+	}
+	c.TabulaRecta = tableau
+
+	return c, nil
 }
 
-// Encipher a message.
-func (c *Cipher) Encipher(s string) (string, error) {
-	t, err := c.maketableau()
-	if err != nil {
-		return "", err
-	}
-	return t.Encipher(s, c.Key, nil)
-}
+// // Encipher a message.
+// func (c *Cipher) Encipher(s string) (string, error) {
+// 	t, err := c.maketableau()
+// 	if err != nil {
+// 		return "", err
+// 	}
+// 	return t.Encipher(s, c.Key, nil)
+// }
 
-// Decipher a message.
-func (c *Cipher) Decipher(s string) (string, error) {
-	t, err := c.maketableau()
-	if err != nil {
-		return "", err
-	}
-	return t.Decipher(s, c.Key, nil)
-}
+// // Decipher a message.
+// func (c *Cipher) Decipher(s string) (string, error) {
+// 	t, err := c.maketableau()
+// 	if err != nil {
+// 		return "", err
+// 	}
+// 	return t.Decipher(s, c.Key, nil)
+// }
 
-// Tableau for encipherment and decipherment.
-func (c *Cipher) Tableau() (string, error) {
-	t, err := c.maketableau()
-	if err != nil {
-		return "", err
-	}
-	return t.Printable()
-}
+// // Tableau for encipherment and decipherment.
+// func (c *Cipher) Tableau() (string, error) {
+// 	t, err := c.maketableau()
+// 	if err != nil {
+// 		return "", err
+// 	}
+// 	return t.Printable()
+// }
