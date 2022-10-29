@@ -15,42 +15,86 @@
 package trithemius
 
 import (
+	"fmt"
+
+	"github.com/merenbach/goldbug/internal/masc"
 	"github.com/merenbach/goldbug/internal/pasc"
-	"github.com/merenbach/goldbug/pkg/vigenere"
+	"github.com/merenbach/goldbug/pkg/caesar"
 )
 
 // Cipher implements a Trithemius cipher.
+// Cipher is effectively a Vigenère cipher with the plaintext alphabet as the key.
 type Cipher struct {
-	Alphabet string
-	Caseless bool
-	Strict   bool
+	alphabet string
+	caseless bool
+	strict   bool
+
+	*pasc.TabulaRecta
 }
 
-func (c *Cipher) makecipher() *vigenere.Cipher {
-	alphabet := c.Alphabet
-	if alphabet == "" {
-		alphabet = pasc.Alphabet
-	}
+// adapted from: https://www.sohamkamani.com/golang/options-pattern/
 
-	return &vigenere.Cipher{
-		Alphabet: alphabet,
-		Caseless: c.Caseless,
-		Key:      alphabet,
-		Strict:   c.Strict,
+type CipherOption func(*Cipher)
+
+func WithStrict() CipherOption {
+	return func(c *Cipher) {
+		c.strict = true
 	}
 }
 
-// Encipher a message.
-func (c *Cipher) Encipher(s string) (string, error) {
-	return c.makecipher().Encipher(s)
+func WithCaseless() CipherOption {
+	return func(c *Cipher) {
+		c.caseless = true
+	}
 }
 
-// Decipher a message.
-func (c *Cipher) Decipher(s string) (string, error) {
-	return c.makecipher().Decipher(s)
+func WithAlphabet(s string) CipherOption {
+	return func(c *Cipher) {
+		c.alphabet = s
+	}
 }
 
-// Tableau for encipherment and decipherment.
-func (c *Cipher) Tableau() (string, error) {
-	return c.makecipher().Tableau()
+func NewCipher(opts ...CipherOption) (*Cipher, error) {
+	c := &Cipher{alphabet: masc.Alphabet}
+	for _, opt := range opts {
+		opt(c)
+	}
+
+	// ctAlphabet, err := Transform([]rune(c.alphabet))
+	// if err != nil {
+	// 	return nil, fmt.Errorf("could not transform alphabet: %w", err)
+	// }
+
+	tableau, err := pasc.NewTabulaRecta(
+		pasc.WithCaseless(c.caseless),
+		pasc.WithPtAlphabet(c.alphabet),
+		pasc.WithKeyAlphabet(c.alphabet),
+		pasc.WithKey(c.alphabet),
+		// pasc.WithCtAlphabet(string(ctAlphabet)),
+		// pasc.WithStrict(c.strict),
+		pasc.WithDictFunc(func(s string, i int) (*masc.Tableau, error) {
+			params := []caesar.CipherOption{
+				caesar.WithAlphabet(s),
+				caesar.WithShift(i),
+			}
+			if c.caseless {
+				params = append(params, caesar.WithCaseless())
+			}
+			if c.strict {
+				params = append(params, caesar.WithStrict())
+			}
+			c2, err := caesar.NewCipher(params...)
+			if err != nil {
+				return nil, fmt.Errorf("could not create cipher: %w", err)
+			}
+
+			return c2.Tableau, nil
+		}),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("could not create tableau: %w", err)
+	}
+	c.TabulaRecta = tableau
+
+	return c, nil
 }
