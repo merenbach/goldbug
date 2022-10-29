@@ -45,9 +45,9 @@ func WithCaseless() CipherOption {
 	}
 }
 
-func WithAlphabet(alphabet string) CipherOption {
+func WithAlphabet(s string) CipherOption {
 	return func(c *Cipher) {
-		c.alphabet = alphabet
+		c.alphabet = s
 	}
 }
 
