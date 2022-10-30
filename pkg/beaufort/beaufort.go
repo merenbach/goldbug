@@ -82,8 +82,6 @@ func NewCipher(opts ...CipherOption) (*Cipher, error) {
 		pasc.WithDictFunc(func(s string, i int) (*masc.Tableau, error) {
 			params := []affine.CipherOption{
 				affine.WithAlphabet(s),
-				affine.WithSlope(-1),
-				affine.WithIntercept(i),
 			}
 			if c.caseless {
 				params = append(params, affine.WithCaseless())
@@ -91,7 +89,7 @@ func NewCipher(opts ...CipherOption) (*Cipher, error) {
 			if c.strict {
 				params = append(params, affine.WithStrict())
 			}
-			c2, err := affine.NewCipher(params...)
+			c2, err := affine.NewCipher(-1, i, params...)
 			if err != nil {
 				return nil, fmt.Errorf("could not create cipher: %w", err)
 			}

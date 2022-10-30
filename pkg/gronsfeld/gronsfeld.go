@@ -84,7 +84,6 @@ func NewCipher(opts ...CipherOption) (*Cipher, error) {
 		pasc.WithDictFunc(func(s string, i int) (*masc.Tableau, error) {
 			params := []caesar.CipherOption{
 				caesar.WithAlphabet(s),
-				caesar.WithShift(i),
 			}
 			if c.caseless {
 				params = append(params, caesar.WithCaseless())
@@ -92,7 +91,7 @@ func NewCipher(opts ...CipherOption) (*Cipher, error) {
 			if c.strict {
 				params = append(params, caesar.WithStrict())
 			}
-			c2, err := caesar.NewCipher(params...)
+			c2, err := caesar.NewCipher(i, params...)
 			if err != nil {
 				return nil, fmt.Errorf("could not create cipher: %w", err)
 			}

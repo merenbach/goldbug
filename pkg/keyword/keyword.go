@@ -26,7 +26,6 @@ type Cipher struct {
 	alphabet string
 	caseless bool
 	strict   bool
-	keyword  string
 
 	*masc.Tableau
 }
@@ -53,19 +52,13 @@ func WithAlphabet(s string) CipherOption {
 	}
 }
 
-func WithKeyword(s string) CipherOption {
-	return func(c *Cipher) {
-		c.keyword = s
-	}
-}
-
-func NewCipher(opts ...CipherOption) (*Cipher, error) {
+func NewCipher(keyword string, opts ...CipherOption) (*Cipher, error) {
 	c := &Cipher{alphabet: masc.Alphabet}
 	for _, opt := range opts {
 		opt(c)
 	}
 
-	ctAlphabet := stringutil.Key(c.alphabet, c.keyword)
+	ctAlphabet := stringutil.Key(c.alphabet, keyword)
 
 	tableau, err := masc.NewTableau(
 		masc.WithPtAlphabet(c.alphabet),

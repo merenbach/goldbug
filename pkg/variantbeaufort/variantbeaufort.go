@@ -19,7 +19,7 @@ import (
 
 	"github.com/merenbach/goldbug/internal/masc"
 	"github.com/merenbach/goldbug/internal/pasc"
-	"github.com/merenbach/goldbug/pkg/affine"
+	"github.com/merenbach/goldbug/pkg/caesar"
 )
 
 // Cipher implements a variant Beaufort cipher.
@@ -80,18 +80,16 @@ func NewCipher(opts ...CipherOption) (*Cipher, error) {
 		// pasc.WithCtAlphabet(string(ctAlphabet)),
 		// pasc.WithStrict(c.strict),
 		pasc.WithDictFunc(func(s string, i int) (*masc.Tableau, error) {
-			params := []affine.CipherOption{
-				affine.WithAlphabet(s),
-				affine.WithSlope(1),
-				affine.WithIntercept(-i),
+			params := []caesar.CipherOption{
+				caesar.WithAlphabet(s),
 			}
 			if c.caseless {
-				params = append(params, affine.WithCaseless())
+				params = append(params, caesar.WithCaseless())
 			}
 			if c.strict {
-				params = append(params, affine.WithStrict())
+				params = append(params, caesar.WithStrict())
 			}
-			c2, err := affine.NewCipher(params...)
+			c2, err := caesar.NewCipher(-i, params...)
 			if err != nil {
 				return nil, fmt.Errorf("could not create cipher: %w", err)
 			}

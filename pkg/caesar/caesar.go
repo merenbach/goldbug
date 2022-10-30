@@ -25,7 +25,6 @@ type Cipher struct {
 	alphabet string
 	caseless bool
 	strict   bool
-	shift    int
 
 	*masc.Tableau
 }
@@ -52,19 +51,13 @@ func WithAlphabet(s string) CipherOption {
 	}
 }
 
-func WithShift(shift int) CipherOption {
-	return func(c *Cipher) {
-		c.shift = shift
-	}
-}
-
-func NewCipher(opts ...CipherOption) (*Cipher, error) {
+func NewCipher(shift int, opts ...CipherOption) (*Cipher, error) {
 	c := &Cipher{alphabet: masc.Alphabet}
 	for _, opt := range opts {
 		opt(c)
 	}
 
-	ctAlphabet, err := Transform([]rune(c.alphabet), c.shift)
+	ctAlphabet, err := Transform([]rune(c.alphabet), shift)
 	if err != nil {
 		return nil, fmt.Errorf("could not transform alphabet: %w", err)
 	}

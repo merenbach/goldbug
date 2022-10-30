@@ -22,10 +22,9 @@ import (
 
 // A Cipher implements a decimation cipher.
 type Cipher struct {
-	alphabet   string
-	caseless   bool
-	strict     bool
-	multiplier int
+	alphabet string
+	caseless bool
+	strict   bool
 
 	*masc.Tableau
 }
@@ -52,19 +51,13 @@ func WithAlphabet(s string) CipherOption {
 	}
 }
 
-func WithMultiplier(multiplier int) CipherOption {
-	return func(c *Cipher) {
-		c.multiplier = multiplier
-	}
-}
-
-func NewCipher(opts ...CipherOption) (*Cipher, error) {
+func NewCipher(multiplier int, opts ...CipherOption) (*Cipher, error) {
 	c := &Cipher{alphabet: masc.Alphabet}
 	for _, opt := range opts {
 		opt(c)
 	}
 
-	ctAlphabet, err := Transform([]rune(c.alphabet), c.multiplier)
+	ctAlphabet, err := Transform([]rune(c.alphabet), multiplier)
 	if err != nil {
 		return nil, fmt.Errorf("could not transform alphabet: %w", err)
 	}

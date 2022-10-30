@@ -22,11 +22,9 @@ import (
 
 // A Cipher implements an affine cipher.
 type Cipher struct {
-	alphabet  string
-	caseless  bool
-	strict    bool
-	slope     int
-	intercept int
+	alphabet string
+	caseless bool
+	strict   bool
 
 	*masc.Tableau
 }
@@ -53,25 +51,13 @@ func WithAlphabet(s string) CipherOption {
 	}
 }
 
-func WithSlope(v int) CipherOption {
-	return func(c *Cipher) {
-		c.slope = v
-	}
-}
-
-func WithIntercept(v int) CipherOption {
-	return func(c *Cipher) {
-		c.intercept = v
-	}
-}
-
-func NewCipher(opts ...CipherOption) (*Cipher, error) {
+func NewCipher(slope int, intercept int, opts ...CipherOption) (*Cipher, error) {
 	c := &Cipher{alphabet: masc.Alphabet}
 	for _, opt := range opts {
 		opt(c)
 	}
 
-	ctAlphabet, err := Transform([]rune(c.alphabet), c.slope, c.intercept)
+	ctAlphabet, err := Transform([]rune(c.alphabet), slope, intercept)
 	if err != nil {
 		return nil, fmt.Errorf("could not transform alphabet: %w", err)
 	}

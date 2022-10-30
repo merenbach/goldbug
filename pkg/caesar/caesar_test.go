@@ -36,9 +36,7 @@ func TestCipher_Encipher(t *testing.T) {
 	for i, table := range tables {
 		t.Logf("Running test %d of %d...", i+1, len(tables))
 
-		params := []CipherOption{
-			WithShift(table.Shift),
-		}
+		var params []CipherOption
 		if table.Alphabet != "" {
 			params = append(params, WithAlphabet(table.Alphabet))
 		}
@@ -49,7 +47,7 @@ func TestCipher_Encipher(t *testing.T) {
 			params = append(params, WithCaseless())
 		}
 
-		c, err := NewCipher(params...)
+		c, err := NewCipher(table.Shift, params...)
 		if err != nil {
 			t.Error("Could not create cipher:", err)
 		}
@@ -77,9 +75,7 @@ func TestCipher_Decipher(t *testing.T) {
 	for i, table := range tables {
 		t.Logf("Running test %d of %d...", i+1, len(tables))
 
-		params := []CipherOption{
-			WithShift(table.Shift),
-		}
+		var params []CipherOption
 		if table.Alphabet != "" {
 			params = append(params, WithAlphabet(table.Alphabet))
 		}
@@ -90,7 +86,7 @@ func TestCipher_Decipher(t *testing.T) {
 			params = append(params, WithCaseless())
 		}
 
-		c, err := NewCipher(params...)
+		c, err := NewCipher(table.Shift, params...)
 		if err != nil {
 			t.Error("Could not create cipher:", err)
 		}
@@ -104,7 +100,7 @@ func TestCipher_Decipher(t *testing.T) {
 }
 
 func ExampleCipher_Tableau() {
-	c, err := NewCipher(WithShift(3))
+	c, err := NewCipher(3)
 	if err != nil {
 		fmt.Println("Error:", err)
 	}
