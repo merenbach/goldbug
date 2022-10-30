@@ -20,6 +20,7 @@ import (
 	"github.com/merenbach/goldbug/internal/masc"
 	"github.com/merenbach/goldbug/internal/pasc"
 	"github.com/merenbach/goldbug/pkg/affine"
+	"github.com/merenbach/goldbug/pkg/masc2"
 )
 
 // Cipher implements a Beaufort cipher.
@@ -80,14 +81,14 @@ func NewCipher(opts ...CipherOption) (*Cipher, error) {
 		// pasc.WithCtAlphabet(string(ctAlphabet)),
 		// pasc.WithStrict(c.strict),
 		pasc.WithDictFunc(func(s string, i int) (*masc.Tableau, error) {
-			params := []affine.ConfigOption{
-				affine.WithAlphabet(s),
+			params := []masc2.ConfigOption{
+				masc2.WithAlphabet(s),
 			}
 			if c.caseless {
-				params = append(params, affine.WithCaseless())
+				params = append(params, masc2.WithCaseless())
 			}
 			if c.strict {
-				params = append(params, affine.WithStrict())
+				params = append(params, masc2.WithStrict())
 			}
 			c2, err := affine.NewCipher(-1, i, params...)
 			if err != nil {

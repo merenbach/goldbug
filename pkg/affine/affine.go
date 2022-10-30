@@ -18,83 +18,31 @@ import (
 	"fmt"
 
 	"github.com/merenbach/goldbug/internal/masc"
+	"github.com/merenbach/goldbug/pkg/masc2"
 )
-
-// A Config struct for a cipher.
-type Config struct {
-	alphabet string
-	caseless bool
-	strict   bool
-}
-
-func (c *Config) Alphabet() string {
-	return c.alphabet
-}
-
-func (c *Config) Caseless() bool {
-	return c.caseless
-}
-
-func (c *Config) Strict() bool {
-	return c.strict
-}
 
 // A Cipher implements an affine cipher.
 type Cipher struct {
-	*Config
 	*masc.Tableau
 }
 
-// adapted from: https://www.sohamkamani.com/golang/options-pattern/
+func NewCipher(slope int, intercept int, opts ...masc2.ConfigOption) (*Cipher, error) {
+	c := masc2.NewConfig(opts...)
 
-type ConfigOption func(*Config)
-
-func WithStrict() ConfigOption {
-	return func(c *Config) {
-		c.strict = true
-	}
-}
-
-func WithCaseless() ConfigOption {
-	return func(c *Config) {
-		c.caseless = true
-	}
-}
-
-func WithAlphabet(s string) ConfigOption {
-	return func(c *Config) {
-		c.alphabet = s
-	}
-}
-
-func NewConfig(opts ...ConfigOption) *Config {
-	c := &Config{alphabet: masc.Alphabet}
-	for _, opt := range opts {
-		opt(c)
-	}
-	return c
-}
-
-func NewCipher(slope int, intercept int, opts ...ConfigOption) (*Cipher, error) {
-	c := NewConfig(opts...)
-
-	ctAlphabet, err := Transform([]rune(c.alphabet), slope, intercept)
+	ctAlphabet, err := Transform([]rune(c.Alphabet()), slope, intercept)
 	if err != nil {
 		return nil, fmt.Errorf("could not transform alphabet: %w", err)
 	}
 
 	tableau, err := masc.NewTableau(
-		c.alphabet,
+		c.Alphabet(),
 		string(ctAlphabet),
-		c.strict,
-		c.caseless,
+		c.Strict(),
+		c.Caseless(),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("could not create tableau: %w", err)
 	}
 
-	return &Cipher{
-		c,
-		tableau,
-	}, nil
+	return &Cipher{tableau}, nil
 }

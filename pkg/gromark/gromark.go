@@ -22,9 +22,9 @@ import (
 	"github.com/merenbach/goldbug/internal/lfg"
 	"github.com/merenbach/goldbug/internal/masc"
 	"github.com/merenbach/goldbug/internal/pasc"
-	"github.com/merenbach/goldbug/pkg/affine"
 	"github.com/merenbach/goldbug/pkg/caesar"
 	"github.com/merenbach/goldbug/pkg/keyword"
+	"github.com/merenbach/goldbug/pkg/masc2"
 	"github.com/merenbach/goldbug/pkg/simple"
 	"github.com/merenbach/goldbug/pkg/transposition"
 )
@@ -139,14 +139,14 @@ func NewCipher(key string, primer string, opts ...CipherOption) (*Cipher, error)
 				return nil, fmt.Errorf("could not transform alphabet: %w", err)
 			}
 
-			params := []affine.ConfigOption{
-				affine.WithAlphabet(s),
+			params := []masc2.ConfigOption{
+				masc2.WithAlphabet(s),
 			}
 			if c.caseless {
-				params = append(params, affine.WithCaseless())
+				params = append(params, masc2.WithCaseless())
 			}
 			if c.strict {
-				params = append(params, affine.WithStrict())
+				params = append(params, masc2.WithStrict())
 			}
 			c2, err := simple.NewCipher(string(ctAlphabetTransformed), params...)
 			if err != nil {

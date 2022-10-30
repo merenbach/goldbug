@@ -18,17 +18,16 @@ import (
 	"fmt"
 
 	"github.com/merenbach/goldbug/internal/masc"
-	"github.com/merenbach/goldbug/pkg/affine"
+	"github.com/merenbach/goldbug/pkg/masc2"
 )
 
 // A Cipher implements a ROT13 cipher.
 type Cipher struct {
-	*affine.Config
 	*masc.Tableau
 }
 
-func NewCipher(opts ...affine.ConfigOption) (*Cipher, error) {
-	c := affine.NewConfig(opts...)
+func NewCipher(opts ...masc2.ConfigOption) (*Cipher, error) {
+	c := masc2.NewConfig(opts...)
 
 	ctAlphabet, err := Transform([]rune(c.Alphabet()))
 	if err != nil {
@@ -45,5 +44,5 @@ func NewCipher(opts ...affine.ConfigOption) (*Cipher, error) {
 		return nil, fmt.Errorf("could not create tableau: %w", err)
 	}
 
-	return &Cipher{c, tableau}, nil
+	return &Cipher{tableau}, nil
 }

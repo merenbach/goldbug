@@ -19,8 +19,8 @@ import (
 
 	"github.com/merenbach/goldbug/internal/masc"
 	"github.com/merenbach/goldbug/internal/pasc"
-	"github.com/merenbach/goldbug/pkg/affine"
 	"github.com/merenbach/goldbug/pkg/caesar"
+	"github.com/merenbach/goldbug/pkg/masc2"
 )
 
 // An AutokeyOption determines the autokey setting for the cipher.
@@ -101,14 +101,14 @@ func NewCipher(opts ...CipherOption) (*Cipher, error) {
 		// pasc.WithCtAlphabet(string(ctAlphabet)),
 		// pasc.WithStrict(c.strict),
 		pasc.WithDictFunc(func(s string, i int) (*masc.Tableau, error) {
-			params2 := []affine.ConfigOption{
-				affine.WithAlphabet(s),
+			params2 := []masc2.ConfigOption{
+				masc2.WithAlphabet(s),
 			}
 			if c.caseless {
-				params2 = append(params2, affine.WithCaseless())
+				params2 = append(params2, masc2.WithCaseless())
 			}
 			if c.strict {
-				params2 = append(params2, affine.WithStrict())
+				params2 = append(params2, masc2.WithStrict())
 			}
 			c2, err := caesar.NewCipher(i, params2...)
 			if err != nil {
