@@ -18,67 +18,32 @@ import (
 	"fmt"
 
 	"github.com/merenbach/goldbug/internal/masc"
+	"github.com/merenbach/goldbug/pkg/affine"
 )
 
 // A Cipher implements a ROT13 cipher.
 type Cipher struct {
-	alphabet string
-	caseless bool
-	strict   bool
-	keyword  string
-
+	*affine.Config
 	*masc.Tableau
 }
 
-// adapted from: https://www.sohamkamani.com/golang/options-pattern/
+func NewCipher(opts ...affine.ConfigOption) (*Cipher, error) {
+	c := affine.NewConfig(opts...)
 
-type CipherOption func(*Cipher)
-
-func WithStrict() CipherOption {
-	return func(c *Cipher) {
-		c.strict = true
-	}
-}
-
-func WithCaseless() CipherOption {
-	return func(c *Cipher) {
-		c.caseless = true
-	}
-}
-
-func WithAlphabet(s string) CipherOption {
-	return func(c *Cipher) {
-		c.alphabet = s
-	}
-}
-
-func WithKeyword(s string) CipherOption {
-	return func(c *Cipher) {
-		c.keyword = s
-	}
-}
-
-func NewCipher(opts ...CipherOption) (*Cipher, error) {
-	c := &Cipher{alphabet: masc.Alphabet}
-	for _, opt := range opts {
-		opt(c)
-	}
-
-	ctAlphabet, err := Transform([]rune(c.alphabet))
+	ctAlphabet, err := Transform([]rune(c.Alphabet()))
 	if err != nil {
 		return nil, fmt.Errorf("could not transform alphabet: %w", err)
 	}
 
 	tableau, err := masc.NewTableau(
-		masc.WithPtAlphabet(c.alphabet),
-		masc.WithCtAlphabet(string(ctAlphabet)),
-		masc.WithStrict(c.strict),
-		masc.WithCaseless(c.caseless),
+		c.Alphabet(),
+		string(ctAlphabet),
+		c.Strict(),
+		c.Caseless(),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("could not create tableau: %w", err)
 	}
-	c.Tableau = tableau
 
-	return c, nil
+	return &Cipher{c, tableau}, nil
 }
