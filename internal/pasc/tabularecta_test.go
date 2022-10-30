@@ -45,10 +45,7 @@ func TestTabulaRecta(t *testing.T) {
 		tr, err := NewTabulaRecta(
 			WithPtAlphabet(table.ptAlphabet),
 			WithDictFunc(func(s string, i int) (*masc.Tableau, error) {
-				c, err := caesar.NewCipher(
-					caesar.WithAlphabet(s),
-					caesar.WithShift(i),
-				)
+				c, err := caesar.NewCipher(i, caesar.WithAlphabet(s))
 				if err != nil {
 					t.Error("could not create cipher:", err)
 				}

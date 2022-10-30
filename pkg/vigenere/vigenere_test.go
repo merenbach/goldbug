@@ -26,6 +26,7 @@ func TestCipher_Encipher(t *testing.T) {
 		Caseless bool
 		Strict   bool
 		Key      string
+		Autokey  autokeyOption
 
 		Input  string
 		Output string
@@ -37,6 +38,7 @@ func TestCipher_Encipher(t *testing.T) {
 
 		params := []CipherOption{
 			WithKey(table.Key),
+			WithAutokey(table.Autokey),
 		}
 		if table.Alphabet != "" {
 			params = append(params, WithAlphabet(table.Alphabet))
@@ -67,6 +69,7 @@ func TestCipher_Decipher(t *testing.T) {
 		Caseless bool
 		Strict   bool
 		Key      string
+		Autokey  autokeyOption
 
 		Input  string
 		Output string
@@ -78,6 +81,7 @@ func TestCipher_Decipher(t *testing.T) {
 
 		params := []CipherOption{
 			WithKey(table.Key),
+			WithAutokey(table.Autokey),
 		}
 		if table.Alphabet != "" {
 			params = append(params, WithAlphabet(table.Alphabet))

@@ -75,6 +75,12 @@ func WithKey(s string) CipherOption {
 	}
 }
 
+func WithAutokey(v autokeyOption) CipherOption {
+	return func(c *Cipher) {
+		c.autokey = v
+	}
+}
+
 func NewCipher(opts ...CipherOption) (*Cipher, error) {
 	c := &Cipher{alphabet: masc.Alphabet}
 	for _, opt := range opts {
@@ -111,16 +117,16 @@ func NewCipher(opts ...CipherOption) (*Cipher, error) {
 			return c2.Tableau, nil
 		}),
 	}
-	if c.autokey != NoAutokey {
-		params = append(params, pasc.WithAutokeyFunc(func(a rune, b rune, keystream *[]rune) {
-			switch c.autokey {
-			case TextAutokey:
-				*keystream = append(*keystream, a)
-			case KeyAutokey:
-				*keystream = append(*keystream, b)
-			}
-		}))
-	}
+	params = append(params, pasc.WithAutokeyFunc(func(a rune, b rune, keystream *[]rune) {
+		switch c.autokey {
+		case TextAutokey:
+			*keystream = append(*keystream, a)
+		case KeyAutokey:
+			*keystream = append(*keystream, b)
+		case NoAutokey:
+			// do nothing
+		}
+	}))
 
 	tableau, err := pasc.NewTabulaRecta(params...)
 	if err != nil {
