@@ -34,10 +34,10 @@ func TestTableau_Encipher(t *testing.T) {
 	fixture.Load(t, &tables)
 	for _, table := range tables {
 		tableau, err := NewTableau(
-			WithPtAlphabet(table.PtAlphabet),
-			WithCtAlphabet(table.CtAlphabet),
-			WithStrict(table.Strict),
-			WithCaseless(table.Caseless),
+			table.PtAlphabet,
+			table.CtAlphabet,
+			table.Strict,
+			table.Caseless,
 		)
 		if err != nil {
 			t.Error("Error:", err)
@@ -65,10 +65,10 @@ func TestTableau_Decipher(t *testing.T) {
 	fixture.Load(t, &tables)
 	for _, table := range tables {
 		tableau, err := NewTableau(
-			WithPtAlphabet(table.PtAlphabet),
-			WithCtAlphabet(table.CtAlphabet),
-			WithStrict(table.Strict),
-			WithCaseless(table.Caseless),
+			table.PtAlphabet,
+			table.CtAlphabet,
+			table.Strict,
+			table.Caseless,
 		)
 		if err != nil {
 			t.Error("Error:", err)

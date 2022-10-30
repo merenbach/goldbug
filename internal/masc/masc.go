@@ -34,55 +34,25 @@ type Tableau struct {
 	ct2pt translation.Table
 }
 
-// adapted from: https://www.sohamkamani.com/golang/options-pattern/
-
-type TableauOption func(*Tableau)
-
-func WithStrict(b bool) TableauOption {
-	return func(c *Tableau) {
-		c.strict = b
-	}
-}
-
-func WithCaseless(b bool) TableauOption {
-	return func(c *Tableau) {
-		c.caseless = b
-	}
-}
-
-func WithPtAlphabet(s string) TableauOption {
-	return func(c *Tableau) {
-		c.ptAlphabet = s
-	}
-}
-
-func WithCtAlphabet(s string) TableauOption {
-	return func(c *Tableau) {
-		c.ctAlphabet = s
-	}
-}
-
-func NewTableau(opts ...TableauOption) (*Tableau, error) {
-	t := &Tableau{
-		ptAlphabet: Alphabet,
-		ctAlphabet: Alphabet,
-	}
-	for _, opt := range opts {
-		opt(t)
-	}
-
-	pt2ct, err := translation.NewTable(t.ptAlphabet, t.ctAlphabet, "")
+func NewTableau(ptAlphabet string, ctAlphabet string, strict bool, caseless bool) (*Tableau, error) {
+	pt2ct, err := translation.NewTable(ptAlphabet, ctAlphabet, "")
 	if err != nil {
 		return nil, fmt.Errorf("could not generate pt2ct table: %w", err)
 	}
 
-	ct2pt, err := translation.NewTable(t.ctAlphabet, t.ptAlphabet, "")
+	ct2pt, err := translation.NewTable(ctAlphabet, ptAlphabet, "")
 	if err != nil {
 		return nil, fmt.Errorf("could not generate ct2pt table: %w", err)
 	}
 
-	t.pt2ct = pt2ct
-	t.ct2pt = ct2pt
+	t := &Tableau{
+		ptAlphabet,
+		ctAlphabet,
+		strict,
+		caseless,
+		pt2ct,
+		ct2pt,
+	}
 
 	return t, nil
 }
