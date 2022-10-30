@@ -14,18 +14,30 @@
 
 package keyword
 
-import "github.com/merenbach/goldbug/internal/stringutil"
+import "github.com/merenbach/goldbug/internal/sliceutil"
 
 // Key a string with prefix text.
 // TODO: rename Prefix? or something to allow semantically for suffix counterpart?
-func Transform(xs string, keyword string) (string, error) {
-	return stringutil.Deduplicate(keyword + xs), nil
-}
+// func Transform(xs string, keyword string) (string, error) {
+// 	return stringutil.Deduplicate(keyword + xs), nil
+// }
 
-/*
-func Transform[T any](xs []T, keyword []T) ([]T, error) {
-	ys := keyword[:]
-	ys = append(ys, xs)
-	return stringutil.Deduplicate(ys)
+func Transform[T comparable](xs []T, keyword []T) ([]T, error) {
+	set := make(map[T]struct{})
+	for _, x := range xs {
+		if _, ok := set[x]; !ok {
+			set[x] = struct{}{}
+		}
+	}
+
+	// Filter out anything from the keyword that isn't in the primary slice
+	filteredKeyword := make([]T, 0)
+	for _, k := range keyword {
+		if _, ok := set[k]; ok {
+			filteredKeyword = append(filteredKeyword, k)
+		}
+	}
+
+	filteredKeyword = append(filteredKeyword, xs...)
+	return sliceutil.Deduplicate(filteredKeyword), nil
 }
-*/

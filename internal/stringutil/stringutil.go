@@ -19,24 +19,6 @@ import (
 	"unicode/utf8"
 )
 
-// Key a string with prefix text.
-// TODO: rename Prefix? or something to allow semantically for suffix counterpart?
-func Key(s string, k string) string {
-	return Deduplicate(k + s)
-}
-
-// Deduplicate removes recurrences for runes from a string, preserving order of first appearance.
-func Deduplicate(s string) string {
-	seen := make(map[rune]struct{})
-	return strings.Map(func(r rune) rune {
-		if _, ok := seen[r]; !ok {
-			seen[r] = struct{}{}
-			return r
-		}
-		return (-1)
-	}, s)
-}
-
 // Intersect removes runes from a string if they don't occur in another string.
 func intersect(s, charset string) string {
 	seen := make(map[rune]bool)

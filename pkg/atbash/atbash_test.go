@@ -19,6 +19,7 @@ import (
 	"testing"
 
 	"github.com/merenbach/goldbug/internal/fixture"
+	"github.com/merenbach/goldbug/pkg/affine"
 )
 
 func TestCipher_Encipher(t *testing.T) {
@@ -35,15 +36,15 @@ func TestCipher_Encipher(t *testing.T) {
 	for i, table := range tables {
 		t.Logf("Running test %d of %d...", i+1, len(tables))
 
-		var params []CipherOption
+		var params []affine.ConfigOption
 		if table.Alphabet != "" {
-			params = append(params, WithAlphabet(table.Alphabet))
+			params = append(params, affine.WithAlphabet(table.Alphabet))
 		}
 		if table.Strict {
-			params = append(params, WithStrict())
+			params = append(params, affine.WithStrict())
 		}
 		if table.Caseless {
-			params = append(params, WithCaseless())
+			params = append(params, affine.WithCaseless())
 		}
 
 		c, err := NewCipher(params...)
@@ -73,15 +74,15 @@ func TestCipher_Decipher(t *testing.T) {
 	for i, table := range tables {
 		t.Logf("Running test %d of %d...", i+1, len(tables))
 
-		var params []CipherOption
+		var params []affine.ConfigOption
 		if table.Alphabet != "" {
-			params = append(params, WithAlphabet(table.Alphabet))
+			params = append(params, affine.WithAlphabet(table.Alphabet))
 		}
 		if table.Strict {
-			params = append(params, WithStrict())
+			params = append(params, affine.WithStrict())
 		}
 		if table.Caseless {
-			params = append(params, WithCaseless())
+			params = append(params, affine.WithCaseless())
 		}
 
 		c, err := NewCipher(params...)

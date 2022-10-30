@@ -43,3 +43,17 @@ func Backpermute[T any](xs []T, by []int) ([]T, error) {
 	}
 	return ys, nil
 }
+
+// Deduplicate removes recurrences for elements from a sequence.
+// Deduplicate is stable in that it preserves the order of first appearance.
+func Deduplicate[T comparable](xs []T) []T {
+	seen := make(map[T]struct{})
+	out := make([]T, 0)
+	for _, x := range xs {
+		if _, ok := seen[x]; !ok {
+			seen[x] = struct{}{}
+			out = append(out, x)
+		}
+	}
+	return out
+}

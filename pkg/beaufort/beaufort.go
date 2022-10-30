@@ -80,7 +80,7 @@ func NewCipher(opts ...CipherOption) (*Cipher, error) {
 		// pasc.WithCtAlphabet(string(ctAlphabet)),
 		// pasc.WithStrict(c.strict),
 		pasc.WithDictFunc(func(s string, i int) (*masc.Tableau, error) {
-			params := []affine.CipherOption{
+			params := []affine.ConfigOption{
 				affine.WithAlphabet(s),
 			}
 			if c.caseless {

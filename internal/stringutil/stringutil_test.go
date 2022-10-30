@@ -19,20 +19,6 @@ import (
 	"testing"
 )
 
-func TestDeduplicate(t *testing.T) {
-	table := map[string]string{
-		"hello":       "helo",
-		"world":       "world",
-		"hello world": "helo wrd",
-	}
-
-	for k, v := range table {
-		if o := Deduplicate(k); o != v {
-			t.Errorf("Deduplication of string %q was %q; expected %q", k, o, v)
-		}
-	}
-}
-
 func TestIntersect(t *testing.T) {
 	tables := [][]string{
 		{"HELLO, WORLD!", "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "HELLOWORLD"},

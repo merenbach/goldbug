@@ -20,42 +20,63 @@ import (
 	"github.com/merenbach/goldbug/internal/masc"
 )
 
-// A Cipher implements an affine cipher.
-type Cipher struct {
+// A Config struct for a cipher.
+type Config struct {
 	alphabet string
 	caseless bool
 	strict   bool
+}
 
+func (c *Config) Alphabet() string {
+	return c.alphabet
+}
+
+func (c *Config) Caseless() bool {
+	return c.caseless
+}
+
+func (c *Config) Strict() bool {
+	return c.strict
+}
+
+// A Cipher implements an affine cipher.
+type Cipher struct {
+	*Config
 	*masc.Tableau
 }
 
 // adapted from: https://www.sohamkamani.com/golang/options-pattern/
 
-type CipherOption func(*Cipher)
+type ConfigOption func(*Config)
 
-func WithStrict() CipherOption {
-	return func(c *Cipher) {
+func WithStrict() ConfigOption {
+	return func(c *Config) {
 		c.strict = true
 	}
 }
 
-func WithCaseless() CipherOption {
-	return func(c *Cipher) {
+func WithCaseless() ConfigOption {
+	return func(c *Config) {
 		c.caseless = true
 	}
 }
 
-func WithAlphabet(s string) CipherOption {
-	return func(c *Cipher) {
+func WithAlphabet(s string) ConfigOption {
+	return func(c *Config) {
 		c.alphabet = s
 	}
 }
 
-func NewCipher(slope int, intercept int, opts ...CipherOption) (*Cipher, error) {
-	c := &Cipher{alphabet: masc.Alphabet}
+func NewConfig(opts ...ConfigOption) *Config {
+	c := &Config{alphabet: masc.Alphabet}
 	for _, opt := range opts {
 		opt(c)
 	}
+	return c
+}
+
+func NewCipher(slope int, intercept int, opts ...ConfigOption) (*Cipher, error) {
+	c := NewConfig(opts...)
 
 	ctAlphabet, err := Transform([]rune(c.alphabet), slope, intercept)
 	if err != nil {
@@ -63,15 +84,17 @@ func NewCipher(slope int, intercept int, opts ...CipherOption) (*Cipher, error) 
 	}
 
 	tableau, err := masc.NewTableau(
-		masc.WithPtAlphabet(c.alphabet),
-		masc.WithCtAlphabet(string(ctAlphabet)),
-		masc.WithStrict(c.strict),
-		masc.WithCaseless(c.caseless),
+		c.alphabet,
+		string(ctAlphabet),
+		c.strict,
+		c.caseless,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("could not create tableau: %w", err)
 	}
-	c.Tableau = tableau
 
-	return c, nil
+	return &Cipher{
+		c,
+		tableau,
+	}, nil
 }

@@ -18,6 +18,7 @@ import (
 	"testing"
 
 	"github.com/merenbach/goldbug/internal/masc"
+	"github.com/merenbach/goldbug/pkg/affine"
 	"github.com/merenbach/goldbug/pkg/caesar"
 )
 
@@ -45,7 +46,7 @@ func TestTabulaRecta(t *testing.T) {
 		tr, err := NewTabulaRecta(
 			WithPtAlphabet(table.ptAlphabet),
 			WithDictFunc(func(s string, i int) (*masc.Tableau, error) {
-				c, err := caesar.NewCipher(i, caesar.WithAlphabet(s))
+				c, err := caesar.NewCipher(i, affine.WithAlphabet(s))
 				if err != nil {
 					t.Error("could not create cipher:", err)
 				}

@@ -42,3 +42,17 @@ func TestBackpermute(t *testing.T) {
 		}
 	}
 }
+
+func TestDeduplicate(t *testing.T) {
+	table := map[string]string{
+		"hello":       "helo",
+		"world":       "world",
+		"hello world": "helo wrd",
+	}
+
+	for k, v := range table {
+		if o := Deduplicate([]rune(k)); !reflect.DeepEqual(o, []rune(v)) {
+			t.Errorf("Deduplication of string %q was %q; expected %q", k, o, v)
+		}
+	}
+}

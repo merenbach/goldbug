@@ -37,7 +37,7 @@ func TestCipher_Encipher(t *testing.T) {
 	for i, table := range tables {
 		t.Logf("Running test %d of %d...", i+1, len(tables))
 
-		var params []CipherOption
+		var params []ConfigOption
 		if table.Alphabet != "" {
 			params = append(params, WithAlphabet(table.Alphabet))
 		}
@@ -77,7 +77,7 @@ func TestCipher_Decipher(t *testing.T) {
 	for i, table := range tables {
 		t.Logf("Running test %d of %d...", i+1, len(tables))
 
-		var params []CipherOption
+		var params []ConfigOption
 		if table.Alphabet != "" {
 			params = append(params, WithAlphabet(table.Alphabet))
 		}
