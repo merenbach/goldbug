@@ -19,6 +19,7 @@ import (
 
 	"github.com/merenbach/goldbug/internal/masc"
 	"github.com/merenbach/goldbug/internal/pasc"
+	"github.com/merenbach/goldbug/pkg/affine"
 	"github.com/merenbach/goldbug/pkg/caesar"
 )
 
@@ -100,14 +101,14 @@ func NewCipher(opts ...CipherOption) (*Cipher, error) {
 		// pasc.WithCtAlphabet(string(ctAlphabet)),
 		// pasc.WithStrict(c.strict),
 		pasc.WithDictFunc(func(s string, i int) (*masc.Tableau, error) {
-			params2 := []caesar.CipherOption{
-				caesar.WithAlphabet(s),
+			params2 := []affine.ConfigOption{
+				affine.WithAlphabet(s),
 			}
 			if c.caseless {
-				params2 = append(params2, caesar.WithCaseless())
+				params2 = append(params2, affine.WithCaseless())
 			}
 			if c.strict {
-				params2 = append(params2, caesar.WithStrict())
+				params2 = append(params2, affine.WithStrict())
 			}
 			c2, err := caesar.NewCipher(i, params2...)
 			if err != nil {

@@ -18,65 +18,27 @@ import (
 	"fmt"
 
 	"github.com/merenbach/goldbug/internal/masc"
+	"github.com/merenbach/goldbug/pkg/affine"
 )
 
 // A Cipher implements a simple cipher.
 type Cipher struct {
-	ptAlphabet string
-	ctAlphabet string
-	caseless   bool
-	strict     bool
-
+	*affine.Config
 	*masc.Tableau
 }
 
-// adapted from: https://www.sohamkamani.com/golang/options-pattern/
-
-type CipherOption func(*Cipher)
-
-func WithStrict() CipherOption {
-	return func(c *Cipher) {
-		c.strict = true
-	}
-}
-
-func WithCaseless() CipherOption {
-	return func(c *Cipher) {
-		c.caseless = true
-	}
-}
-
-func WithPtAlphabet(s string) CipherOption {
-	return func(c *Cipher) {
-		c.ptAlphabet = s
-	}
-}
-
-func WithCtAlphabet(s string) CipherOption {
-	return func(c *Cipher) {
-		c.ctAlphabet = s
-	}
-}
-
-func NewCipher(opts ...CipherOption) (*Cipher, error) {
-	c := &Cipher{
-		ptAlphabet: masc.Alphabet,
-		ctAlphabet: masc.Alphabet,
-	}
-	for _, opt := range opts {
-		opt(c)
-	}
+func NewCipher(ctAlphabet string, opts ...affine.ConfigOption) (*Cipher, error) {
+	c := affine.NewConfig(opts...)
 
 	tableau, err := masc.NewTableau(
-		masc.WithPtAlphabet(c.ptAlphabet),
-		masc.WithCtAlphabet(c.ctAlphabet),
-		masc.WithStrict(c.strict),
-		masc.WithCaseless(c.caseless),
+		c.Alphabet(),
+		ctAlphabet,
+		c.Strict(),
+		c.Caseless(),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("could not create tableau: %w", err)
 	}
-	c.Tableau = tableau
 
-	return c, nil
+	return &Cipher{c, tableau}, nil
 }

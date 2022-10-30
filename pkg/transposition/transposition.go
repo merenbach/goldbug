@@ -18,9 +18,8 @@ import (
 	"sort"
 	"unicode/utf8"
 
-	"github.com/merenbach/goldbug/internal/stringutil"
-
 	"github.com/merenbach/goldbug/internal/grid"
+	"github.com/merenbach/goldbug/internal/sliceutil"
 )
 
 // LexicalKey returns a key based on the relative lexicographic ordering of runes in a string.
@@ -31,17 +30,16 @@ func lexicalKey(s string, repeats bool) []int {
 	sort.Slice(data, func(i, j int) bool {
 		return data[i] < data[j]
 	})
-	dataString := string(data)
 
 	if repeats {
-		dataString = stringutil.Deduplicate(dataString)
+		data = sliceutil.Deduplicate(data)
 	}
 
 	seen := make(map[int]struct{})
 	for i, r := range []rune(s) {
 
 		var z int
-		for i2, r2 := range []rune(dataString) {
+		for i2, r2 := range data {
 			if r2 == r {
 				if _, ok := seen[i2]; ok {
 					if !repeats {

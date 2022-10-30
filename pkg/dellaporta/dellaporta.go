@@ -20,6 +20,7 @@ import (
 
 	"github.com/merenbach/goldbug/internal/masc"
 	"github.com/merenbach/goldbug/internal/pasc"
+	"github.com/merenbach/goldbug/pkg/affine"
 	"github.com/merenbach/goldbug/pkg/simple"
 )
 
@@ -110,18 +111,17 @@ func NewCipher(opts ...CipherOption) (*Cipher, error) {
 				return nil, err
 			}
 
-			params := []simple.CipherOption{
-				simple.WithPtAlphabet(s),
-				simple.WithCtAlphabet(ctAlphabet2),
+			params := []affine.ConfigOption{
+				affine.WithAlphabet(s),
 			}
 			if c.caseless {
-				params = append(params, simple.WithCaseless())
+				params = append(params, affine.WithCaseless())
 			}
 			if c.strict {
-				params = append(params, simple.WithStrict())
+				params = append(params, affine.WithStrict())
 			}
 
-			c2, err := simple.NewCipher(params...)
+			c2, err := simple.NewCipher(ctAlphabet2, params...)
 			if err != nil {
 				return nil, fmt.Errorf("could not create cipher: %w", err)
 			}

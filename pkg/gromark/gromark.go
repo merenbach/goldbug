@@ -22,6 +22,7 @@ import (
 	"github.com/merenbach/goldbug/internal/lfg"
 	"github.com/merenbach/goldbug/internal/masc"
 	"github.com/merenbach/goldbug/internal/pasc"
+	"github.com/merenbach/goldbug/pkg/affine"
 	"github.com/merenbach/goldbug/pkg/caesar"
 	"github.com/merenbach/goldbug/pkg/keyword"
 	"github.com/merenbach/goldbug/pkg/simple"
@@ -112,12 +113,12 @@ func NewCipher(key string, primer string, opts ...CipherOption) (*Cipher, error)
 		opt(c)
 	}
 
-	ctAlphabetInput, _ := keyword.Transform(c.alphabet, key)
+	ctAlphabetInput, _ := keyword.Transform([]rune(c.alphabet), []rune(key))
 
 	tc := transposition.Cipher{
 		Keys: []string{key},
 	}
-	transposedCtAlphabet, err := tc.Encipher(ctAlphabetInput)
+	transposedCtAlphabet, err := tc.Encipher(string(ctAlphabetInput))
 	if err != nil {
 		return nil, err
 	}
@@ -138,17 +139,16 @@ func NewCipher(key string, primer string, opts ...CipherOption) (*Cipher, error)
 				return nil, fmt.Errorf("could not transform alphabet: %w", err)
 			}
 
-			params := []simple.CipherOption{
-				simple.WithPtAlphabet(s),
-				simple.WithCtAlphabet(string(ctAlphabetTransformed)),
+			params := []affine.ConfigOption{
+				affine.WithAlphabet(s),
 			}
 			if c.caseless {
-				params = append(params, simple.WithCaseless())
+				params = append(params, affine.WithCaseless())
 			}
 			if c.strict {
-				params = append(params, simple.WithStrict())
+				params = append(params, affine.WithStrict())
 			}
-			c2, err := simple.NewCipher(params...)
+			c2, err := simple.NewCipher(string(ctAlphabetTransformed), params...)
 			if err != nil {
 				return nil, fmt.Errorf("could not create cipher: %w", err)
 			}
