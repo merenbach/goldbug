@@ -13,3 +13,32 @@
 // limitations under the License.
 
 package caesar
+
+import (
+	"reflect"
+	"testing"
+
+	"github.com/merenbach/goldbug/internal/fixture"
+)
+
+func TestTransform(t *testing.T) {
+	var tables []struct {
+		Input  []int
+		Output []int
+		Shift  int
+	}
+
+	fixture.Load(t, &tables)
+	for i, table := range tables {
+		t.Logf("Running test %d of %d...", i+1, len(tables))
+
+		out, err := Transform(table.Input, table.Shift)
+		if err != nil {
+			t.Error("Could not complete transformation:", err)
+		}
+
+		if !reflect.DeepEqual(out, table.Output) {
+			t.Errorf("Expected %+v to transform to %v, but instead got %v", table.Input, table.Output, out)
+		}
+	}
+}
