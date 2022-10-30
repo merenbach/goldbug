@@ -14,7 +14,18 @@
 
 package keyword
 
-// // Transform a slice according to an keyword reordering.
-// func Transform[T any](xs string, keyword string) ([]T, error) {
-// 	return stringutil.Key(xs, keyword), nil
-// }
+import "github.com/merenbach/goldbug/internal/stringutil"
+
+// Key a string with prefix text.
+// TODO: rename Prefix? or something to allow semantically for suffix counterpart?
+func Transform(xs string, keyword string) (string, error) {
+	return stringutil.Deduplicate(keyword + xs), nil
+}
+
+/*
+func Transform[T any](xs []T, keyword []T) ([]T, error) {
+	ys := keyword[:]
+	ys = append(ys, xs)
+	return stringutil.Deduplicate(ys)
+}
+*/

@@ -1,4 +1,4 @@
-// Copyright 2020 Andrew Merenbach
+// Copyright 2018 Andrew Merenbach
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,15 +22,37 @@ import (
 
 func TestCipher_Encipher(t *testing.T) {
 	var tables []struct {
-		Cipher
+		Alphabet string
+		Caseless bool
+		Strict   bool
+		Key      string
+		Primer   string
 
 		Input  string
 		Output string
 	}
 
 	fixture.Load(t, &tables)
-	for _, table := range tables {
-		if out, err := table.Encipher(table.Input); err != nil {
+	for i, table := range tables {
+		t.Logf("Running test %d of %d...", i+1, len(tables))
+
+		var params []CipherOption
+		if table.Alphabet != "" {
+			params = append(params, WithAlphabet(table.Alphabet))
+		}
+		if table.Strict {
+			params = append(params, WithStrict())
+		}
+		if table.Caseless {
+			params = append(params, WithCaseless())
+		}
+
+		c, err := NewCipher(table.Key, table.Primer, params...)
+		if err != nil {
+			t.Error("Could not create cipher:", err)
+		}
+
+		if out, err := c.Encipher(table.Input); err != nil {
 			t.Error("Could not encipher:", err)
 		} else if out != table.Output {
 			t.Errorf("Expected %q to encipher to %q, but instead got %q", table.Input, table.Output, out)
@@ -40,15 +62,37 @@ func TestCipher_Encipher(t *testing.T) {
 
 func TestCipher_Decipher(t *testing.T) {
 	var tables []struct {
-		Cipher
+		Alphabet string
+		Caseless bool
+		Strict   bool
+		Key      string
+		Primer   string
 
 		Input  string
 		Output string
 	}
 
 	fixture.Load(t, &tables)
-	for _, table := range tables {
-		if out, err := table.Decipher(table.Input); err != nil {
+	for i, table := range tables {
+		t.Logf("Running test %d of %d...", i+1, len(tables))
+
+		var params []CipherOption
+		if table.Alphabet != "" {
+			params = append(params, WithAlphabet(table.Alphabet))
+		}
+		if table.Strict {
+			params = append(params, WithStrict())
+		}
+		if table.Caseless {
+			params = append(params, WithCaseless())
+		}
+
+		c, err := NewCipher(table.Key, table.Primer, params...)
+		if err != nil {
+			t.Error("Could not create cipher:", err)
+		}
+
+		if out, err := c.Decipher(table.Input); err != nil {
 			t.Error("Could not decipher:", err)
 		} else if out != table.Output {
 			t.Errorf("Expected %q to decipher to %q, but instead got %q", table.Input, table.Output, out)
@@ -57,11 +101,12 @@ func TestCipher_Decipher(t *testing.T) {
 }
 
 func TestCipher_Tableau(t *testing.T) {
-	c := Cipher{
-		Key:    "ENIGMA",
-		Primer: "23452",
+	c, err := NewCipher("ENIGMA", "23452")
+	if err != nil {
+		t.Fatal("Error:", err)
 	}
-	tableau, err := c.Tableau()
+
+	tableau, err := c.Printable()
 	if err != nil {
 		t.Fatal("Error:", err)
 	}

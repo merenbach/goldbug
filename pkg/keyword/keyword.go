@@ -18,7 +18,6 @@ import (
 	"fmt"
 
 	"github.com/merenbach/goldbug/internal/masc"
-	"github.com/merenbach/goldbug/internal/stringutil"
 )
 
 // A Cipher implements a keyword cipher.
@@ -58,7 +57,7 @@ func NewCipher(keyword string, opts ...CipherOption) (*Cipher, error) {
 		opt(c)
 	}
 
-	ctAlphabet := stringutil.Key(c.alphabet, keyword)
+	ctAlphabet, _ := Transform(c.alphabet, keyword)
 
 	tableau, err := masc.NewTableau(
 		masc.WithPtAlphabet(c.alphabet),

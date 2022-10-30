@@ -40,8 +40,9 @@ type TabulaRecta struct {
 
 	key string
 
-	dictFunc    func(s string, i int) (*masc.Tableau, error)
-	autokeyFunc func(rune, rune, *[]rune)
+	dictFunc     func(string, int) (*masc.Tableau, error)
+	autokeyFunc  func(rune, rune, *[]rune)
+	keyGenerator func(string) (string, error)
 
 	tableau map[rune]*masc.Tableau
 }
@@ -85,6 +86,12 @@ func WithKeyAlphabet(s string) TabulaRectaOption {
 func WithKey(s string) TabulaRectaOption {
 	return func(c *TabulaRecta) {
 		c.key = s
+	}
+}
+
+func WithKeyGenerator(f func(string) (string, error)) TabulaRectaOption {
+	return func(c *TabulaRecta) {
+		c.keyGenerator = f
 	}
 }
 
@@ -224,7 +231,16 @@ func (tr *TabulaRecta) Encipher(s string) (string, error) {
 
 	tableau := tr.tableau
 
-	keyRunes := []rune(tr.key)
+	key := tr.key
+	if tr.keyGenerator != nil {
+		key2, err := tr.keyGenerator(s)
+		if err != nil {
+			return "", fmt.Errorf("could not generate key: %w", err)
+		}
+		key = key2
+	}
+	keyRunes := []rune(key)
+
 	var transcodedCharCount = 0
 	return strings.Map(func(r rune) rune {
 		k := keyRunes[transcodedCharCount%len(keyRunes)]
@@ -264,7 +280,16 @@ func (tr *TabulaRecta) Decipher(s string) (string, error) {
 
 	tableau := tr.tableau
 
-	keyRunes := []rune(tr.key)
+	key := tr.key
+	if tr.keyGenerator != nil {
+		key2, err := tr.keyGenerator(s)
+		if err != nil {
+			return "", fmt.Errorf("could not generate key: %w", err)
+		}
+		key = key2
+	}
+	keyRunes := []rune(key)
+
 	var transcodedCharCount = 0
 	return strings.Map(func(r rune) rune {
 		k := keyRunes[transcodedCharCount%len(keyRunes)]
