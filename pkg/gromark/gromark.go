@@ -168,14 +168,6 @@ func NewCipher(key string, primer string, opts ...CipherOption) (*Cipher, error)
 	return c, nil
 }
 
-type Cipher2 struct {
-	Alphabet string
-	Caseless bool
-	Key      string
-	Primer   string
-	Strict   bool
-}
-
 // // ALLOW COMPOUND CIPHER CHAINING:
 // // NewCompoundCipher(keyword.Cipher, transposition.Cipher, caesar.Cipher...).Tableau()
 // type cipher interface {
