@@ -21,7 +21,7 @@ import (
 	"github.com/merenbach/goldbug/internal/lfg"
 	"github.com/merenbach/goldbug/internal/sliceutil"
 	"github.com/merenbach/goldbug/pkg/masc"
-	"github.com/merenbach/goldbug/pkg/pasc2"
+	"github.com/merenbach/goldbug/pkg/pasc"
 	"github.com/merenbach/goldbug/pkg/transposition"
 )
 
@@ -56,16 +56,16 @@ type Cipher struct {
 	key      string
 	strict   bool
 
-	*pasc2.TabulaRecta
+	*pasc.TabulaRecta
 }
 
 // adapted from: https://www.sohamkamani.com/golang/options-pattern/
 
 // NewGromarkCipher creates and returns a new Gromark cipher.
-func NewGromarkCipher(key string, primer string, opts ...pasc2.ConfigOption) (*Cipher, error) {
+func NewGromarkCipher(key string, primer string, opts ...pasc.ConfigOption) (*Cipher, error) {
 	const digits = "0123456789"
 
-	c := pasc2.NewConfig(opts...)
+	c := pasc.NewConfig(opts...)
 
 	ctAlphabetInput, _ := sliceutil.Keyword([]rune(c.alphabet), []rune(key))
 
@@ -108,9 +108,9 @@ func NewGromarkCipher(key string, primer string, opts ...pasc2.ConfigOption) (*C
 		ciphers[i] = cipher
 	}
 
-	// return pasc2.NewTabulaRectaCipher(primer, ciphers, specialautokey, opts...)
+	// return pasc.NewTabulaRectaCipher(primer, ciphers, specialautokey, opts...)
 
-	tableau, err := pasc2.NewTabulaRecta(c.alphabet, digits, primer, ciphers, func(_ rune, _ rune, keystream *[]rune) {
+	tableau, err := pasc.NewTabulaRecta(c.alphabet, digits, primer, ciphers, func(_ rune, _ rune, keystream *[]rune) {
 		*keystream = append(*keystream, keygen())
 	}, c.caseless)
 	if err != nil {

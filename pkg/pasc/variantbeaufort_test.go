@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package pasc2
+package pasc
 
 import (
 	"testing"
@@ -20,7 +20,7 @@ import (
 	"github.com/merenbach/goldbug/internal/fixture"
 )
 
-func TestGronsfeldCipher_Encipher(t *testing.T) {
+func TestVariantBeaufortCipher_Encipher(t *testing.T) {
 	var tables []struct {
 		Alphabet string
 		Caseless bool
@@ -46,7 +46,7 @@ func TestGronsfeldCipher_Encipher(t *testing.T) {
 			params = append(params, WithCaseless())
 		}
 
-		c, err := NewGronsfeldCipher(table.Key, params...)
+		c, err := NewVariantBeaufortCipher(table.Key, params...)
 		if err != nil {
 			t.Error("Could not create cipher:", err)
 		}
@@ -59,7 +59,7 @@ func TestGronsfeldCipher_Encipher(t *testing.T) {
 	}
 }
 
-func TestGronsfeldCipher_Decipher(t *testing.T) {
+func TestVariantBeaufortCipher_Decipher(t *testing.T) {
 	var tables []struct {
 		Alphabet string
 		Caseless bool
@@ -85,7 +85,7 @@ func TestGronsfeldCipher_Decipher(t *testing.T) {
 			params = append(params, WithCaseless())
 		}
 
-		c, err := NewGronsfeldCipher(table.Key, params...)
+		c, err := NewVariantBeaufortCipher(table.Key, params...)
 		if err != nil {
 			t.Error("Could not create cipher:", err)
 		}
@@ -98,8 +98,8 @@ func TestGronsfeldCipher_Decipher(t *testing.T) {
 	}
 }
 
-func TestGronsfeldCipher_Printable(t *testing.T) {
-	c, err := NewGronsfeldCipher("")
+func TestVariantBeaufortCipher_Printable(t *testing.T) {
+	c, err := NewVariantBeaufortCipher("")
 	if err != nil {
 		t.Fatal("Error:", err)
 	}

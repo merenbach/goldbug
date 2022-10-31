@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package pasc2
+package pasc
 
 import (
 	"errors"

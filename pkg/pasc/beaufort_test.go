@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package pasc2
+package pasc
 
 import (
 	"testing"
@@ -20,13 +20,12 @@ import (
 	"github.com/merenbach/goldbug/internal/fixture"
 )
 
-func TestVigenereCipher_Encipher(t *testing.T) {
+func TestBeaufortCipher_Encipher(t *testing.T) {
 	var tables []struct {
 		Alphabet string
 		Caseless bool
 		Strict   bool
 		Key      string
-		Autokey  autokeyOption
 
 		Input  string
 		Output string
@@ -36,9 +35,7 @@ func TestVigenereCipher_Encipher(t *testing.T) {
 	for i, table := range tables {
 		t.Logf("Running test %d of %d...", i+1, len(tables))
 
-		params := []ConfigOption{
-			// WithAutokey(table.Autokey),
-		}
+		var params []ConfigOption
 		if table.Alphabet != "" {
 			params = append(params, WithPtAlphabet(table.Alphabet))
 		}
@@ -49,7 +46,7 @@ func TestVigenereCipher_Encipher(t *testing.T) {
 			params = append(params, WithCaseless())
 		}
 
-		c, err := NewVigenereCipher(table.Key, table.Autokey, params...)
+		c, err := NewBeaufortCipher(table.Key, params...)
 		if err != nil {
 			t.Error("Could not create cipher:", err)
 		}
@@ -62,13 +59,12 @@ func TestVigenereCipher_Encipher(t *testing.T) {
 	}
 }
 
-func TestVigenereCipher_Decipher(t *testing.T) {
+func TestBeaufortCipher_Decipher(t *testing.T) {
 	var tables []struct {
 		Alphabet string
 		Caseless bool
 		Strict   bool
 		Key      string
-		Autokey  autokeyOption
 
 		Input  string
 		Output string
@@ -78,9 +74,7 @@ func TestVigenereCipher_Decipher(t *testing.T) {
 	for i, table := range tables {
 		t.Logf("Running test %d of %d...", i+1, len(tables))
 
-		params := []ConfigOption{
-			// WithAutokey(table.Autokey),
-		}
+		var params []ConfigOption
 		if table.Alphabet != "" {
 			params = append(params, WithPtAlphabet(table.Alphabet))
 		}
@@ -91,7 +85,7 @@ func TestVigenereCipher_Decipher(t *testing.T) {
 			params = append(params, WithCaseless())
 		}
 
-		c, err := NewVigenereCipher(table.Key, table.Autokey, params...)
+		c, err := NewBeaufortCipher(table.Key, params...)
 		if err != nil {
 			t.Error("Could not create cipher:", err)
 		}
@@ -104,8 +98,8 @@ func TestVigenereCipher_Decipher(t *testing.T) {
 	}
 }
 
-func TestVigenereCipher_Printable(t *testing.T) {
-	c, err := NewVigenereCipher("", NoAutokey)
+func TestBeaufortCipher_Printable(t *testing.T) {
+	c, err := NewBeaufortCipher("")
 	if err != nil {
 		t.Fatal("Error:", err)
 	}

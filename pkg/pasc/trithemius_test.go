@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package pasc2
+package pasc
 
 import (
 	"testing"
@@ -20,12 +20,11 @@ import (
 	"github.com/merenbach/goldbug/internal/fixture"
 )
 
-func TestVariantBeaufortCipher_Encipher(t *testing.T) {
+func TestTrithemiusCipher_Encipher(t *testing.T) {
 	var tables []struct {
 		Alphabet string
 		Caseless bool
 		Strict   bool
-		Key      string
 
 		Input  string
 		Output string
@@ -46,7 +45,7 @@ func TestVariantBeaufortCipher_Encipher(t *testing.T) {
 			params = append(params, WithCaseless())
 		}
 
-		c, err := NewVariantBeaufortCipher(table.Key, params...)
+		c, err := NewTrithemiusCipher(params...)
 		if err != nil {
 			t.Error("Could not create cipher:", err)
 		}
@@ -59,7 +58,7 @@ func TestVariantBeaufortCipher_Encipher(t *testing.T) {
 	}
 }
 
-func TestVariantBeaufortCipher_Decipher(t *testing.T) {
+func TestTrithemiusCipher_Decipher(t *testing.T) {
 	var tables []struct {
 		Alphabet string
 		Caseless bool
@@ -85,7 +84,7 @@ func TestVariantBeaufortCipher_Decipher(t *testing.T) {
 			params = append(params, WithCaseless())
 		}
 
-		c, err := NewVariantBeaufortCipher(table.Key, params...)
+		c, err := NewTrithemiusCipher(params...)
 		if err != nil {
 			t.Error("Could not create cipher:", err)
 		}
@@ -98,8 +97,8 @@ func TestVariantBeaufortCipher_Decipher(t *testing.T) {
 	}
 }
 
-func TestVariantBeaufortCipher_Printable(t *testing.T) {
-	c, err := NewVariantBeaufortCipher("")
+func TestTrithemiusCipher_Printable(t *testing.T) {
+	c, err := NewTrithemiusCipher()
 	if err != nil {
 		t.Fatal("Error:", err)
 	}

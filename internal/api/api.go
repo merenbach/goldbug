@@ -17,13 +17,6 @@ package api
 import (
 	"encoding/json"
 	"errors"
-
-	"github.com/merenbach/goldbug/pkg/beaufort"
-	"github.com/merenbach/goldbug/pkg/dellaporta"
-	"github.com/merenbach/goldbug/pkg/gronsfeld"
-	"github.com/merenbach/goldbug/pkg/trithemius"
-	"github.com/merenbach/goldbug/pkg/variantbeaufort"
-	"github.com/merenbach/goldbug/pkg/vigenere"
 )
 
 // MascBaseConfig is a base configuration for a monoalphabetic substitution cipher operation

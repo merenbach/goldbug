@@ -15,16 +15,11 @@
 package pkg
 
 import (
-	"github.com/merenbach/goldbug/pkg/beaufort"
-	"github.com/merenbach/goldbug/pkg/dellaporta"
 	"github.com/merenbach/goldbug/pkg/gromark"
-	"github.com/merenbach/goldbug/pkg/gronsfeld"
 	"github.com/merenbach/goldbug/pkg/masc"
+	"github.com/merenbach/goldbug/pkg/pasc"
 	"github.com/merenbach/goldbug/pkg/railfence"
 	"github.com/merenbach/goldbug/pkg/transposition"
-	"github.com/merenbach/goldbug/pkg/trithemius"
-	"github.com/merenbach/goldbug/pkg/variantbeaufort"
-	"github.com/merenbach/goldbug/pkg/vigenere"
 )
 
 // A Cipher tranforms strings through encipherment and decipherment.
@@ -34,13 +29,8 @@ type cipher interface {
 }
 
 // Validate against this interface
-var _ cipher = &beaufort.Cipher{}
-var _ cipher = &dellaporta.Cipher{}
 var _ cipher = &gromark.Cipher{}
-var _ cipher = &gronsfeld.Cipher{}
 var _ cipher = &railfence.Cipher{}
 var _ cipher = &masc.SimpleCipher{}
 var _ cipher = &transposition.Cipher{}
-var _ cipher = &trithemius.Cipher{}
-var _ cipher = &variantbeaufort.Cipher{}
-var _ cipher = &vigenere.Cipher{}
+var _ cipher = &pasc.TabulaRectaCipher{}

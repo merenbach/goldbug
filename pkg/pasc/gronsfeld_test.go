@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package pasc2
+package pasc
 
 import (
 	"testing"
@@ -20,45 +20,7 @@ import (
 	"github.com/merenbach/goldbug/internal/fixture"
 )
 
-func TestTrithemiusCipher_Encipher(t *testing.T) {
-	var tables []struct {
-		Alphabet string
-		Caseless bool
-		Strict   bool
-
-		Input  string
-		Output string
-	}
-
-	fixture.Load(t, &tables)
-	for i, table := range tables {
-		t.Logf("Running test %d of %d...", i+1, len(tables))
-
-		var params []ConfigOption
-		if table.Alphabet != "" {
-			params = append(params, WithPtAlphabet(table.Alphabet))
-		}
-		if table.Strict {
-			params = append(params, WithStrict())
-		}
-		if table.Caseless {
-			params = append(params, WithCaseless())
-		}
-
-		c, err := NewTrithemiusCipher(params...)
-		if err != nil {
-			t.Error("Could not create cipher:", err)
-		}
-
-		if out, err := c.Encipher(table.Input); err != nil {
-			t.Error("Could not encipher:", err)
-		} else if out != table.Output {
-			t.Errorf("Expected %q to encipher to %q, but instead got %q", table.Input, table.Output, out)
-		}
-	}
-}
-
-func TestTrithemiusCipher_Decipher(t *testing.T) {
+func TestGronsfeldCipher_Encipher(t *testing.T) {
 	var tables []struct {
 		Alphabet string
 		Caseless bool
@@ -84,7 +46,46 @@ func TestTrithemiusCipher_Decipher(t *testing.T) {
 			params = append(params, WithCaseless())
 		}
 
-		c, err := NewTrithemiusCipher(params...)
+		c, err := NewGronsfeldCipher(table.Key, params...)
+		if err != nil {
+			t.Error("Could not create cipher:", err)
+		}
+
+		if out, err := c.Encipher(table.Input); err != nil {
+			t.Error("Could not encipher:", err)
+		} else if out != table.Output {
+			t.Errorf("Expected %q to encipher to %q, but instead got %q", table.Input, table.Output, out)
+		}
+	}
+}
+
+func TestGronsfeldCipher_Decipher(t *testing.T) {
+	var tables []struct {
+		Alphabet string
+		Caseless bool
+		Strict   bool
+		Key      string
+
+		Input  string
+		Output string
+	}
+
+	fixture.Load(t, &tables)
+	for i, table := range tables {
+		t.Logf("Running test %d of %d...", i+1, len(tables))
+
+		var params []ConfigOption
+		if table.Alphabet != "" {
+			params = append(params, WithPtAlphabet(table.Alphabet))
+		}
+		if table.Strict {
+			params = append(params, WithStrict())
+		}
+		if table.Caseless {
+			params = append(params, WithCaseless())
+		}
+
+		c, err := NewGronsfeldCipher(table.Key, params...)
 		if err != nil {
 			t.Error("Could not create cipher:", err)
 		}
@@ -97,8 +98,8 @@ func TestTrithemiusCipher_Decipher(t *testing.T) {
 	}
 }
 
-func TestTrithemiusCipher_Printable(t *testing.T) {
-	c, err := NewTrithemiusCipher()
+func TestGronsfeldCipher_Printable(t *testing.T) {
+	c, err := NewGronsfeldCipher("")
 	if err != nil {
 		t.Fatal("Error:", err)
 	}
