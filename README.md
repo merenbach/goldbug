@@ -23,8 +23,7 @@ Instantiate your deployment pipeline as follows, adapting as necessary the param
 ## TODO
 
 * Explore making MASC String() into Printable()
-* Put tests in for MASC transforms
-* Make MASC Tableau vars nonexported
+* Fix test names and filename conventions
 * Implement PASC transforms and tests
 * Refactor testing methodology for MASC and PASC to reduce duplication
 * Explore alternative PASC with (slope, intercept) = (-1, -1)

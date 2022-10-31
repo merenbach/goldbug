@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package beaufort
+package pasc2
 
 import (
 	"testing"
@@ -20,7 +20,7 @@ import (
 	"github.com/merenbach/goldbug/internal/fixture"
 )
 
-func TestCipher_Encipher(t *testing.T) {
+func TestBeaufortCipher_Encipher(t *testing.T) {
 	var tables []struct {
 		Alphabet string
 		Caseless bool
@@ -35,9 +35,7 @@ func TestCipher_Encipher(t *testing.T) {
 	for i, table := range tables {
 		t.Logf("Running test %d of %d...", i+1, len(tables))
 
-		params := []CipherOption{
-			WithKey(table.Key),
-		}
+		var params []ConfigOption
 		if table.Alphabet != "" {
 			params = append(params, WithAlphabet(table.Alphabet))
 		}
@@ -48,7 +46,7 @@ func TestCipher_Encipher(t *testing.T) {
 			params = append(params, WithCaseless())
 		}
 
-		c, err := NewCipher(params...)
+		c, err := NewBeaufortCipher(table.Key, params...)
 		if err != nil {
 			t.Error("Could not create cipher:", err)
 		}
@@ -61,7 +59,7 @@ func TestCipher_Encipher(t *testing.T) {
 	}
 }
 
-func TestCipher_Decipher(t *testing.T) {
+func TestBeaufortCipher_Decipher(t *testing.T) {
 	var tables []struct {
 		Alphabet string
 		Caseless bool
@@ -76,9 +74,7 @@ func TestCipher_Decipher(t *testing.T) {
 	for i, table := range tables {
 		t.Logf("Running test %d of %d...", i+1, len(tables))
 
-		params := []CipherOption{
-			WithKey(table.Key),
-		}
+		var params []ConfigOption
 		if table.Alphabet != "" {
 			params = append(params, WithAlphabet(table.Alphabet))
 		}
@@ -89,7 +85,7 @@ func TestCipher_Decipher(t *testing.T) {
 			params = append(params, WithCaseless())
 		}
 
-		c, err := NewCipher(params...)
+		c, err := NewBeaufortCipher(table.Key, params...)
 		if err != nil {
 			t.Error("Could not create cipher:", err)
 		}
@@ -102,8 +98,8 @@ func TestCipher_Decipher(t *testing.T) {
 	}
 }
 
-func TestCipher_Tableau(t *testing.T) {
-	c, err := NewCipher()
+func TestBeaufortCipher_Printable(t *testing.T) {
+	c, err := NewBeaufortCipher("")
 	if err != nil {
 		t.Fatal("Error:", err)
 	}

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package beaufort
+package pasc2
 
 import (
 	"fmt"
@@ -24,47 +24,13 @@ import (
 // Cipher implements a Beaufort cipher.
 // Cipher is effectively a Vigenère cipher with the ciphertext and key alphabets both mirrored (back-to-front).
 type Cipher struct {
-	alphabet string
-	caseless bool
-	key      string
-	strict   bool
-
 	*pasc.TabulaRecta
 }
 
 // adapted from: https://www.sohamkamani.com/golang/options-pattern/
 
-type CipherOption func(*Cipher)
-
-func WithStrict() CipherOption {
-	return func(c *Cipher) {
-		c.strict = true
-	}
-}
-
-func WithCaseless() CipherOption {
-	return func(c *Cipher) {
-		c.caseless = true
-	}
-}
-
-func WithAlphabet(s string) CipherOption {
-	return func(c *Cipher) {
-		c.alphabet = s
-	}
-}
-
-func WithKey(s string) CipherOption {
-	return func(c *Cipher) {
-		c.key = s
-	}
-}
-
-func NewCipher(opts ...CipherOption) (*Cipher, error) {
-	c := &Cipher{alphabet: pasc.Alphabet}
-	for _, opt := range opts {
-		opt(c)
-	}
+func NewBeaufortCipher(key string, opts ...ConfigOption) (*Cipher, error) {
+	c := NewConfig(opts...)
 
 	// ctAlphabet, err := Transform([]rune(c.alphabet))
 	// if err != nil {
@@ -75,7 +41,7 @@ func NewCipher(opts ...CipherOption) (*Cipher, error) {
 		pasc.WithCaseless(c.caseless),
 		pasc.WithPtAlphabet(c.alphabet),
 		pasc.WithKeyAlphabet(c.alphabet),
-		pasc.WithKey(c.key),
+		pasc.WithKey(key),
 		// pasc.WithCtAlphabet(string(ctAlphabet)),
 		// pasc.WithStrict(c.strict),
 		pasc.WithDictFunc(func(s string, i int) (*masc.SimpleCipher, error) {
@@ -94,7 +60,8 @@ func NewCipher(opts ...CipherOption) (*Cipher, error) {
 	if err != nil {
 		return nil, fmt.Errorf("could not create tableau: %w", err)
 	}
-	c.TabulaRecta = tableau
 
-	return c, nil
+	return &Cipher{
+		tableau,
+	}, nil
 }
