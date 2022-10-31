@@ -21,7 +21,6 @@ import (
 	"github.com/merenbach/goldbug/internal/masc"
 	"github.com/merenbach/goldbug/internal/pasc"
 	"github.com/merenbach/goldbug/pkg/masc2"
-	"github.com/merenbach/goldbug/pkg/simple"
 )
 
 // WrapString wraps a string a specified number of indices.
@@ -105,7 +104,7 @@ func NewCipher(opts ...CipherOption) (*Cipher, error) {
 		pasc.WithKey(c.key),
 		// pasc.WithCtAlphabet(string(ctAlphabet)),
 		// pasc.WithStrict(c.strict),
-		pasc.WithDictFunc(func(s string, i int) (*simple.Cipher, error) {
+		pasc.WithDictFunc(func(s string, i int) (*masc2.Cipher, error) {
 			ctAlphabet2, err := owrapString(s, i/2)
 			if err != nil {
 				return nil, err
@@ -121,7 +120,7 @@ func NewCipher(opts ...CipherOption) (*Cipher, error) {
 				params = append(params, masc2.WithStrict())
 			}
 
-			return simple.NewCipher(ctAlphabet2, params...)
+			return masc2.NewSimpleCipher(ctAlphabet2, params...)
 		}),
 	)
 	if err != nil {

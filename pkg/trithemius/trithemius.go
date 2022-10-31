@@ -19,9 +19,7 @@ import (
 
 	"github.com/merenbach/goldbug/internal/masc"
 	"github.com/merenbach/goldbug/internal/pasc"
-	"github.com/merenbach/goldbug/pkg/caesar"
 	"github.com/merenbach/goldbug/pkg/masc2"
-	"github.com/merenbach/goldbug/pkg/simple"
 )
 
 // Cipher implements a Trithemius cipher.
@@ -74,7 +72,7 @@ func NewCipher(opts ...CipherOption) (*Cipher, error) {
 		pasc.WithKey(c.alphabet),
 		// pasc.WithCtAlphabet(string(ctAlphabet)),
 		// pasc.WithStrict(c.strict),
-		pasc.WithDictFunc(func(s string, i int) (*simple.Cipher, error) {
+		pasc.WithDictFunc(func(s string, i int) (*masc2.Cipher, error) {
 			params := []masc2.ConfigOption{
 				masc2.WithAlphabet(s),
 			}
@@ -84,7 +82,7 @@ func NewCipher(opts ...CipherOption) (*Cipher, error) {
 			if c.strict {
 				params = append(params, masc2.WithStrict())
 			}
-			return caesar.NewCipher(i, params...)
+			return masc2.NewCaesarCipher(i, params...)
 		}),
 	)
 	if err != nil {

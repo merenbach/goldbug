@@ -1,9 +1,12 @@
 package sliceutil
 
 import (
+	"errors"
 	"fmt"
 	"sort"
 
+	"github.com/merenbach/goldbug/internal/mathutil"
+	"github.com/merenbach/goldbug/internal/prng"
 	"golang.org/x/exp/constraints"
 )
 
@@ -56,4 +59,64 @@ func Deduplicate[T comparable](xs []T) []T {
 		}
 	}
 	return out
+}
+
+// Affine transform a slice and return the result.
+func Affine[T any](xs []T, slope int, intercept int) ([]T, error) {
+	m := len(xs)
+
+	if m == 0 {
+		return xs, nil
+	}
+
+	for slope < 0 {
+		slope += m
+	}
+	for intercept < 0 {
+		intercept += m
+	}
+
+	if !mathutil.Coprime(m, slope) {
+		return nil, errors.New("slope and string length must be coprime")
+	}
+
+	lcg := &prng.LCG{
+		Modulus:    m,
+		Multiplier: 1,
+		Increment:  slope,
+		Seed:       intercept,
+	}
+
+	positions, err := lcg.Slice(m)
+	if err != nil {
+		return nil, fmt.Errorf("couldn't initialize LCG: %w", err)
+	}
+
+	ys, err := Backpermute(xs, positions)
+	if err != nil {
+		return nil, fmt.Errorf("couldn't backpermute input: %w", err)
+	}
+
+	return ys, nil
+}
+
+// Keyword transform a slice.
+func Keyword[T comparable](xs []T, keyword []T) ([]T, error) {
+	set := make(map[T]struct{})
+	for _, x := range xs {
+		if _, ok := set[x]; !ok {
+			set[x] = struct{}{}
+		}
+	}
+
+	// Filter out anything from the keyword that isn't in the primary slice
+	filteredKeyword := make([]T, 0)
+	for _, k := range keyword {
+		if _, ok := set[k]; ok {
+			filteredKeyword = append(filteredKeyword, k)
+		}
+	}
+
+	filteredKeyword = append(filteredKeyword, xs...)
+	return Deduplicate(filteredKeyword), nil
 }

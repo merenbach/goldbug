@@ -12,17 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package simple
+package masc2
 
 import (
 	"fmt"
 	"testing"
 
 	"github.com/merenbach/goldbug/internal/fixture"
-	"github.com/merenbach/goldbug/pkg/masc2"
 )
 
-func TestCipher_Encipher(t *testing.T) {
+func TestSimpleCipher_Encipher(t *testing.T) {
 	var tables []struct {
 		Alphabet   string
 		Caseless   bool
@@ -37,15 +36,15 @@ func TestCipher_Encipher(t *testing.T) {
 	for i, table := range tables {
 		t.Logf("Running test %d of %d...", i+1, len(tables))
 
-		var params []masc2.ConfigOption
+		var params []ConfigOption
 		if table.Strict {
-			params = append(params, masc2.WithStrict())
+			params = append(params, WithStrict())
 		}
 		if table.Caseless {
-			params = append(params, masc2.WithCaseless())
+			params = append(params, WithCaseless())
 		}
 
-		c, err := NewCipher(table.CtAlphabet, params...)
+		c, err := NewSimpleCipher(table.CtAlphabet, params...)
 		if err != nil {
 			t.Error("Could not create cipher:", err)
 		}
@@ -58,7 +57,7 @@ func TestCipher_Encipher(t *testing.T) {
 	}
 }
 
-func TestCipher_Decipher(t *testing.T) {
+func TestSimpleCipher_Decipher(t *testing.T) {
 	var tables []struct {
 		Alphabet   string
 		Caseless   bool
@@ -74,15 +73,15 @@ func TestCipher_Decipher(t *testing.T) {
 	for i, table := range tables {
 		t.Logf("Running test %d of %d...", i+1, len(tables))
 
-		var params []masc2.ConfigOption
+		var params []ConfigOption
 		if table.Strict {
-			params = append(params, masc2.WithStrict())
+			params = append(params, WithStrict())
 		}
 		if table.Caseless {
-			params = append(params, masc2.WithCaseless())
+			params = append(params, WithCaseless())
 		}
 
-		c, err := NewCipher(table.CtAlphabet, params...)
+		c, err := NewSimpleCipher(table.CtAlphabet, params...)
 		if err != nil {
 			t.Error("Could not create cipher:", err)
 		}
@@ -95,8 +94,8 @@ func TestCipher_Decipher(t *testing.T) {
 	}
 }
 
-func ExampleCipher_Tableau() {
-	c, err := NewCipher("MLSDEFPTJCARNUVWYXOGQKIZHB")
+func ExampleNewSimpleCipher() {
+	c, err := NewSimpleCipher("MLSDEFPTJCARNUVWYXOGQKIZHB")
 	if err != nil {
 		fmt.Println("Error:", err)
 	}

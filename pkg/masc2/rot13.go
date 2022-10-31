@@ -12,16 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package decimation
+package masc2
 
-import (
-	"github.com/merenbach/goldbug/pkg/affine"
-	"github.com/merenbach/goldbug/pkg/masc2"
-	"github.com/merenbach/goldbug/pkg/simple"
-)
-
-// NewCipher creates and returns a new cipher.
-func NewCipher(multiplier int, opts ...masc2.ConfigOption) (*simple.Cipher, error) {
-	const intercept = 0
-	return affine.NewCipher(multiplier, intercept, opts...)
+// NewRot13Cipher creates and returns a new ROT13 cipher.
+func NewRot13Cipher(opts ...ConfigOption) (*Cipher, error) {
+	const shift = 13
+	return NewCaesarCipher(shift, opts...)
 }

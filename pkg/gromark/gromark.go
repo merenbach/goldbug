@@ -22,10 +22,8 @@ import (
 	"github.com/merenbach/goldbug/internal/lfg"
 	"github.com/merenbach/goldbug/internal/masc"
 	"github.com/merenbach/goldbug/internal/pasc"
-	"github.com/merenbach/goldbug/pkg/affine"
-	"github.com/merenbach/goldbug/pkg/keyword"
+	"github.com/merenbach/goldbug/internal/sliceutil"
 	"github.com/merenbach/goldbug/pkg/masc2"
-	"github.com/merenbach/goldbug/pkg/simple"
 	"github.com/merenbach/goldbug/pkg/transposition"
 )
 
@@ -113,7 +111,7 @@ func NewCipher(key string, primer string, opts ...CipherOption) (*Cipher, error)
 		opt(c)
 	}
 
-	ctAlphabetInput, _ := keyword.Transform([]rune(c.alphabet), []rune(key))
+	ctAlphabetInput, _ := sliceutil.Keyword([]rune(c.alphabet), []rune(key))
 
 	tc := transposition.Cipher{
 		Keys: []string{key},
@@ -133,8 +131,8 @@ func NewCipher(key string, primer string, opts ...CipherOption) (*Cipher, error)
 		pasc.WithKeyGenerator(func(s string) (string, error) {
 			return makekey(primer, utf8.RuneCountInString(s))
 		}),
-		pasc.WithDictFunc(func(s string, i int) (*simple.Cipher, error) {
-			ctAlphabetTransformed, err := affine.Transform([]rune(transposedCtAlphabet), 1, i)
+		pasc.WithDictFunc(func(s string, i int) (*masc2.Cipher, error) {
+			ctAlphabetTransformed, err := sliceutil.Affine([]rune(transposedCtAlphabet), 1, i)
 			if err != nil {
 				return nil, fmt.Errorf("could not transform alphabet: %w", err)
 			}
@@ -148,7 +146,7 @@ func NewCipher(key string, primer string, opts ...CipherOption) (*Cipher, error)
 			if c.strict {
 				params = append(params, masc2.WithStrict())
 			}
-			return simple.NewCipher(string(ctAlphabetTransformed), params...)
+			return masc2.NewSimpleCipher(string(ctAlphabetTransformed), params...)
 		}),
 	}
 	if c.caseless {

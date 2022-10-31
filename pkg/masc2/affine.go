@@ -12,19 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package atbash
+package masc2
 
 import (
-	"github.com/merenbach/goldbug/pkg/affine"
-	"github.com/merenbach/goldbug/pkg/masc2"
-	"github.com/merenbach/goldbug/pkg/simple"
+	"fmt"
+
+	"github.com/merenbach/goldbug/internal/sliceutil"
 )
 
-// NewCipher creates and returns a new cipher.
-func NewCipher(opts ...masc2.ConfigOption) (*simple.Cipher, error) {
-	const (
-		slope     = (-1)
-		intercept = (-1)
-	)
-	return affine.NewCipher(slope, intercept, opts...)
+// NewAffineCipher creates and returns a new affine cipher.
+func NewAffineCipher(slope int, intercept int, opts ...ConfigOption) (*Cipher, error) {
+	c := NewConfig(opts...)
+
+	ctAlphabet, err := sliceutil.Affine([]rune(c.Alphabet()), slope, intercept)
+	if err != nil {
+		return nil, fmt.Errorf("could not transform alphabet: %w", err)
+	}
+
+	return NewSimpleCipher(string(ctAlphabet), opts...)
 }

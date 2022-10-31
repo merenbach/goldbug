@@ -12,22 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package decimation
+package masc2
 
 import (
 	"fmt"
 	"testing"
 
 	"github.com/merenbach/goldbug/internal/fixture"
-	"github.com/merenbach/goldbug/pkg/masc2"
 )
 
-func TestCipher_Encipher(t *testing.T) {
+func TestKeywordCipher_Encipher(t *testing.T) {
 	var tables []struct {
-		Alphabet   string
-		Caseless   bool
-		Strict     bool
-		Multiplier int
+		Alphabet string
+		Caseless bool
+		Strict   bool
+		Keyword  string
 
 		Input  string
 		Output string
@@ -37,18 +36,18 @@ func TestCipher_Encipher(t *testing.T) {
 	for i, table := range tables {
 		t.Logf("Running test %d of %d...", i+1, len(tables))
 
-		var params []masc2.ConfigOption
+		var params []ConfigOption
 		if table.Alphabet != "" {
-			params = append(params, masc2.WithAlphabet(table.Alphabet))
+			params = append(params, WithAlphabet(table.Alphabet))
 		}
 		if table.Strict {
-			params = append(params, masc2.WithStrict())
+			params = append(params, WithStrict())
 		}
 		if table.Caseless {
-			params = append(params, masc2.WithCaseless())
+			params = append(params, WithCaseless())
 		}
 
-		c, err := NewCipher(table.Multiplier, params...)
+		c, err := NewKeywordCipher(table.Keyword, params...)
 		if err != nil {
 			t.Error("Could not create cipher:", err)
 		}
@@ -61,12 +60,12 @@ func TestCipher_Encipher(t *testing.T) {
 	}
 }
 
-func TestCipher_Decipher(t *testing.T) {
+func TestKeywordCipher_Decipher(t *testing.T) {
 	var tables []struct {
-		Alphabet   string
-		Caseless   bool
-		Strict     bool
-		Multiplier int
+		Alphabet string
+		Caseless bool
+		Strict   bool
+		Keyword  string
 
 		Input  string
 		Output string
@@ -76,18 +75,18 @@ func TestCipher_Decipher(t *testing.T) {
 	for i, table := range tables {
 		t.Logf("Running test %d of %d...", i+1, len(tables))
 
-		var params []masc2.ConfigOption
+		var params []ConfigOption
 		if table.Alphabet != "" {
-			params = append(params, masc2.WithAlphabet(table.Alphabet))
+			params = append(params, WithAlphabet(table.Alphabet))
 		}
 		if table.Strict {
-			params = append(params, masc2.WithStrict())
+			params = append(params, WithStrict())
 		}
 		if table.Caseless {
-			params = append(params, masc2.WithCaseless())
+			params = append(params, WithCaseless())
 		}
 
-		c, err := NewCipher(table.Multiplier, params...)
+		c, err := NewKeywordCipher(table.Keyword, params...)
 		if err != nil {
 			t.Error("Could not create cipher:", err)
 		}
@@ -100,8 +99,8 @@ func TestCipher_Decipher(t *testing.T) {
 	}
 }
 
-func ExampleCipher_Tableau() {
-	c, err := NewCipher(7)
+func ExampleNewKeywordCipher() {
+	c, err := NewKeywordCipher("CIPHER")
 	if err != nil {
 		fmt.Println("Error:", err)
 	}
@@ -109,5 +108,5 @@ func ExampleCipher_Tableau() {
 
 	// Output:
 	// PT: ABCDEFGHIJKLMNOPQRSTUVWXYZ
-	// CT: AHOVCJQXELSZGNUBIPWDKRYFMT
+	// CT: CIPHERABDFGJKLMNOQSTUVWXYZ
 }

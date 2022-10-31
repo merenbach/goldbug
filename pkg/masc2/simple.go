@@ -12,16 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package rot13
+package masc2
 
 import (
-	"github.com/merenbach/goldbug/pkg/caesar"
-	"github.com/merenbach/goldbug/pkg/masc2"
-	"github.com/merenbach/goldbug/pkg/simple"
+	"fmt"
+
+	"github.com/merenbach/goldbug/internal/masc"
 )
 
-// NewCipher creates and returns a new cipher.
-func NewCipher(opts ...masc2.ConfigOption) (*simple.Cipher, error) {
-	const shift = 13
-	return caesar.NewCipher(shift, opts...)
+// A Cipher implements a simple cipher.
+type Cipher struct {
+	*masc.Tableau
+}
+
+// NewSimpleCipher creates and returns a new simple cipher.
+func NewSimpleCipher(ctAlphabet string, opts ...ConfigOption) (*Cipher, error) {
+	c := NewConfig(opts...)
+
+	tableau, err := masc.NewTableau(
+		c.Alphabet(),
+		ctAlphabet,
+		c.Strict(),
+		c.Caseless(),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("could not create tableau: %w", err)
+	}
+
+	return &Cipher{tableau}, nil
 }

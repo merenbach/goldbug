@@ -12,16 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package caesar
+package masc2
 
-import (
-	"github.com/merenbach/goldbug/pkg/affine"
-	"github.com/merenbach/goldbug/pkg/masc2"
-	"github.com/merenbach/goldbug/pkg/simple"
-)
-
-// NewCipher creates and returns a new cipher.
-func NewCipher(shift int, opts ...masc2.ConfigOption) (*simple.Cipher, error) {
+// NewCaesarCipher creates and returns a new Caesar cipher.
+func NewCaesarCipher(shift int, opts ...ConfigOption) (*Cipher, error) {
 	const slope = 1
-	return affine.NewCipher(slope, shift, opts...)
+	return NewAffineCipher(slope, shift, opts...)
 }

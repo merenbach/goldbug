@@ -12,33 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package simple
+package masc2
 
-import (
-	"fmt"
-
-	"github.com/merenbach/goldbug/internal/masc"
-	"github.com/merenbach/goldbug/pkg/masc2"
-)
-
-// A Cipher implements a simple cipher.
-type Cipher struct {
-	*masc.Tableau
-}
-
-// NewCipher creates and returns a new cipher.
-func NewCipher(ctAlphabet string, opts ...masc2.ConfigOption) (*Cipher, error) {
-	c := masc2.NewConfig(opts...)
-
-	tableau, err := masc.NewTableau(
-		c.Alphabet(),
-		ctAlphabet,
-		c.Strict(),
-		c.Caseless(),
+// NewAtbashCipher creates and returns a new cipher.
+func NewAtbashCipher(opts ...ConfigOption) (*Cipher, error) {
+	const (
+		slope     = (-1)
+		intercept = (-1)
 	)
-	if err != nil {
-		return nil, fmt.Errorf("could not create tableau: %w", err)
-	}
-
-	return &Cipher{tableau}, nil
+	return NewAffineCipher(slope, intercept, opts...)
 }

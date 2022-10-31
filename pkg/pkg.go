@@ -19,8 +19,8 @@ import (
 	"github.com/merenbach/goldbug/pkg/dellaporta"
 	"github.com/merenbach/goldbug/pkg/gromark"
 	"github.com/merenbach/goldbug/pkg/gronsfeld"
+	"github.com/merenbach/goldbug/pkg/masc2"
 	"github.com/merenbach/goldbug/pkg/railfence"
-	"github.com/merenbach/goldbug/pkg/simple"
 	"github.com/merenbach/goldbug/pkg/transposition"
 	"github.com/merenbach/goldbug/pkg/trithemius"
 	"github.com/merenbach/goldbug/pkg/variantbeaufort"
@@ -39,7 +39,7 @@ var _ cipher = &dellaporta.Cipher{}
 var _ cipher = &gromark.Cipher{}
 var _ cipher = &gronsfeld.Cipher{}
 var _ cipher = &railfence.Cipher{}
-var _ cipher = &simple.Cipher{}
+var _ cipher = &masc2.Cipher{}
 var _ cipher = &transposition.Cipher{}
 var _ cipher = &trithemius.Cipher{}
 var _ cipher = &variantbeaufort.Cipher{}

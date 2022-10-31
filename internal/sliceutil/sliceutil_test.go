@@ -56,3 +56,48 @@ func TestDeduplicate(t *testing.T) {
 		}
 	}
 }
+
+func TestAffine(t *testing.T) {
+	var tables []struct {
+		Input     []int
+		Output    []int
+		Slope     int
+		Intercept int
+	}
+
+	fixture.Load(t, &tables)
+	for i, table := range tables {
+		t.Logf("Running test %d of %d...", i+1, len(tables))
+
+		out, err := Affine(table.Input, table.Slope, table.Intercept)
+		if err != nil {
+			t.Error("Could not complete transformation:", err)
+		}
+
+		if !reflect.DeepEqual(out, table.Output) {
+			t.Errorf("Expected %+v to transform to %v, but instead got %v", table.Input, table.Output, out)
+		}
+	}
+}
+
+func TestKeyword(t *testing.T) {
+	var tables []struct {
+		Input   []int
+		Output  []int
+		Keyword []int
+	}
+
+	fixture.Load(t, &tables)
+	for i, table := range tables {
+		t.Logf("Running test %d of %d...", i+1, len(tables))
+
+		out, err := Keyword(table.Input, table.Keyword)
+		if err != nil {
+			t.Error("Could not complete transformation:", err)
+		}
+
+		if !reflect.DeepEqual(out, table.Output) {
+			t.Errorf("Expected %+v to transform to %v, but instead got %v", table.Input, table.Output, out)
+		}
+	}
+}

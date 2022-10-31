@@ -21,7 +21,7 @@ import (
 	"text/tabwriter"
 	"unicode"
 
-	"github.com/merenbach/goldbug/pkg/simple"
+	"github.com/merenbach/goldbug/pkg/masc2"
 )
 
 // TabulaRecta holds a tabula recta.
@@ -34,11 +34,11 @@ type TabulaRecta struct {
 
 	key string
 
-	dictFunc     func(string, int) (*simple.Cipher, error)
+	dictFunc     func(string, int) (*masc2.Cipher, error)
 	autokeyFunc  func(rune, rune, *[]rune)
 	keyGenerator func(string) (string, error)
 
-	tableau map[rune]*simple.Cipher
+	tableau map[rune]*masc2.Cipher
 }
 
 // adapted from: https://www.sohamkamani.com/golang/options-pattern/
@@ -89,7 +89,7 @@ func WithKeyGenerator(f func(string) (string, error)) TabulaRectaOption {
 	}
 }
 
-func WithDictFunc(f func(s string, i int) (*simple.Cipher, error)) TabulaRectaOption {
+func WithDictFunc(f func(s string, i int) (*masc2.Cipher, error)) TabulaRectaOption {
 	return func(c *TabulaRecta) {
 		c.dictFunc = f
 	}
@@ -121,7 +121,7 @@ func NewTabulaRecta(opts ...TabulaRectaOption) (*TabulaRecta, error) {
 	return t, nil
 }
 
-func (tr *TabulaRecta) maketableau() (map[rune]*simple.Cipher, error) {
+func (tr *TabulaRecta) maketableau() (map[rune]*masc2.Cipher, error) {
 	f := tr.dictFunc
 
 	ptAlphabet, keyAlphabet := tr.ptAlphabet, tr.keyAlphabet
@@ -130,7 +130,7 @@ func (tr *TabulaRecta) maketableau() (map[rune]*simple.Cipher, error) {
 		keyAlphabet = ptAlphabet
 	}
 
-	m := make(map[rune]*simple.Cipher)
+	m := make(map[rune]*masc2.Cipher)
 
 	keyRunes := []rune(keyAlphabet)
 

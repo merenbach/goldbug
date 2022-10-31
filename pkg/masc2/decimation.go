@@ -12,23 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package affine
+package masc2
 
-import (
-	"fmt"
-
-	"github.com/merenbach/goldbug/pkg/masc2"
-	"github.com/merenbach/goldbug/pkg/simple"
-)
-
-// NewCipher creates and returns a new cipher.
-func NewCipher(slope int, intercept int, opts ...masc2.ConfigOption) (*simple.Cipher, error) {
-	c := masc2.NewConfig(opts...)
-
-	ctAlphabet, err := Transform([]rune(c.Alphabet()), slope, intercept)
-	if err != nil {
-		return nil, fmt.Errorf("could not transform alphabet: %w", err)
-	}
-
-	return simple.NewCipher(string(ctAlphabet), opts...)
+// NewDecimationCipher creates and returns a new decimation cipher.
+func NewDecimationCipher(multiplier int, opts ...ConfigOption) (*Cipher, error) {
+	const intercept = 0
+	return NewAffineCipher(multiplier, intercept, opts...)
 }
