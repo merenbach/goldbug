@@ -24,7 +24,7 @@ import (
 func NewAffineCipher(slope int, intercept int, opts ...ConfigOption) (*SimpleCipher, error) {
 	c := NewConfig(opts...)
 
-	ctAlphabet, err := sliceutil.Affine([]rune(c.Alphabet()), slope, intercept)
+	ctAlphabet, err := sliceutil.Affine([]rune(c.alphabet), slope, intercept)
 	if err != nil {
 		return nil, fmt.Errorf("could not transform alphabet: %w", err)
 	}

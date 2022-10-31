@@ -23,18 +23,6 @@ type Config struct {
 	strict   bool
 }
 
-func (c *Config) Alphabet() string {
-	return c.alphabet
-}
-
-func (c *Config) Caseless() bool {
-	return c.caseless
-}
-
-func (c *Config) Strict() bool {
-	return c.strict
-}
-
 // adapted from: https://www.sohamkamani.com/golang/options-pattern/
 
 type ConfigOption func(*Config)
