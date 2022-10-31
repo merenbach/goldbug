@@ -1,0 +1,38 @@
+[
+    {
+        "Alphabet": "",
+        "CtAlphabet": "MLSDEFPTJCARNUVWYXOGQKIZHB",
+        "Input": "Terrv, ivxrd!",
+        "Output": "Hello, world!",
+        "Strict": false,
+        "Caseless": true
+    },
+    {
+        "Alphabet": "",
+        "CtAlphabet": "MLSDEFPTJCARNUVWYXOGQKIZHB",
+        "Input": "TERRV, IVXRD!",
+        "Output": "HELLO, WORLD!",
+        "Strict": false
+    },
+    {
+        "Alphabet": "",
+        "CtAlphabet": "MLSDEFPTJCARNUVWYXOGQKIZHB",
+        "Input": "TERRV, IVXRD!",
+        "Output": "HELLOWORLD",
+        "Strict": true
+    },
+    {
+        "Alphabet": "",
+        "CtAlphabet": "MLSDEFPTJCARNUVWYXOGQKIZHB",
+        "Input": "MFFJUE SJWTEX",
+        "Output": "AFFINE CIPHER",
+        "Strict": false
+    },
+    {
+        "Alphabet": "",
+        "CtAlphabet": "MLSDEFPTJCARNUVWYXOGQKIZHB",
+        "Input": "MFFJUE SJWTEX",
+        "Output": "AFFINECIPHER",
+        "Strict": true
+    }
+]
