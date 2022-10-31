@@ -105,7 +105,7 @@ func NewCipher(opts ...CipherOption) (*Cipher, error) {
 		pasc.WithKey(c.key),
 		// pasc.WithCtAlphabet(string(ctAlphabet)),
 		// pasc.WithStrict(c.strict),
-		pasc.WithDictFunc(func(s string, i int) (*masc.Tableau, error) {
+		pasc.WithDictFunc(func(s string, i int) (*simple.Cipher, error) {
 			ctAlphabet2, err := owrapString(s, i/2)
 			if err != nil {
 				return nil, err
@@ -121,12 +121,7 @@ func NewCipher(opts ...CipherOption) (*Cipher, error) {
 				params = append(params, masc2.WithStrict())
 			}
 
-			c2, err := simple.NewCipher(ctAlphabet2, params...)
-			if err != nil {
-				return nil, fmt.Errorf("could not create cipher: %w", err)
-			}
-
-			return c2.Tableau, nil
+			return simple.NewCipher(ctAlphabet2, params...)
 		}),
 	)
 	if err != nil {

@@ -21,6 +21,7 @@ import (
 	"github.com/merenbach/goldbug/internal/pasc"
 	"github.com/merenbach/goldbug/pkg/caesar"
 	"github.com/merenbach/goldbug/pkg/masc2"
+	"github.com/merenbach/goldbug/pkg/simple"
 )
 
 // Cipher implements a Gronsfeld cipher.
@@ -82,7 +83,7 @@ func NewCipher(opts ...CipherOption) (*Cipher, error) {
 		pasc.WithKey(c.key),
 		// pasc.WithCtAlphabet(string(ctAlphabet)),
 		// pasc.WithStrict(c.strict),
-		pasc.WithDictFunc(func(s string, i int) (*masc.Tableau, error) {
+		pasc.WithDictFunc(func(s string, i int) (*simple.Cipher, error) {
 			params := []masc2.ConfigOption{
 				masc2.WithAlphabet(s),
 			}
@@ -92,12 +93,7 @@ func NewCipher(opts ...CipherOption) (*Cipher, error) {
 			if c.strict {
 				params = append(params, masc2.WithStrict())
 			}
-			c2, err := caesar.NewCipher(i, params...)
-			if err != nil {
-				return nil, fmt.Errorf("could not create cipher: %w", err)
-			}
-
-			return c2.Tableau, nil
+			return caesar.NewCipher(i, params...)
 		}),
 	)
 	if err != nil {

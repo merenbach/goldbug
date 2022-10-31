@@ -133,7 +133,7 @@ func NewCipher(key string, primer string, opts ...CipherOption) (*Cipher, error)
 		pasc.WithKeyGenerator(func(s string) (string, error) {
 			return makekey(primer, utf8.RuneCountInString(s))
 		}),
-		pasc.WithDictFunc(func(s string, i int) (*masc.Tableau, error) {
+		pasc.WithDictFunc(func(s string, i int) (*simple.Cipher, error) {
 			ctAlphabetTransformed, err := caesar.Transform([]rune(transposedCtAlphabet), i)
 			if err != nil {
 				return nil, fmt.Errorf("could not transform alphabet: %w", err)
@@ -148,11 +148,7 @@ func NewCipher(key string, primer string, opts ...CipherOption) (*Cipher, error)
 			if c.strict {
 				params = append(params, masc2.WithStrict())
 			}
-			c2, err := simple.NewCipher(string(ctAlphabetTransformed), params...)
-			if err != nil {
-				return nil, fmt.Errorf("could not create cipher: %w", err)
-			}
-			return c2.Tableau, nil
+			return simple.NewCipher(string(ctAlphabetTransformed), params...)
 		}),
 	}
 	if c.caseless {
