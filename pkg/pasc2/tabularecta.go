@@ -48,7 +48,7 @@ func NewTabulaRectaCipher(key string, ciphers []*masc.SimpleCipher, autokey auto
 	params := []pasc.TabulaRectaOption{
 		pasc.WithCaseless(c.caseless),
 		pasc.WithPtAlphabet(c.ptAlphabet),
-		pasc.WithKeyAlphabet(c.ptAlphabet),
+		pasc.WithKeyAlphabet(c.keyAlphabet),
 		pasc.WithKey(key),
 		// pasc.WithCtAlphabet(string(ctAlphabet)),
 		// pasc.WithStrict(c.strict),
