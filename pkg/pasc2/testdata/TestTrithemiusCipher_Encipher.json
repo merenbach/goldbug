@@ -1,0 +1,28 @@
+[
+    {
+        "Alphabet": "",
+        "Input": "HELLO, WORLD!",
+        "Output": "HFNOS, BUYTM!",
+        "Strict": false
+    },
+    {
+        "Alphabet": "",
+        "Input": "Hello, World!",
+        "Output": "Hfnos, Buytm!",
+        "Caseless": true,
+        "Strict": false
+    },
+    {
+        "Alphabet": "",
+        "Input": "HELLO, WORLD!",
+        "Output": "HFNOSBUYTM",
+        "Strict": true
+    },
+    {
+        "Alphabet": "",
+        "Input": "Hello, World!",
+        "Output": "HfnosBuytm",
+        "Caseless": true,
+        "Strict": true
+    }
+]

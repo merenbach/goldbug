@@ -104,7 +104,7 @@ func TestVigenereCipher_Decipher(t *testing.T) {
 	}
 }
 
-func TestVigenereCipher_Tableau(t *testing.T) {
+func TestVigenereCipher_Printable(t *testing.T) {
 	c, err := NewVigenereCipher("", NoAutokey)
 	if err != nil {
 		t.Fatal("Error:", err)
