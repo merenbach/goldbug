@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package masc
+package masc2
 
 import (
 	"testing"

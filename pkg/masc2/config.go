@@ -14,8 +14,6 @@
 
 package masc2
 
-import "github.com/merenbach/goldbug/internal/masc"
-
 // A Config struct for a cipher.
 type Config struct {
 	alphabet string
@@ -59,7 +57,7 @@ func WithAlphabet(s string) ConfigOption {
 
 func NewConfig(opts ...ConfigOption) *Config {
 	const (
-		defaultAlphabet = masc.Alphabet
+		defaultAlphabet = Alphabet
 	)
 
 	c := &Config{alphabet: defaultAlphabet}

@@ -17,7 +17,6 @@ package vigenere
 import (
 	"fmt"
 
-	"github.com/merenbach/goldbug/internal/masc"
 	"github.com/merenbach/goldbug/internal/pasc"
 	"github.com/merenbach/goldbug/pkg/masc2"
 )
@@ -82,7 +81,7 @@ func WithAutokey(v autokeyOption) CipherOption {
 }
 
 func NewCipher(opts ...CipherOption) (*Cipher, error) {
-	c := &Cipher{alphabet: masc.Alphabet}
+	c := &Cipher{alphabet: pasc.Alphabet}
 	for _, opt := range opts {
 		opt(c)
 	}

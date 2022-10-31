@@ -16,20 +16,18 @@ package masc2
 
 import (
 	"fmt"
-
-	"github.com/merenbach/goldbug/internal/masc"
 )
 
 // A Cipher implements a simple cipher.
 type Cipher struct {
-	*masc.Tableau
+	*Tableau
 }
 
 // NewSimpleCipher creates and returns a new simple cipher.
 func NewSimpleCipher(ctAlphabet string, opts ...ConfigOption) (*Cipher, error) {
 	c := NewConfig(opts...)
 
-	tableau, err := masc.NewTableau(
+	tableau, err := NewTableau(
 		c.Alphabet(),
 		ctAlphabet,
 		c.Strict(),
