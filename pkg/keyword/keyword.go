@@ -15,30 +15,14 @@
 package keyword
 
 import (
-	"fmt"
-
-	"github.com/merenbach/goldbug/internal/masc"
 	"github.com/merenbach/goldbug/pkg/masc2"
+	"github.com/merenbach/goldbug/pkg/simple"
 )
 
-// A Cipher implements a keyword cipher.
-type Cipher struct {
-	*masc.Tableau
-}
-
-func NewCipher(keyword string, opts ...masc2.ConfigOption) (*Cipher, error) {
+// NewCipher creates and returns a new cipher.
+func NewCipher(keyword string, opts ...masc2.ConfigOption) (*simple.Cipher, error) {
 	c := masc2.NewConfig(opts...)
 	ctAlphabet, _ := Transform([]rune(c.Alphabet()), []rune(keyword))
 
-	tableau, err := masc.NewTableau(
-		c.Alphabet(),
-		string(ctAlphabet),
-		c.Strict(),
-		c.Caseless(),
-	)
-	if err != nil {
-		return nil, fmt.Errorf("could not create tableau: %w", err)
-	}
-
-	return &Cipher{tableau}, nil
+	return simple.NewCipher(string(ctAlphabet), opts...)
 }

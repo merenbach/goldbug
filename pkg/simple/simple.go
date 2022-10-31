@@ -26,6 +26,7 @@ type Cipher struct {
 	*masc.Tableau
 }
 
+// NewCipher creates and returns a new cipher.
 func NewCipher(ctAlphabet string, opts ...masc2.ConfigOption) (*Cipher, error) {
 	c := masc2.NewConfig(opts...)
 

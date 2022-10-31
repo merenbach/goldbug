@@ -15,17 +15,12 @@
 package pkg
 
 import (
-	"github.com/merenbach/goldbug/pkg/affine"
-	"github.com/merenbach/goldbug/pkg/atbash"
 	"github.com/merenbach/goldbug/pkg/beaufort"
-	"github.com/merenbach/goldbug/pkg/caesar"
-	"github.com/merenbach/goldbug/pkg/decimation"
 	"github.com/merenbach/goldbug/pkg/dellaporta"
 	"github.com/merenbach/goldbug/pkg/gromark"
 	"github.com/merenbach/goldbug/pkg/gronsfeld"
-	"github.com/merenbach/goldbug/pkg/keyword"
 	"github.com/merenbach/goldbug/pkg/railfence"
-	"github.com/merenbach/goldbug/pkg/rot13"
+	"github.com/merenbach/goldbug/pkg/simple"
 	"github.com/merenbach/goldbug/pkg/transposition"
 	"github.com/merenbach/goldbug/pkg/trithemius"
 	"github.com/merenbach/goldbug/pkg/variantbeaufort"
@@ -39,17 +34,12 @@ type cipher interface {
 }
 
 // Validate against this interface
-var _ cipher = &affine.Cipher{}
-var _ cipher = &atbash.Cipher{}
 var _ cipher = &beaufort.Cipher{}
-var _ cipher = &caesar.Cipher{}
-var _ cipher = &decimation.Cipher{}
 var _ cipher = &dellaporta.Cipher{}
 var _ cipher = &gromark.Cipher{}
 var _ cipher = &gronsfeld.Cipher{}
-var _ cipher = &keyword.Cipher{}
 var _ cipher = &railfence.Cipher{}
-var _ cipher = &rot13.Cipher{}
+var _ cipher = &simple.Cipher{}
 var _ cipher = &transposition.Cipher{}
 var _ cipher = &trithemius.Cipher{}
 var _ cipher = &variantbeaufort.Cipher{}
