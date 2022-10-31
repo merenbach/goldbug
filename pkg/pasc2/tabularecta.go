@@ -21,6 +21,20 @@ import (
 	"github.com/merenbach/goldbug/pkg/masc"
 )
 
+// An AutokeyOption determines the autokey setting for the cipher.
+type autokeyOption uint8
+
+const (
+	// NoAutokey signifies not to autokey the cipher.
+	NoAutokey autokeyOption = iota
+
+	// TextAutokey denotes a text-autokey mechanism.
+	TextAutokey
+
+	// KeyAutokey denotes a key-autokey mechanism.
+	KeyAutokey
+)
+
 // TabulaRectaCipher implements a Vigenère cipher.
 type TabulaRectaCipher struct {
 	*pasc.TabulaRecta
@@ -28,10 +42,10 @@ type TabulaRectaCipher struct {
 
 // adapted from: https://www.sohamkamani.com/golang/options-pattern/
 
-func NewTabulaRectaCipher(key string, ciphers []*masc.SimpleCipher, opts ...ConfigOption) (*TabulaRectaCipher, error) {
+func NewTabulaRectaCipher(key string, ciphers []*masc.SimpleCipher, autokey autokeyOption, opts ...ConfigOption) (*TabulaRectaCipher, error) {
 	c := NewConfig(opts...)
 
-	tableau, err := pasc.NewTabulaRecta(
+	params := []pasc.TabulaRectaOption{
 		pasc.WithCaseless(c.caseless),
 		pasc.WithPtAlphabet(c.ptAlphabet),
 		pasc.WithKeyAlphabet(c.ptAlphabet),
@@ -41,7 +55,19 @@ func NewTabulaRectaCipher(key string, ciphers []*masc.SimpleCipher, opts ...Conf
 		pasc.WithDictFunc(func(s string, i int) (*masc.SimpleCipher, error) {
 			return ciphers[i%len(ciphers)], nil
 		}),
-	)
+	}
+	params = append(params, pasc.WithAutokeyer(func(a rune, b rune, keystream *[]rune) {
+		switch autokey {
+		case NoAutokey:
+			// do nothing
+		case KeyAutokey:
+			*keystream = append(*keystream, b)
+		case TextAutokey:
+			*keystream = append(*keystream, a)
+		}
+	}))
+
+	tableau, err := pasc.NewTabulaRecta(params...)
 	if err != nil {
 		return nil, fmt.Errorf("could not create tableau: %w", err)
 	}

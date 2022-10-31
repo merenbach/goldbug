@@ -22,8 +22,10 @@ Instantiate your deployment pipeline as follows, adapting as necessary the param
 
 ## TODO
 
+* Can we reduce use of pointers, e.g., with PASC keyGenerator or returning cipher structs?
 * Explore making MASC String() into Printable()
 * Fix test names and filename conventions
+* Make comments and docs more consistent
 * Implement PASC transforms and tests
 * Refactor testing methodology for MASC and PASC to reduce duplication
 * Explore alternative PASC with (slope, intercept) = (-1, -1)

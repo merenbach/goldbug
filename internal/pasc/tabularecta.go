@@ -34,9 +34,8 @@ type TabulaRecta struct {
 
 	key string
 
-	dictFunc     func(string, int) (*masc.SimpleCipher, error)
-	autokeyFunc  func(rune, rune, *[]rune)
-	keyGenerator func(string) (string, error)
+	dictFunc  func(string, int) (*masc.SimpleCipher, error)
+	autokeyer func(rune, rune, *[]rune)
 
 	tableau map[rune]*masc.SimpleCipher
 }
@@ -83,21 +82,15 @@ func WithKey(s string) TabulaRectaOption {
 	}
 }
 
-func WithKeyGenerator(f func(string) (string, error)) TabulaRectaOption {
+func WithAutokeyer(f func(rune, rune, *[]rune)) TabulaRectaOption {
 	return func(c *TabulaRecta) {
-		c.keyGenerator = f
+		c.autokeyer = f
 	}
 }
 
 func WithDictFunc(f func(s string, i int) (*masc.SimpleCipher, error)) TabulaRectaOption {
 	return func(c *TabulaRecta) {
 		c.dictFunc = f
-	}
-}
-
-func WithAutokeyFunc(f func(rune, rune, *[]rune)) TabulaRectaOption {
-	return func(c *TabulaRecta) {
-		c.autokeyFunc = f
 	}
 }
 
@@ -225,15 +218,7 @@ func (tr *TabulaRecta) Encipher(s string) (string, error) {
 
 	tableau := tr.tableau
 
-	key := tr.key
-	if tr.keyGenerator != nil {
-		key2, err := tr.keyGenerator(s)
-		if err != nil {
-			return "", fmt.Errorf("could not generate key: %w", err)
-		}
-		key = key2
-	}
-	keyRunes := []rune(key)
+	keyRunes := []rune(tr.key)
 
 	var transcodedCharCount = 0
 	return strings.Map(func(r rune) rune {
@@ -257,8 +242,8 @@ func (tr *TabulaRecta) Encipher(s string) (string, error) {
 		if ok {
 			// Transcoding successful
 			transcodedCharCount++
-			if tr.autokeyFunc != nil {
-				tr.autokeyFunc(r, o, &keyRunes)
+			if tr.autokeyer != nil {
+				tr.autokeyer(r, o, &keyRunes)
 			}
 		}
 		return o
@@ -274,15 +259,7 @@ func (tr *TabulaRecta) Decipher(s string) (string, error) {
 
 	tableau := tr.tableau
 
-	key := tr.key
-	if tr.keyGenerator != nil {
-		key2, err := tr.keyGenerator(s)
-		if err != nil {
-			return "", fmt.Errorf("could not generate key: %w", err)
-		}
-		key = key2
-	}
-	keyRunes := []rune(key)
+	keyRunes := []rune(tr.key)
 
 	var transcodedCharCount = 0
 	return strings.Map(func(r rune) rune {
@@ -305,8 +282,8 @@ func (tr *TabulaRecta) Decipher(s string) (string, error) {
 		if ok {
 			// Transcoding successful
 			transcodedCharCount++
-			if tr.autokeyFunc != nil {
-				tr.autokeyFunc(o, r, &keyRunes)
+			if tr.autokeyer != nil {
+				tr.autokeyer(o, r, &keyRunes)
 			}
 		}
 		return o

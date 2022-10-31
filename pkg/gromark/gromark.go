@@ -16,7 +16,6 @@ package gromark
 
 import (
 	"fmt"
-	"strings"
 	"unicode/utf8"
 
 	"github.com/merenbach/goldbug/internal/lfg"
@@ -26,41 +25,27 @@ import (
 	"github.com/merenbach/goldbug/pkg/transposition"
 )
 
-func chainadder(m int, count int, primer []int) ([]int, error) {
+// msglen does not need to be exact; it simply needs to meet the minimum key character needs of the cipher
+func makekey(k string) (func() rune, error) {
+	primer := make([]int, utf8.RuneCountInString(k))
+	for i, r := range k {
+		primer[i] = int(r - '0')
+	}
+
 	g := lfg.Additive{
 		Seed:    primer,
 		Taps:    []int{1, 2},
 		Modulus: 10,
 	}
 
-	out := make([]int, len(primer))
-	copy(out, primer)
-	sliced, err := g.Slice(count)
+	iter, err := g.Iterate()
 	if err != nil {
-		return nil, err
-	}
-	out = append(out, sliced...)
-	return out, nil
-}
-
-// msglen does not need to be exact; it simply needs to meet the minimum key character needs of the cipher
-func makekey(k string, msglen int) (string, error) {
-	primer := make([]int, utf8.RuneCountInString(k))
-	for i, r := range k {
-		primer[i] = int(r - '0')
+		return nil, fmt.Errorf("couldn't configure chain adder: %w", err)
 	}
 
-	raw, err := chainadder(10, msglen, primer)
-	if err != nil {
-		return "", err
-	}
-
-	var b strings.Builder
-	for _, r := range raw {
-		b.WriteRune(rune(r + '0'))
-	}
-
-	return b.String(), nil
+	return func() rune {
+		return rune(iter() + '0')
+	}, nil
 }
 
 // Cipher implements a GROMARK (GROnsfeld with Mixed Alphabet and Running Key) cipher.
@@ -123,12 +108,17 @@ func NewCipher(key string, primer string, opts ...CipherOption) (*Cipher, error)
 	// t, err := masc.NewTableau(ptAlphabet, transposedCtAlphabet, func(string) (string, error) {
 	// 	return transposedCtAlphabet, nil
 	// })
+	keygen, err := makekey(primer)
+	if err != nil {
+		return nil, fmt.Errorf("couldn't create running key generator: %w", err)
+	}
+
 	params := []pasc.TabulaRectaOption{
 		pasc.WithPtAlphabet(c.alphabet),
 		pasc.WithKeyAlphabet(digits),
-		pasc.WithKey(key),
-		pasc.WithKeyGenerator(func(s string) (string, error) {
-			return makekey(primer, utf8.RuneCountInString(s))
+		pasc.WithKey(primer),
+		pasc.WithAutokeyer(func(_ rune, _ rune, keystream *[]rune) {
+			*keystream = append(*keystream, keygen())
 		}),
 		pasc.WithDictFunc(func(s string, i int) (*masc.SimpleCipher, error) {
 			ctAlphabetTransformed, err := sliceutil.Affine([]rune(transposedCtAlphabet), 1, i)

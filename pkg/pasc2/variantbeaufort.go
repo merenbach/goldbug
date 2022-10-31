@@ -38,10 +38,10 @@ func NewVariantBeaufortCipher(key string, opts ...ConfigOption) (*TabulaRectaCip
 	for i := range c.keyAlphabet {
 		cipher, err := masc.NewCaesarCipher(-i, params...)
 		if err != nil {
-			return nil, fmt.Errorf("could not create affine cipher: %w", err)
+			return nil, fmt.Errorf("could not create cipher: %w", err)
 		}
 		ciphers[i] = cipher
 	}
 
-	return NewTabulaRectaCipher(key, ciphers, opts...)
+	return NewTabulaRectaCipher(key, ciphers, NoAutokey, opts...)
 }

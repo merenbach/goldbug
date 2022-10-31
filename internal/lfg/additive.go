@@ -27,7 +27,7 @@ type Additive struct {
 }
 
 // Iterate across an additive lagged Fibonacci generator (ALFG) sequence.
-func (g *Additive) iterate() (func() int, error) {
+func (g *Additive) Iterate() (func() int, error) {
 	// if err := g.validate(); err != nil {
 	// 	return nil, err
 	// }
@@ -36,7 +36,7 @@ func (g *Additive) iterate() (func() int, error) {
 	if all(g.Seed, func(i int) bool {
 		return i%2 == 0
 	}) {
-		return nil, errors.New("At least one ALFG seed value must be odd")
+		return nil, errors.New("at least one ALFG seed value must be odd")
 	}
 
 	return iterateLagTable(g.Modulus, g.Seed, func(lagTable []int) int {
@@ -49,8 +49,9 @@ func (g *Additive) iterate() (func() int, error) {
 }
 
 // Slice of LCG values.
+// TODO: is this method still necessary?
 func (g *Additive) Slice(n int) ([]int, error) {
-	iter, err := g.iterate()
+	iter, err := g.Iterate()
 	if err != nil {
 		return nil, err
 	}
