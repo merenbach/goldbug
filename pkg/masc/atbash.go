@@ -14,7 +14,7 @@
 
 package masc
 
-// NewAtbashCipher creates and returns a new cipher.
+// NewAtbashCipher creates and returns a new Atbash cipher.
 func NewAtbashCipher(opts ...ConfigOption) (*SimpleCipher, error) {
 	const (
 		slope     = (-1)

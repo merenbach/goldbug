@@ -20,7 +20,7 @@ import (
 	"github.com/merenbach/goldbug/internal/translation"
 )
 
-// A SimpleCipher implements a simple cipher.
+// A SimpleCipher implements a simple monoalphabetic substitution cipher.
 type SimpleCipher struct {
 	*Config
 
@@ -69,7 +69,8 @@ func (c *SimpleCipher) Decipher(s string) (string, error) {
 	return c.ct2pt.Map(s, c.strict, c.caseless), nil
 }
 
-func (c *SimpleCipher) String() string {
+// Printable representation of this cipher.
+func (c *SimpleCipher) Printable() (string, error) {
 	ctAlphabet, _ := c.Encipher(c.alphabet)
-	return fmt.Sprintf("PT: %s\nCT: %s", c.alphabet, ctAlphabet)
+	return fmt.Sprintf("PT: %s\nCT: %s", c.alphabet, ctAlphabet), nil
 }

@@ -97,7 +97,12 @@ func ExampleNewRot13Cipher() {
 	if err != nil {
 		fmt.Println("Error:", err)
 	}
-	fmt.Println(c)
+
+	out, err := c.Printable()
+	if err != nil {
+		fmt.Println("Error:", err)
+	}
+	fmt.Println(out)
 
 	// Output:
 	// PT: ABCDEFGHIJKLMNOPQRSTUVWXYZ
