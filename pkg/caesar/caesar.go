@@ -15,20 +15,13 @@
 package caesar
 
 import (
-	"fmt"
-
+	"github.com/merenbach/goldbug/pkg/affine"
 	"github.com/merenbach/goldbug/pkg/masc2"
 	"github.com/merenbach/goldbug/pkg/simple"
 )
 
 // NewCipher creates and returns a new cipher.
 func NewCipher(shift int, opts ...masc2.ConfigOption) (*simple.Cipher, error) {
-	c := masc2.NewConfig(opts...)
-
-	ctAlphabet, err := Transform([]rune(c.Alphabet()), shift)
-	if err != nil {
-		return nil, fmt.Errorf("could not transform alphabet: %w", err)
-	}
-
-	return simple.NewCipher(string(ctAlphabet), opts...)
+	const slope = 1
+	return affine.NewCipher(slope, shift, opts...)
 }

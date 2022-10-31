@@ -22,7 +22,7 @@ import (
 	"github.com/merenbach/goldbug/internal/lfg"
 	"github.com/merenbach/goldbug/internal/masc"
 	"github.com/merenbach/goldbug/internal/pasc"
-	"github.com/merenbach/goldbug/pkg/caesar"
+	"github.com/merenbach/goldbug/pkg/affine"
 	"github.com/merenbach/goldbug/pkg/keyword"
 	"github.com/merenbach/goldbug/pkg/masc2"
 	"github.com/merenbach/goldbug/pkg/simple"
@@ -134,7 +134,7 @@ func NewCipher(key string, primer string, opts ...CipherOption) (*Cipher, error)
 			return makekey(primer, utf8.RuneCountInString(s))
 		}),
 		pasc.WithDictFunc(func(s string, i int) (*simple.Cipher, error) {
-			ctAlphabetTransformed, err := caesar.Transform([]rune(transposedCtAlphabet), i)
+			ctAlphabetTransformed, err := affine.Transform([]rune(transposedCtAlphabet), 1, i)
 			if err != nil {
 				return nil, fmt.Errorf("could not transform alphabet: %w", err)
 			}

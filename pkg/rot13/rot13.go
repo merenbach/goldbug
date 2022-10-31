@@ -15,20 +15,13 @@
 package rot13
 
 import (
-	"fmt"
-
+	"github.com/merenbach/goldbug/pkg/caesar"
 	"github.com/merenbach/goldbug/pkg/masc2"
 	"github.com/merenbach/goldbug/pkg/simple"
 )
 
 // NewCipher creates and returns a new cipher.
 func NewCipher(opts ...masc2.ConfigOption) (*simple.Cipher, error) {
-	c := masc2.NewConfig(opts...)
-
-	ctAlphabet, err := Transform([]rune(c.Alphabet()))
-	if err != nil {
-		return nil, fmt.Errorf("could not transform alphabet: %w", err)
-	}
-
-	return simple.NewCipher(string(ctAlphabet), opts...)
+	const shift = 13
+	return caesar.NewCipher(shift, opts...)
 }
