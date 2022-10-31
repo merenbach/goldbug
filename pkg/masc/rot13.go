@@ -15,7 +15,7 @@
 package masc
 
 // NewRot13Cipher creates and returns a new ROT13 cipher.
-func NewRot13Cipher(opts ...ConfigOption) (*Cipher, error) {
+func NewRot13Cipher(opts ...ConfigOption) (*SimpleCipher, error) {
 	const shift = 13
 	return NewCaesarCipher(shift, opts...)
 }

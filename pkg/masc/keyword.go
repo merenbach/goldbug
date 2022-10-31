@@ -17,7 +17,7 @@ package masc
 import "github.com/merenbach/goldbug/internal/sliceutil"
 
 // NewKeywordCipher creates and returns a new keyword cipher.
-func NewKeywordCipher(keyword string, opts ...ConfigOption) (*Cipher, error) {
+func NewKeywordCipher(keyword string, opts ...ConfigOption) (*SimpleCipher, error) {
 	c := NewConfig(opts...)
 	ctAlphabet, _ := sliceutil.Keyword([]rune(c.Alphabet()), []rune(keyword))
 

@@ -15,7 +15,7 @@
 package masc
 
 // NewCaesarCipher creates and returns a new Caesar cipher.
-func NewCaesarCipher(shift int, opts ...ConfigOption) (*Cipher, error) {
+func NewCaesarCipher(shift int, opts ...ConfigOption) (*SimpleCipher, error) {
 	const slope = 1
 	return NewAffineCipher(slope, shift, opts...)
 }

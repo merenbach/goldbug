@@ -15,7 +15,7 @@
 package masc
 
 // NewDecimationCipher creates and returns a new decimation cipher.
-func NewDecimationCipher(multiplier int, opts ...ConfigOption) (*Cipher, error) {
+func NewDecimationCipher(multiplier int, opts ...ConfigOption) (*SimpleCipher, error) {
 	const intercept = 0
 	return NewAffineCipher(multiplier, intercept, opts...)
 }

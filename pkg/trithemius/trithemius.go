@@ -71,7 +71,7 @@ func NewCipher(opts ...CipherOption) (*Cipher, error) {
 		pasc.WithKey(c.alphabet),
 		// pasc.WithCtAlphabet(string(ctAlphabet)),
 		// pasc.WithStrict(c.strict),
-		pasc.WithDictFunc(func(s string, i int) (*masc.Cipher, error) {
+		pasc.WithDictFunc(func(s string, i int) (*masc.SimpleCipher, error) {
 			params := []masc.ConfigOption{
 				masc.WithAlphabet(s),
 			}

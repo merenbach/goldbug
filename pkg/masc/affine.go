@@ -21,7 +21,7 @@ import (
 )
 
 // NewAffineCipher creates and returns a new affine cipher.
-func NewAffineCipher(slope int, intercept int, opts ...ConfigOption) (*Cipher, error) {
+func NewAffineCipher(slope int, intercept int, opts ...ConfigOption) (*SimpleCipher, error) {
 	c := NewConfig(opts...)
 
 	ctAlphabet, err := sliceutil.Affine([]rune(c.Alphabet()), slope, intercept)

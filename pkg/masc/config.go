@@ -14,6 +14,8 @@
 
 package masc
 
+const Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
 // A Config struct for a cipher.
 type Config struct {
 	alphabet string

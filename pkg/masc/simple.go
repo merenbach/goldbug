@@ -16,26 +16,60 @@ package masc
 
 import (
 	"fmt"
+
+	"github.com/merenbach/goldbug/internal/translation"
 )
 
-// A Cipher implements a simple cipher.
-type Cipher struct {
-	*Tableau
+// A SimpleCipher implements a simple cipher.
+type SimpleCipher struct {
+	*Config
+
+	pt2ct translation.Table
+	ct2pt translation.Table
 }
 
 // NewSimpleCipher creates and returns a new simple cipher.
-func NewSimpleCipher(ctAlphabet string, opts ...ConfigOption) (*Cipher, error) {
+func NewSimpleCipher(ctAlphabet string, opts ...ConfigOption) (*SimpleCipher, error) {
 	c := NewConfig(opts...)
 
-	tableau, err := NewTableau(
-		c.Alphabet(),
-		ctAlphabet,
-		c.Strict(),
-		c.Caseless(),
-	)
+	pt2ct, err := translation.NewTable(c.alphabet, ctAlphabet, "")
 	if err != nil {
-		return nil, fmt.Errorf("could not create tableau: %w", err)
+		return nil, fmt.Errorf("could not generate pt2ct table: %w", err)
 	}
 
-	return &Cipher{tableau}, nil
+	ct2pt, err := translation.NewTable(ctAlphabet, c.alphabet, "")
+	if err != nil {
+		return nil, fmt.Errorf("could not generate ct2pt table: %w", err)
+	}
+
+	return &SimpleCipher{
+		c,
+		pt2ct,
+		ct2pt,
+	}, nil
+}
+
+// EncipherRune enciphers a rune.
+func (c *SimpleCipher) EncipherRune(r rune) (rune, bool) {
+	return c.pt2ct.Get(r, c.strict, c.caseless)
+}
+
+// DecipherRune deciphers a rune.
+func (c *SimpleCipher) DecipherRune(r rune) (rune, bool) {
+	return c.ct2pt.Get(r, c.strict, c.caseless)
+}
+
+// Encipher a string.
+func (c *SimpleCipher) Encipher(s string) (string, error) {
+	return c.pt2ct.Map(s, c.strict, c.caseless), nil
+}
+
+// Decipher a string.
+func (c *SimpleCipher) Decipher(s string) (string, error) {
+	return c.ct2pt.Map(s, c.strict, c.caseless), nil
+}
+
+func (c *SimpleCipher) String() string {
+	ctAlphabet, _ := c.Encipher(c.alphabet)
+	return fmt.Sprintf("PT: %s\nCT: %s", c.alphabet, ctAlphabet)
 }

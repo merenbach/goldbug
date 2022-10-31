@@ -43,7 +43,7 @@ func TestTabulaRecta(t *testing.T) {
 	for _, table := range tables {
 		tr, err := NewTabulaRecta(
 			WithPtAlphabet(table.ptAlphabet),
-			WithDictFunc(func(s string, i int) (*masc.Cipher, error) {
+			WithDictFunc(func(s string, i int) (*masc.SimpleCipher, error) {
 				return masc.NewCaesarCipher(i, masc.WithAlphabet(s))
 			}),
 			WithKey(table.keyRune),

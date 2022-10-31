@@ -130,7 +130,7 @@ func NewCipher(key string, primer string, opts ...CipherOption) (*Cipher, error)
 		pasc.WithKeyGenerator(func(s string) (string, error) {
 			return makekey(primer, utf8.RuneCountInString(s))
 		}),
-		pasc.WithDictFunc(func(s string, i int) (*masc.Cipher, error) {
+		pasc.WithDictFunc(func(s string, i int) (*masc.SimpleCipher, error) {
 			ctAlphabetTransformed, err := sliceutil.Affine([]rune(transposedCtAlphabet), 1, i)
 			if err != nil {
 				return nil, fmt.Errorf("could not transform alphabet: %w", err)
