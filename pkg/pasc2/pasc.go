@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package pasc
+package pasc2
 
 import (
 	"errors"
@@ -26,6 +26,7 @@ import (
 
 // TabulaRecta holds a tabula recta.
 type TabulaRecta struct {
+	// this is used here only for key lookups, hence no corresponding "strict" option at this time
 	caseless bool
 
 	ptAlphabet string
@@ -34,77 +35,21 @@ type TabulaRecta struct {
 
 	key string
 
-	dictFunc  func(string, int) (*masc.SimpleCipher, error)
 	autokeyer func(rune, rune, *[]rune)
 
 	tableau map[rune]*masc.SimpleCipher
 }
 
-// adapted from: https://www.sohamkamani.com/golang/options-pattern/
-
-type TabulaRectaOption func(*TabulaRecta)
-
-// func WithStrict(b bool) TabulaRectaOption {
-// 	return func(c *TabulaRecta) {
-// 		c.strict = b
-// 	}
-// }
-
-func WithCaseless(b bool) TabulaRectaOption {
-	return func(c *TabulaRecta) {
-		c.caseless = b
-	}
-}
-
-func WithPtAlphabet(s string) TabulaRectaOption {
-	return func(c *TabulaRecta) {
-		c.ptAlphabet = s
-	}
-}
-
-// func WithCtAlphabet(s string) TableauOption {
-// 	return func(c *TabulaRecta) {
-// 		if s != "" {
-// 			c.ctAlphabet = s
-// 		}
-// 	}
-// }
-
-func WithKeyAlphabet(s string) TabulaRectaOption {
-	return func(c *TabulaRecta) {
-		c.keyAlphabet = s
-	}
-}
-
-func WithKey(s string) TabulaRectaOption {
-	return func(c *TabulaRecta) {
-		c.key = s
-	}
-}
-
-func WithAutokeyer(f func(rune, rune, *[]rune)) TabulaRectaOption {
-	return func(c *TabulaRecta) {
-		c.autokeyer = f
-	}
-}
-
-func WithDictFunc(f func(s string, i int) (*masc.SimpleCipher, error)) TabulaRectaOption {
-	return func(c *TabulaRecta) {
-		c.dictFunc = f
-	}
-}
-
-func NewTabulaRecta(opts ...TabulaRectaOption) (*TabulaRecta, error) {
+func NewTabulaRecta(ptAlphabet string, keyAlphabet string, key string, ciphers []*masc.SimpleCipher, autokeyer func(rune, rune, *[]rune), caseless bool) (*TabulaRecta, error) {
 	t := &TabulaRecta{
-		ptAlphabet:  Alphabet,
-		keyAlphabet: Alphabet,
-		// ctAlphabet: Alphabet,
-	}
-	for _, opt := range opts {
-		opt(t)
+		ptAlphabet:  ptAlphabet,
+		keyAlphabet: keyAlphabet,
+		key:         key,
+		autokeyer:   autokeyer,
+		caseless:    caseless,
 	}
 
-	tableau, err := t.maketableau()
+	tableau, err := t.maketableau(ciphers)
 	if err != nil {
 		return nil, fmt.Errorf("could not create tableau: %w", err)
 	}
@@ -114,9 +59,7 @@ func NewTabulaRecta(opts ...TabulaRectaOption) (*TabulaRecta, error) {
 	return t, nil
 }
 
-func (tr *TabulaRecta) maketableau() (map[rune]*masc.SimpleCipher, error) {
-	f := tr.dictFunc
-
+func (tr *TabulaRecta) maketableau(ciphers []*masc.SimpleCipher) (map[rune]*masc.SimpleCipher, error) {
 	ptAlphabet, keyAlphabet := tr.ptAlphabet, tr.keyAlphabet
 
 	if keyAlphabet == "" {
@@ -132,11 +75,7 @@ func (tr *TabulaRecta) maketableau() (map[rune]*masc.SimpleCipher, error) {
 	}
 
 	for i, r := range keyRunes {
-		t, err := f(ptAlphabet, i)
-		if err != nil {
-			return nil, err
-		}
-		m[r] = t
+		m[r] = ciphers[i]
 	}
 
 	return m, nil

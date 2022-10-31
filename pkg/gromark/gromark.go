@@ -19,9 +19,9 @@ import (
 	"unicode/utf8"
 
 	"github.com/merenbach/goldbug/internal/lfg"
-	"github.com/merenbach/goldbug/internal/pasc"
 	"github.com/merenbach/goldbug/internal/sliceutil"
 	"github.com/merenbach/goldbug/pkg/masc"
+	"github.com/merenbach/goldbug/pkg/pasc2"
 	"github.com/merenbach/goldbug/pkg/transposition"
 )
 
@@ -56,44 +56,16 @@ type Cipher struct {
 	key      string
 	strict   bool
 
-	*pasc.TabulaRecta
+	*pasc2.TabulaRecta
 }
 
 // adapted from: https://www.sohamkamani.com/golang/options-pattern/
 
-type CipherOption func(*Cipher)
-
-func WithStrict() CipherOption {
-	return func(c *Cipher) {
-		c.strict = true
-	}
-}
-
-func WithCaseless() CipherOption {
-	return func(c *Cipher) {
-		c.caseless = true
-	}
-}
-
-func WithAlphabet(s string) CipherOption {
-	return func(c *Cipher) {
-		c.alphabet = s
-	}
-}
-
-func WithKey(s string) CipherOption {
-	return func(c *Cipher) {
-		c.key = s
-	}
-}
-
-func NewCipher(key string, primer string, opts ...CipherOption) (*Cipher, error) {
+// NewGromarkCipher creates and returns a new Gromark cipher.
+func NewGromarkCipher(key string, primer string, opts ...pasc2.ConfigOption) (*Cipher, error) {
 	const digits = "0123456789"
 
-	c := &Cipher{alphabet: pasc.Alphabet}
-	for _, opt := range opts {
-		opt(c)
-	}
+	c := pasc2.NewConfig(opts...)
 
 	ctAlphabetInput, _ := sliceutil.Keyword([]rune(c.alphabet), []rune(key))
 
@@ -113,36 +85,34 @@ func NewCipher(key string, primer string, opts ...CipherOption) (*Cipher, error)
 		return nil, fmt.Errorf("couldn't create running key generator: %w", err)
 	}
 
-	params := []pasc.TabulaRectaOption{
-		pasc.WithPtAlphabet(c.alphabet),
-		pasc.WithKeyAlphabet(digits),
-		pasc.WithKey(primer),
-		pasc.WithAutokeyer(func(_ rune, _ rune, keystream *[]rune) {
-			*keystream = append(*keystream, keygen())
-		}),
-		pasc.WithDictFunc(func(s string, i int) (*masc.SimpleCipher, error) {
-			ctAlphabetTransformed, err := sliceutil.Affine([]rune(transposedCtAlphabet), 1, i)
-			if err != nil {
-				return nil, fmt.Errorf("could not transform alphabet: %w", err)
-			}
+	ciphers := make([]*masc.SimpleCipher, utf8.RuneCountInString(digits))
+	for i := range ciphers {
+		ctAlphabetTransformed, err := sliceutil.Affine([]rune(transposedCtAlphabet), 1, i)
+		if err != nil {
+			return nil, fmt.Errorf("could not transform alphabet: %w", err)
+		}
 
-			params := []masc.ConfigOption{
-				masc.WithAlphabet(s),
-			}
-			if c.caseless {
-				params = append(params, masc.WithCaseless())
-			}
-			if c.strict {
-				params = append(params, masc.WithStrict())
-			}
-			return masc.NewSimpleCipher(string(ctAlphabetTransformed), params...)
-		}),
-	}
-	if c.caseless {
-		params = append(params, pasc.WithCaseless(true))
+		params := []masc.ConfigOption{
+			masc.WithAlphabet(s),
+		}
+		if c.caseless {
+			params = append(params, masc.WithCaseless())
+		}
+		if c.strict {
+			params = append(params, masc.WithStrict())
+		}
+		cipher, err := masc.NewSimpleCipher(string(ctAlphabetTransformed), params...)
+		if err != nil {
+			return nil, fmt.Errorf("could not create cipher: %w", err)
+		}
+		ciphers[i] = cipher
 	}
 
-	tableau, err := pasc.NewTabulaRecta(params...)
+	// return pasc2.NewTabulaRectaCipher(primer, ciphers, specialautokey, opts...)
+
+	tableau, err := pasc2.NewTabulaRecta(c.alphabet, digits, primer, ciphers, func(_ rune, _ rune, keystream *[]rune) {
+		*keystream = append(*keystream, keygen())
+	}, c.caseless)
 	if err != nil {
 		return nil, fmt.Errorf("could not create tableau: %w", err)
 	}

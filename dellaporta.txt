@@ -1,0 +1,44 @@
+    A B C D E F G H I J K L M   N O P Q R S T U V W X Y Z
+
+A   N O P Q R S T U V W X Y Z   A B C D E F G H I J K L M  Slope 1, Intercept 13
+C   O P Q R S T U V W X Y Z N   M A B C D E F G H I J K L  
+E   P Q R S T U V W X Y Z N O   L M A B C D E F G H I J K
+G   Q R S T U V W X Y Z N O P   K L M A B C D E F G H I J
+I   R S T U V W X Y Z N O P Q   J K L M A B C D E F G H I
+K   S T U V W X Y Z N O P Q R   I J K L M A B C D E F G H
+M   T U V W X Y Z N O P Q R S   H I J K L M A B C D E F G
+O   U V W X Y Z N O P Q R S T   G H I J K L M A B C D E F
+Q   V W X Y Z N O P Q R S T U   F G H I J K L M A B C D E
+S   W X Y Z N O P Q R S T U V   E F G H I J K L M A B C D
+U   X Y Z N O P Q R S T U V W   D E F G H I J K L M A B C
+W   Y Z N O P Q R S T U V W X   C D E F G H I J K L M A B
+Y   Z N O P Q R S T U V W X Y   B C D E F G H I J K L M A
+
+
+
+C    O  P  Q  R  S  T  U  V  W  X  Y  Z  N   M  A  B  C  D  E  F  G  H  I  J   K   L  
+    14 15 16 17 18 19 20 21 22 23 24 25 13   12 0  1  2  3  4  5  6  7  8  9  10  11   
+
+    M=12
+    N=13
+    O=14
+
+f(col, row, col<13) = (col + row/2)%13+13
+f(col, row, col>=13) = (col - row/2)%13
+
+
+is this a min(x, 13-x) situation? -- see zigzag pattern
+
+ 0: 0-25 => 13-25,               0-12  => x+13
+ 1: 0-25 => 14-25, 13,    12,    0-11  => x+14, x, x-1, x-14
+ 2: 0-25 => 15-25, 13-14, 11-12, 0-10  => x+15, .... x-15
+ 3: 0-25 => 16-25, 13-15, 10-12, 0-9
+ 4: 0-25 => 17-25, 13-16,  9-12, 0-8
+ 5: 0-25 => 18-25, 13-17,  8-12, 0-7
+ 6: 0-25 => 19-25, 13-18,  7-12, 0-6
+ 7: 0-25 => 20-25, 13-19,  6-12, 0-5
+ 8: 0-25 => 21-25, 13-20,  5-12, 0-4
+ 9: 0-25 => 22-25, 13-21,  4-12, 0-3
+10: 0-25 => 23-25, 13-22,  3-12, 0-2
+11: 0-25 => 24-25, 13-23,  2-12, 0-1
+12: 0-25 => 25,    13-24,  1-12, 0

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package dellaporta
+package pasc2
 
 import (
 	"testing"
@@ -20,7 +20,7 @@ import (
 	"github.com/merenbach/goldbug/internal/fixture"
 )
 
-func TestCipher_Encipher(t *testing.T) {
+func TestDellaPortaCipher_Encipher(t *testing.T) {
 	var tables []struct {
 		Alphabet string
 		Caseless bool
@@ -33,11 +33,9 @@ func TestCipher_Encipher(t *testing.T) {
 
 	fixture.Load(t, &tables)
 	for _, table := range tables {
-		params := []CipherOption{
-			WithKey(table.Key),
-		}
+		var params []ConfigOption
 		if table.Alphabet != "" {
-			params = append(params, WithAlphabet(table.Alphabet))
+			params = append(params, WithPtAlphabet(table.Alphabet))
 		}
 		if table.Strict {
 			params = append(params, WithStrict())
@@ -46,7 +44,7 @@ func TestCipher_Encipher(t *testing.T) {
 			params = append(params, WithCaseless())
 		}
 
-		c, err := NewCipher(params...)
+		c, err := NewDellaPortaCipher(table.Key, params...)
 		if err != nil {
 			t.Error("Could not create cipher:", err)
 		}
@@ -59,7 +57,7 @@ func TestCipher_Encipher(t *testing.T) {
 	}
 }
 
-func TestCipher_Decipher(t *testing.T) {
+func TestDellaPortaCipher_Decipher(t *testing.T) {
 	var tables []struct {
 		Alphabet string
 		Caseless bool
@@ -72,11 +70,9 @@ func TestCipher_Decipher(t *testing.T) {
 
 	fixture.Load(t, &tables)
 	for _, table := range tables {
-		params := []CipherOption{
-			WithKey(table.Key),
-		}
+		var params []ConfigOption
 		if table.Alphabet != "" {
-			params = append(params, WithAlphabet(table.Alphabet))
+			params = append(params, WithPtAlphabet(table.Alphabet))
 		}
 		if table.Strict {
 			params = append(params, WithStrict())
@@ -85,7 +81,7 @@ func TestCipher_Decipher(t *testing.T) {
 			params = append(params, WithCaseless())
 		}
 
-		c, err := NewCipher(params...)
+		c, err := NewDellaPortaCipher(table.Key, params...)
 		if err != nil {
 			t.Error("Could not create cipher:", err)
 		}
@@ -98,8 +94,8 @@ func TestCipher_Decipher(t *testing.T) {
 	}
 }
 
-func TestCipher_Tableau(t *testing.T) {
-	c, err := NewCipher()
+func TestDellaPortaCipher_Printable(t *testing.T) {
+	c, err := NewDellaPortaCipher("")
 	if err != nil {
 		t.Fatal("Error:", err)
 	}

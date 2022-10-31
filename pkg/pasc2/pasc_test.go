@@ -12,10 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package pasc
+package pasc2
 
 import (
 	"testing"
+	"unicode/utf8"
 
 	"github.com/merenbach/goldbug/pkg/masc"
 )
@@ -41,12 +42,22 @@ func TestTabulaRecta(t *testing.T) {
 	}
 
 	for _, table := range tables {
+		ciphers := make([]*masc.SimpleCipher, utf8.RuneCountInString(table.keyAlphabet))
+		for i := range table.keyAlphabet {
+			cipher, err := masc.NewCaesarCipher(i, masc.WithAlphabet(table.ctAlphabet))
+			if err != nil {
+				t.Error("Could not create ciphers:", err)
+			}
+			ciphers[i] = cipher
+		}
+
 		tr, err := NewTabulaRecta(
-			WithPtAlphabet(table.ptAlphabet),
-			WithDictFunc(func(s string, i int) (*masc.SimpleCipher, error) {
-				return masc.NewCaesarCipher(i, masc.WithAlphabet(s))
-			}),
-			WithKey(table.keyRune),
+			table.ptAlphabet,
+			table.keyAlphabet,
+			table.keyRune,
+			ciphers,
+			nil,
+			false,
 		)
 		if err != nil {
 			t.Error("Could not create tabula recta:", err)

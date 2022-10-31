@@ -17,7 +17,6 @@ package pasc2
 import (
 	"fmt"
 
-	"github.com/merenbach/goldbug/internal/pasc"
 	"github.com/merenbach/goldbug/pkg/masc"
 )
 
@@ -29,7 +28,7 @@ type Cipher struct {
 	key      string
 	strict   bool
 
-	*pasc.TabulaRecta
+	*TabulaRecta
 }
 
 // adapted from: https://www.sohamkamani.com/golang/options-pattern/
