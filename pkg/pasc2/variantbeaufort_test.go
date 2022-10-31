@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package variantbeaufort
+package pasc2
 
 import (
 	"testing"
@@ -20,7 +20,7 @@ import (
 	"github.com/merenbach/goldbug/internal/fixture"
 )
 
-func TestCipher_Encipher(t *testing.T) {
+func TestVariantBeaufortCipher_Encipher(t *testing.T) {
 	var tables []struct {
 		Alphabet string
 		Caseless bool
@@ -35,11 +35,9 @@ func TestCipher_Encipher(t *testing.T) {
 	for i, table := range tables {
 		t.Logf("Running test %d of %d...", i+1, len(tables))
 
-		params := []CipherOption{
-			WithKey(table.Key),
-		}
+		var params []ConfigOption
 		if table.Alphabet != "" {
-			params = append(params, WithAlphabet(table.Alphabet))
+			params = append(params, WithPtAlphabet(table.Alphabet))
 		}
 		if table.Strict {
 			params = append(params, WithStrict())
@@ -48,7 +46,7 @@ func TestCipher_Encipher(t *testing.T) {
 			params = append(params, WithCaseless())
 		}
 
-		c, err := NewCipher(params...)
+		c, err := NewVariantBeaufortCipher(table.Key, params...)
 		if err != nil {
 			t.Error("Could not create cipher:", err)
 		}
@@ -61,7 +59,7 @@ func TestCipher_Encipher(t *testing.T) {
 	}
 }
 
-func TestCipher_Decipher(t *testing.T) {
+func TestVariantBeaufortCipher_Decipher(t *testing.T) {
 	var tables []struct {
 		Alphabet string
 		Caseless bool
@@ -76,11 +74,9 @@ func TestCipher_Decipher(t *testing.T) {
 	for i, table := range tables {
 		t.Logf("Running test %d of %d...", i+1, len(tables))
 
-		params := []CipherOption{
-			WithKey(table.Key),
-		}
+		var params []ConfigOption
 		if table.Alphabet != "" {
-			params = append(params, WithAlphabet(table.Alphabet))
+			params = append(params, WithPtAlphabet(table.Alphabet))
 		}
 		if table.Strict {
 			params = append(params, WithStrict())
@@ -89,7 +85,7 @@ func TestCipher_Decipher(t *testing.T) {
 			params = append(params, WithCaseless())
 		}
 
-		c, err := NewCipher(params...)
+		c, err := NewVariantBeaufortCipher(table.Key, params...)
 		if err != nil {
 			t.Error("Could not create cipher:", err)
 		}
@@ -102,8 +98,8 @@ func TestCipher_Decipher(t *testing.T) {
 	}
 }
 
-func TestCipher_Tableau(t *testing.T) {
-	c, err := NewCipher()
+func TestVariantBeaufortCipher_Tableau(t *testing.T) {
+	c, err := NewVariantBeaufortCipher("")
 	if err != nil {
 		t.Fatal("Error:", err)
 	}

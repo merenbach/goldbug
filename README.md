@@ -27,6 +27,7 @@ Instantiate your deployment pipeline as follows, adapting as necessary the param
 * Implement PASC transforms and tests
 * Refactor testing methodology for MASC and PASC to reduce duplication
 * Explore alternative PASC with (slope, intercept) = (-1, -1)
+* Can we reduce inefficiency of creating multiple config objects when covering constructors?
 * Expand tests for custom ciphertext alphabets
 * Improve and enhance test cases overall
 * Expand tests for tabula recta to catch cases with reversed or alternate alphabets

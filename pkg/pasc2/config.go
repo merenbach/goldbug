@@ -18,24 +18,31 @@ const Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 // A Config struct for a cipher.
 type Config struct {
-	alphabet string
-	caseless bool
-	strict   bool
+	ptAlphabet  string
+	keyAlphabet string
+	caseless    bool
+	strict      bool
 }
 
 // adapted from: https://www.sohamkamani.com/golang/options-pattern/
 
 type ConfigOption func(*Config)
 
-func WithAlphabet(s string) ConfigOption {
-	return func(c *Config) {
-		c.alphabet = s
-	}
-}
-
 func WithCaseless() ConfigOption {
 	return func(c *Config) {
 		c.caseless = true
+	}
+}
+
+func WithKeyAlphabet(s string) ConfigOption {
+	return func(c *Config) {
+		c.keyAlphabet = s
+	}
+}
+
+func WithPtAlphabet(s string) ConfigOption {
+	return func(c *Config) {
+		c.ptAlphabet = s
 	}
 }
 
@@ -50,7 +57,10 @@ func NewConfig(opts ...ConfigOption) *Config {
 		defaultAlphabet = Alphabet
 	)
 
-	c := &Config{alphabet: defaultAlphabet}
+	c := &Config{
+		ptAlphabet:  defaultAlphabet,
+		keyAlphabet: defaultAlphabet,
+	}
 	for _, opt := range opts {
 		opt(c)
 	}

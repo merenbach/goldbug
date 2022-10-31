@@ -37,7 +37,7 @@ func TestBeaufortCipher_Encipher(t *testing.T) {
 
 		var params []ConfigOption
 		if table.Alphabet != "" {
-			params = append(params, WithAlphabet(table.Alphabet))
+			params = append(params, WithPtAlphabet(table.Alphabet))
 		}
 		if table.Strict {
 			params = append(params, WithStrict())
@@ -76,7 +76,7 @@ func TestBeaufortCipher_Decipher(t *testing.T) {
 
 		var params []ConfigOption
 		if table.Alphabet != "" {
-			params = append(params, WithAlphabet(table.Alphabet))
+			params = append(params, WithPtAlphabet(table.Alphabet))
 		}
 		if table.Strict {
 			params = append(params, WithStrict())

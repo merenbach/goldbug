@@ -20,8 +20,8 @@ import (
 	"github.com/merenbach/goldbug/pkg/masc"
 )
 
-// NewBeaufortCipher creates a new Beaufort cipher.
-func NewBeaufortCipher(key string, opts ...ConfigOption) (*TabulaRectaCipher, error) {
+// NewBeaufortCipher creates and returns a new variant Beaufort cipher.
+func NewVariantBeaufortCipher(key string, opts ...ConfigOption) (*TabulaRectaCipher, error) {
 	c := NewConfig(opts...)
 
 	params := []masc.ConfigOption{
@@ -36,7 +36,7 @@ func NewBeaufortCipher(key string, opts ...ConfigOption) (*TabulaRectaCipher, er
 
 	ciphers := make([]*masc.SimpleCipher, len(c.keyAlphabet))
 	for i := range c.keyAlphabet {
-		cipher, err := masc.NewAffineCipher(-1, i, params...)
+		cipher, err := masc.NewCaesarCipher(-i, params...)
 		if err != nil {
 			return nil, fmt.Errorf("could not create affine cipher: %w", err)
 		}
