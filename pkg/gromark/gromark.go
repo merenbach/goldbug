@@ -51,23 +51,18 @@ func makekey(k string) (func() rune, error) {
 // Cipher implements a GROMARK (GROnsfeld with Mixed Alphabet and Running Key) cipher.
 // Cipher key is simply the primer for a running key.
 type Cipher struct {
-	alphabet string
-	caseless bool
-	key      string
-	strict   bool
-
 	*pasc.TabulaRecta
 }
 
 // adapted from: https://www.sohamkamani.com/golang/options-pattern/
 
 // NewGromarkCipher creates and returns a new Gromark cipher.
-func NewGromarkCipher(key string, primer string, opts ...pasc.ConfigOption) (*Cipher, error) {
+func NewGromarkCipher(key string, primer string, opts ...ConfigOption) (*Cipher, error) {
 	const digits = "0123456789"
 
-	c := pasc.NewConfig(opts...)
+	c := NewConfig(opts...)
 
-	ctAlphabetInput, _ := sliceutil.Keyword([]rune(c.alphabet), []rune(key))
+	ctAlphabetInput, _ := sliceutil.Keyword([]rune(c.ptAlphabet), []rune(key))
 
 	tc := transposition.Cipher{
 		Keys: []string{key},
@@ -92,6 +87,8 @@ func NewGromarkCipher(key string, primer string, opts ...pasc.ConfigOption) (*Ci
 			return nil, fmt.Errorf("could not transform alphabet: %w", err)
 		}
 
+		s := c.ptAlphabet
+
 		params := []masc.ConfigOption{
 			masc.WithAlphabet(s),
 		}
@@ -110,15 +107,14 @@ func NewGromarkCipher(key string, primer string, opts ...pasc.ConfigOption) (*Ci
 
 	// return pasc.NewTabulaRectaCipher(primer, ciphers, specialautokey, opts...)
 
-	tableau, err := pasc.NewTabulaRecta(c.alphabet, digits, primer, ciphers, func(_ rune, _ rune, keystream *[]rune) {
+	tr, err := pasc.NewTabulaRecta(c.ptAlphabet, digits, primer, ciphers, func(_ rune, _ rune, keystream *[]rune) {
 		*keystream = append(*keystream, keygen())
 	}, c.caseless)
 	if err != nil {
-		return nil, fmt.Errorf("could not create tableau: %w", err)
+		return nil, fmt.Errorf("couldn't create tabula recta: %w", err)
 	}
-	c.TabulaRecta = tableau
 
-	return c, nil
+	return &Cipher{tr}, nil
 }
 
 // // ALLOW COMPOUND CIPHER CHAINING:

@@ -20,7 +20,7 @@ import (
 	"github.com/merenbach/goldbug/internal/fixture"
 )
 
-func TestCipher_Encipher(t *testing.T) {
+func TestGromarkCipher_Encipher(t *testing.T) {
 	var tables []struct {
 		Alphabet string
 		Caseless bool
@@ -36,9 +36,9 @@ func TestCipher_Encipher(t *testing.T) {
 	for i, table := range tables {
 		t.Logf("Running test %d of %d...", i+1, len(tables))
 
-		var params []CipherOption
+		var params []ConfigOption
 		if table.Alphabet != "" {
-			params = append(params, WithAlphabet(table.Alphabet))
+			params = append(params, WithPtAlphabet(table.Alphabet))
 		}
 		if table.Strict {
 			params = append(params, WithStrict())
@@ -47,7 +47,7 @@ func TestCipher_Encipher(t *testing.T) {
 			params = append(params, WithCaseless())
 		}
 
-		c, err := NewCipher(table.Key, table.Primer, params...)
+		c, err := NewGromarkCipher(table.Key, table.Primer, params...)
 		if err != nil {
 			t.Error("Could not create cipher:", err)
 		}
@@ -60,7 +60,7 @@ func TestCipher_Encipher(t *testing.T) {
 	}
 }
 
-func TestCipher_Decipher(t *testing.T) {
+func TestGromarkCipher_Decipher(t *testing.T) {
 	var tables []struct {
 		Alphabet string
 		Caseless bool
@@ -76,9 +76,9 @@ func TestCipher_Decipher(t *testing.T) {
 	for i, table := range tables {
 		t.Logf("Running test %d of %d...", i+1, len(tables))
 
-		var params []CipherOption
+		var params []ConfigOption
 		if table.Alphabet != "" {
-			params = append(params, WithAlphabet(table.Alphabet))
+			params = append(params, WithPtAlphabet(table.Alphabet))
 		}
 		if table.Strict {
 			params = append(params, WithStrict())
@@ -87,7 +87,7 @@ func TestCipher_Decipher(t *testing.T) {
 			params = append(params, WithCaseless())
 		}
 
-		c, err := NewCipher(table.Key, table.Primer, params...)
+		c, err := NewGromarkCipher(table.Key, table.Primer, params...)
 		if err != nil {
 			t.Error("Could not create cipher:", err)
 		}
@@ -100,8 +100,8 @@ func TestCipher_Decipher(t *testing.T) {
 	}
 }
 
-func TestCipher_Tableau(t *testing.T) {
-	c, err := NewCipher("ENIGMA", "23452")
+func TestGromarkCipher_Tableau(t *testing.T) {
+	c, err := NewGromarkCipher("ENIGMA", "23452")
 	if err != nil {
 		t.Fatal("Error:", err)
 	}
