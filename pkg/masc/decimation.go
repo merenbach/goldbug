@@ -12,22 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package masc2
+package masc
 
-import (
-	"fmt"
-
-	"github.com/merenbach/goldbug/internal/sliceutil"
-)
-
-// NewAffineCipher creates and returns a new affine cipher.
-func NewAffineCipher(slope int, intercept int, opts ...ConfigOption) (*Cipher, error) {
-	c := NewConfig(opts...)
-
-	ctAlphabet, err := sliceutil.Affine([]rune(c.Alphabet()), slope, intercept)
-	if err != nil {
-		return nil, fmt.Errorf("could not transform alphabet: %w", err)
-	}
-
-	return NewSimpleCipher(string(ctAlphabet), opts...)
+// NewDecimationCipher creates and returns a new decimation cipher.
+func NewDecimationCipher(multiplier int, opts ...ConfigOption) (*Cipher, error) {
+	const intercept = 0
+	return NewAffineCipher(multiplier, intercept, opts...)
 }

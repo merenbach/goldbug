@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package masc2
+package masc
 
 // A Config struct for a cipher.
 type Config struct {

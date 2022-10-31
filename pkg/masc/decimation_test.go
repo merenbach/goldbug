@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package masc2
+package masc
 
 import (
 	"fmt"
@@ -21,12 +21,12 @@ import (
 	"github.com/merenbach/goldbug/internal/fixture"
 )
 
-func TestKeywordCipher_Encipher(t *testing.T) {
+func TestDecimationCipher_Encipher(t *testing.T) {
 	var tables []struct {
-		Alphabet string
-		Caseless bool
-		Strict   bool
-		Keyword  string
+		Alphabet   string
+		Caseless   bool
+		Strict     bool
+		Multiplier int
 
 		Input  string
 		Output string
@@ -47,7 +47,7 @@ func TestKeywordCipher_Encipher(t *testing.T) {
 			params = append(params, WithCaseless())
 		}
 
-		c, err := NewKeywordCipher(table.Keyword, params...)
+		c, err := NewDecimationCipher(table.Multiplier, params...)
 		if err != nil {
 			t.Error("Could not create cipher:", err)
 		}
@@ -60,12 +60,12 @@ func TestKeywordCipher_Encipher(t *testing.T) {
 	}
 }
 
-func TestKeywordCipher_Decipher(t *testing.T) {
+func TestDecimationCipher_Decipher(t *testing.T) {
 	var tables []struct {
-		Alphabet string
-		Caseless bool
-		Strict   bool
-		Keyword  string
+		Alphabet   string
+		Caseless   bool
+		Strict     bool
+		Multiplier int
 
 		Input  string
 		Output string
@@ -86,7 +86,7 @@ func TestKeywordCipher_Decipher(t *testing.T) {
 			params = append(params, WithCaseless())
 		}
 
-		c, err := NewKeywordCipher(table.Keyword, params...)
+		c, err := NewDecimationCipher(table.Multiplier, params...)
 		if err != nil {
 			t.Error("Could not create cipher:", err)
 		}
@@ -99,8 +99,8 @@ func TestKeywordCipher_Decipher(t *testing.T) {
 	}
 }
 
-func ExampleNewKeywordCipher() {
-	c, err := NewKeywordCipher("CIPHER")
+func ExampleNewDecimationCipher() {
+	c, err := NewDecimationCipher(7)
 	if err != nil {
 		fmt.Println("Error:", err)
 	}
@@ -108,5 +108,5 @@ func ExampleNewKeywordCipher() {
 
 	// Output:
 	// PT: ABCDEFGHIJKLMNOPQRSTUVWXYZ
-	// CT: CIPHERABDFGJKLMNOQSTUVWXYZ
+	// CT: AHOVCJQXELSZGNUBIPWDKRYFMT
 }

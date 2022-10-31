@@ -12,20 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package masc2
+package masc
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/merenbach/goldbug/internal/fixture"
 )
 
-func TestTableau_Encipher(t *testing.T) {
+func TestKeywordCipher_Encipher(t *testing.T) {
 	var tables []struct {
-		PtAlphabet string
-		CtAlphabet string
-		Caseless   bool
-		Strict     bool
+		Alphabet string
+		Caseless bool
+		Strict   bool
+		Keyword  string
 
 		Input  string
 		Output string
@@ -35,17 +36,23 @@ func TestTableau_Encipher(t *testing.T) {
 	for i, table := range tables {
 		t.Logf("Running test %d of %d...", i+1, len(tables))
 
-		tableau, err := NewTableau(
-			table.PtAlphabet,
-			table.CtAlphabet,
-			table.Strict,
-			table.Caseless,
-		)
-		if err != nil {
-			t.Error("Error:", err)
+		var params []ConfigOption
+		if table.Alphabet != "" {
+			params = append(params, WithAlphabet(table.Alphabet))
+		}
+		if table.Strict {
+			params = append(params, WithStrict())
+		}
+		if table.Caseless {
+			params = append(params, WithCaseless())
 		}
 
-		if out, err := tableau.Encipher(table.Input); err != nil {
+		c, err := NewKeywordCipher(table.Keyword, params...)
+		if err != nil {
+			t.Error("Could not create cipher:", err)
+		}
+
+		if out, err := c.Encipher(table.Input); err != nil {
 			t.Error("Could not encipher:", err)
 		} else if out != table.Output {
 			t.Errorf("Expected %q to encipher to %q, but instead got %q", table.Input, table.Output, out)
@@ -53,12 +60,12 @@ func TestTableau_Encipher(t *testing.T) {
 	}
 }
 
-func TestTableau_Decipher(t *testing.T) {
+func TestKeywordCipher_Decipher(t *testing.T) {
 	var tables []struct {
-		PtAlphabet string
-		CtAlphabet string
-		Caseless   bool
-		Strict     bool
+		Alphabet string
+		Caseless bool
+		Strict   bool
+		Keyword  string
 
 		Input  string
 		Output string
@@ -68,20 +75,38 @@ func TestTableau_Decipher(t *testing.T) {
 	for i, table := range tables {
 		t.Logf("Running test %d of %d...", i+1, len(tables))
 
-		tableau, err := NewTableau(
-			table.PtAlphabet,
-			table.CtAlphabet,
-			table.Strict,
-			table.Caseless,
-		)
-		if err != nil {
-			t.Error("Error:", err)
+		var params []ConfigOption
+		if table.Alphabet != "" {
+			params = append(params, WithAlphabet(table.Alphabet))
+		}
+		if table.Strict {
+			params = append(params, WithStrict())
+		}
+		if table.Caseless {
+			params = append(params, WithCaseless())
 		}
 
-		if out, err := tableau.Decipher(table.Input); err != nil {
+		c, err := NewKeywordCipher(table.Keyword, params...)
+		if err != nil {
+			t.Error("Could not create cipher:", err)
+		}
+
+		if out, err := c.Decipher(table.Input); err != nil {
 			t.Error("Could not decipher:", err)
 		} else if out != table.Output {
 			t.Errorf("Expected %q to decipher to %q, but instead got %q", table.Input, table.Output, out)
 		}
 	}
+}
+
+func ExampleNewKeywordCipher() {
+	c, err := NewKeywordCipher("CIPHER")
+	if err != nil {
+		fmt.Println("Error:", err)
+	}
+	fmt.Println(c)
+
+	// Output:
+	// PT: ABCDEFGHIJKLMNOPQRSTUVWXYZ
+	// CT: CIPHERABDFGJKLMNOQSTUVWXYZ
 }

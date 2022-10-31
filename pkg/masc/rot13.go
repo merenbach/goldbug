@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package masc2
+package masc
 
 // NewRot13Cipher creates and returns a new ROT13 cipher.
 func NewRot13Cipher(opts ...ConfigOption) (*Cipher, error) {

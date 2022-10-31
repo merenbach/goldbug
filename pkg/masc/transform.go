@@ -12,13 +12,4 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package masc2
-
-// NewAtbashCipher creates and returns a new cipher.
-func NewAtbashCipher(opts ...ConfigOption) (*Cipher, error) {
-	const (
-		slope     = (-1)
-		intercept = (-1)
-	)
-	return NewAffineCipher(slope, intercept, opts...)
-}
+package masc

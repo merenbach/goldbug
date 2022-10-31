@@ -17,7 +17,7 @@ package pasc
 import (
 	"testing"
 
-	"github.com/merenbach/goldbug/pkg/masc2"
+	"github.com/merenbach/goldbug/pkg/masc"
 )
 
 func TestTabulaRecta(t *testing.T) {
@@ -43,8 +43,8 @@ func TestTabulaRecta(t *testing.T) {
 	for _, table := range tables {
 		tr, err := NewTabulaRecta(
 			WithPtAlphabet(table.ptAlphabet),
-			WithDictFunc(func(s string, i int) (*masc2.Cipher, error) {
-				return masc2.NewCaesarCipher(i, masc2.WithAlphabet(s))
+			WithDictFunc(func(s string, i int) (*masc.Cipher, error) {
+				return masc.NewCaesarCipher(i, masc.WithAlphabet(s))
 			}),
 			WithKey(table.keyRune),
 		)

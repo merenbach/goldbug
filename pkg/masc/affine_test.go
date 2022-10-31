@@ -1,4 +1,4 @@
-// Copyright 2022 Andrew Merenbach
+// Copyright 2018 Andrew Merenbach
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package masc2
+package masc
 
 import (
 	"fmt"
@@ -21,12 +21,13 @@ import (
 	"github.com/merenbach/goldbug/internal/fixture"
 )
 
-func TestSimpleCipher_Encipher(t *testing.T) {
+func TestAffineCipher_Encipher(t *testing.T) {
 	var tables []struct {
-		Alphabet   string
-		Caseless   bool
-		Strict     bool
-		CtAlphabet string
+		Alphabet  string
+		Caseless  bool
+		Strict    bool
+		Intercept int
+		Slope     int
 
 		Input  string
 		Output string
@@ -37,6 +38,9 @@ func TestSimpleCipher_Encipher(t *testing.T) {
 		t.Logf("Running test %d of %d...", i+1, len(tables))
 
 		var params []ConfigOption
+		if table.Alphabet != "" {
+			params = append(params, WithAlphabet(table.Alphabet))
+		}
 		if table.Strict {
 			params = append(params, WithStrict())
 		}
@@ -44,7 +48,7 @@ func TestSimpleCipher_Encipher(t *testing.T) {
 			params = append(params, WithCaseless())
 		}
 
-		c, err := NewSimpleCipher(table.CtAlphabet, params...)
+		c, err := NewAffineCipher(table.Slope, table.Intercept, params...)
 		if err != nil {
 			t.Error("Could not create cipher:", err)
 		}
@@ -57,13 +61,13 @@ func TestSimpleCipher_Encipher(t *testing.T) {
 	}
 }
 
-func TestSimpleCipher_Decipher(t *testing.T) {
+func TestAffineCipher_Decipher(t *testing.T) {
 	var tables []struct {
-		Alphabet   string
-		Caseless   bool
-		Strict     bool
-		Keyword    string
-		CtAlphabet string
+		Alphabet  string
+		Caseless  bool
+		Strict    bool
+		Intercept int
+		Slope     int
 
 		Input  string
 		Output string
@@ -74,6 +78,9 @@ func TestSimpleCipher_Decipher(t *testing.T) {
 		t.Logf("Running test %d of %d...", i+1, len(tables))
 
 		var params []ConfigOption
+		if table.Alphabet != "" {
+			params = append(params, WithAlphabet(table.Alphabet))
+		}
 		if table.Strict {
 			params = append(params, WithStrict())
 		}
@@ -81,7 +88,7 @@ func TestSimpleCipher_Decipher(t *testing.T) {
 			params = append(params, WithCaseless())
 		}
 
-		c, err := NewSimpleCipher(table.CtAlphabet, params...)
+		c, err := NewAffineCipher(table.Slope, table.Intercept, params...)
 		if err != nil {
 			t.Error("Could not create cipher:", err)
 		}
@@ -94,8 +101,8 @@ func TestSimpleCipher_Decipher(t *testing.T) {
 	}
 }
 
-func ExampleNewSimpleCipher() {
-	c, err := NewSimpleCipher("MLSDEFPTJCARNUVWYXOGQKIZHB")
+func ExampleNewAffineCipher() {
+	c, err := NewAffineCipher(7, 3)
 	if err != nil {
 		fmt.Println("Error:", err)
 	}
@@ -103,5 +110,5 @@ func ExampleNewSimpleCipher() {
 
 	// Output:
 	// PT: ABCDEFGHIJKLMNOPQRSTUVWXYZ
-	// CT: MLSDEFPTJCARNUVWYXOGQKIZHB
+	// CT: DKRYFMTAHOVCJQXELSZGNUBIPW
 }

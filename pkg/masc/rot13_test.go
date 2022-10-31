@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package masc2
+package masc
 
 import (
 	"fmt"
@@ -21,12 +21,11 @@ import (
 	"github.com/merenbach/goldbug/internal/fixture"
 )
 
-func TestCaesarCipher_Encipher(t *testing.T) {
+func TestRot13Cipher_Encipher(t *testing.T) {
 	var tables []struct {
 		Alphabet string
 		Caseless bool
 		Strict   bool
-		Shift    int
 
 		Input  string
 		Output string
@@ -37,9 +36,6 @@ func TestCaesarCipher_Encipher(t *testing.T) {
 		t.Logf("Running test %d of %d...", i+1, len(tables))
 
 		var params []ConfigOption
-		if table.Alphabet != "" {
-			params = append(params, WithAlphabet(table.Alphabet))
-		}
 		if table.Strict {
 			params = append(params, WithStrict())
 		}
@@ -47,7 +43,7 @@ func TestCaesarCipher_Encipher(t *testing.T) {
 			params = append(params, WithCaseless())
 		}
 
-		c, err := NewCaesarCipher(table.Shift, params...)
+		c, err := NewRot13Cipher(params...)
 		if err != nil {
 			t.Error("Could not create cipher:", err)
 		}
@@ -60,12 +56,12 @@ func TestCaesarCipher_Encipher(t *testing.T) {
 	}
 }
 
-func TestCaesarCipher_Decipher(t *testing.T) {
+func TestRot13Cipher_Decipher(t *testing.T) {
 	var tables []struct {
 		Alphabet string
 		Caseless bool
 		Strict   bool
-		Shift    int
+		Keyword  string
 
 		Input  string
 		Output string
@@ -76,9 +72,6 @@ func TestCaesarCipher_Decipher(t *testing.T) {
 		t.Logf("Running test %d of %d...", i+1, len(tables))
 
 		var params []ConfigOption
-		if table.Alphabet != "" {
-			params = append(params, WithAlphabet(table.Alphabet))
-		}
 		if table.Strict {
 			params = append(params, WithStrict())
 		}
@@ -86,7 +79,7 @@ func TestCaesarCipher_Decipher(t *testing.T) {
 			params = append(params, WithCaseless())
 		}
 
-		c, err := NewCaesarCipher(table.Shift, params...)
+		c, err := NewRot13Cipher(params...)
 		if err != nil {
 			t.Error("Could not create cipher:", err)
 		}
@@ -99,8 +92,8 @@ func TestCaesarCipher_Decipher(t *testing.T) {
 	}
 }
 
-func ExampleNewCaesarCipher() {
-	c, err := NewCaesarCipher(3)
+func ExampleNewRot13Cipher() {
+	c, err := NewRot13Cipher()
 	if err != nil {
 		fmt.Println("Error:", err)
 	}
@@ -108,5 +101,5 @@ func ExampleNewCaesarCipher() {
 
 	// Output:
 	// PT: ABCDEFGHIJKLMNOPQRSTUVWXYZ
-	// CT: DEFGHIJKLMNOPQRSTUVWXYZABC
+	// CT: NOPQRSTUVWXYZABCDEFGHIJKLM
 }

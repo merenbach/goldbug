@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package masc2
+package masc
 
 import (
 	"fmt"
@@ -21,13 +21,12 @@ import (
 	"github.com/merenbach/goldbug/internal/fixture"
 )
 
-func TestAffineCipher_Encipher(t *testing.T) {
+func TestCaesarCipher_Encipher(t *testing.T) {
 	var tables []struct {
-		Alphabet  string
-		Caseless  bool
-		Strict    bool
-		Intercept int
-		Slope     int
+		Alphabet string
+		Caseless bool
+		Strict   bool
+		Shift    int
 
 		Input  string
 		Output string
@@ -48,7 +47,7 @@ func TestAffineCipher_Encipher(t *testing.T) {
 			params = append(params, WithCaseless())
 		}
 
-		c, err := NewAffineCipher(table.Slope, table.Intercept, params...)
+		c, err := NewCaesarCipher(table.Shift, params...)
 		if err != nil {
 			t.Error("Could not create cipher:", err)
 		}
@@ -61,13 +60,12 @@ func TestAffineCipher_Encipher(t *testing.T) {
 	}
 }
 
-func TestAffineCipher_Decipher(t *testing.T) {
+func TestCaesarCipher_Decipher(t *testing.T) {
 	var tables []struct {
-		Alphabet  string
-		Caseless  bool
-		Strict    bool
-		Intercept int
-		Slope     int
+		Alphabet string
+		Caseless bool
+		Strict   bool
+		Shift    int
 
 		Input  string
 		Output string
@@ -88,7 +86,7 @@ func TestAffineCipher_Decipher(t *testing.T) {
 			params = append(params, WithCaseless())
 		}
 
-		c, err := NewAffineCipher(table.Slope, table.Intercept, params...)
+		c, err := NewCaesarCipher(table.Shift, params...)
 		if err != nil {
 			t.Error("Could not create cipher:", err)
 		}
@@ -101,8 +99,8 @@ func TestAffineCipher_Decipher(t *testing.T) {
 	}
 }
 
-func ExampleNewAffineCipher() {
-	c, err := NewAffineCipher(7, 3)
+func ExampleNewCaesarCipher() {
+	c, err := NewCaesarCipher(3)
 	if err != nil {
 		fmt.Println("Error:", err)
 	}
@@ -110,5 +108,5 @@ func ExampleNewAffineCipher() {
 
 	// Output:
 	// PT: ABCDEFGHIJKLMNOPQRSTUVWXYZ
-	// CT: DKRYFMTAHOVCJQXELSZGNUBIPW
+	// CT: DEFGHIJKLMNOPQRSTUVWXYZABC
 }

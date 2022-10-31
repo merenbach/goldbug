@@ -1,4 +1,4 @@
-// Copyright 2018 Andrew Merenbach
+// Copyright 2022 Andrew Merenbach
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package masc2
+package masc
 
 import (
 	"fmt"
@@ -21,12 +21,12 @@ import (
 	"github.com/merenbach/goldbug/internal/fixture"
 )
 
-func TestDecimationCipher_Encipher(t *testing.T) {
+func TestSimpleCipher_Encipher(t *testing.T) {
 	var tables []struct {
 		Alphabet   string
 		Caseless   bool
 		Strict     bool
-		Multiplier int
+		CtAlphabet string
 
 		Input  string
 		Output string
@@ -37,9 +37,6 @@ func TestDecimationCipher_Encipher(t *testing.T) {
 		t.Logf("Running test %d of %d...", i+1, len(tables))
 
 		var params []ConfigOption
-		if table.Alphabet != "" {
-			params = append(params, WithAlphabet(table.Alphabet))
-		}
 		if table.Strict {
 			params = append(params, WithStrict())
 		}
@@ -47,7 +44,7 @@ func TestDecimationCipher_Encipher(t *testing.T) {
 			params = append(params, WithCaseless())
 		}
 
-		c, err := NewDecimationCipher(table.Multiplier, params...)
+		c, err := NewSimpleCipher(table.CtAlphabet, params...)
 		if err != nil {
 			t.Error("Could not create cipher:", err)
 		}
@@ -60,12 +57,13 @@ func TestDecimationCipher_Encipher(t *testing.T) {
 	}
 }
 
-func TestDecimationCipher_Decipher(t *testing.T) {
+func TestSimpleCipher_Decipher(t *testing.T) {
 	var tables []struct {
 		Alphabet   string
 		Caseless   bool
 		Strict     bool
-		Multiplier int
+		Keyword    string
+		CtAlphabet string
 
 		Input  string
 		Output string
@@ -76,9 +74,6 @@ func TestDecimationCipher_Decipher(t *testing.T) {
 		t.Logf("Running test %d of %d...", i+1, len(tables))
 
 		var params []ConfigOption
-		if table.Alphabet != "" {
-			params = append(params, WithAlphabet(table.Alphabet))
-		}
 		if table.Strict {
 			params = append(params, WithStrict())
 		}
@@ -86,7 +81,7 @@ func TestDecimationCipher_Decipher(t *testing.T) {
 			params = append(params, WithCaseless())
 		}
 
-		c, err := NewDecimationCipher(table.Multiplier, params...)
+		c, err := NewSimpleCipher(table.CtAlphabet, params...)
 		if err != nil {
 			t.Error("Could not create cipher:", err)
 		}
@@ -99,8 +94,8 @@ func TestDecimationCipher_Decipher(t *testing.T) {
 	}
 }
 
-func ExampleNewDecimationCipher() {
-	c, err := NewDecimationCipher(7)
+func ExampleNewSimpleCipher() {
+	c, err := NewSimpleCipher("MLSDEFPTJCARNUVWYXOGQKIZHB")
 	if err != nil {
 		fmt.Println("Error:", err)
 	}
@@ -108,5 +103,5 @@ func ExampleNewDecimationCipher() {
 
 	// Output:
 	// PT: ABCDEFGHIJKLMNOPQRSTUVWXYZ
-	// CT: AHOVCJQXELSZGNUBIPWDKRYFMT
+	// CT: MLSDEFPTJCARNUVWYXOGQKIZHB
 }

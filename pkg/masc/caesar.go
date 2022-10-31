@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package masc2
+package masc
 
 // NewCaesarCipher creates and returns a new Caesar cipher.
 func NewCaesarCipher(shift int, opts ...ConfigOption) (*Cipher, error) {

@@ -1,4 +1,4 @@
-// Copyright 2018 Andrew Merenbach
+// Copyright 2022 Andrew Merenbach
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,14 +12,4 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package masc2
-
-import "github.com/merenbach/goldbug/internal/sliceutil"
-
-// NewKeywordCipher creates and returns a new keyword cipher.
-func NewKeywordCipher(keyword string, opts ...ConfigOption) (*Cipher, error) {
-	c := NewConfig(opts...)
-	ctAlphabet, _ := sliceutil.Keyword([]rune(c.Alphabet()), []rune(keyword))
-
-	return NewSimpleCipher(string(ctAlphabet), opts...)
-}
+package masc
