@@ -40,7 +40,9 @@ func TestGCD(t *testing.T) {
 		{6, 15, 3},
 		{14, 28, 14},
 	}
-	for _, table := range tables {
+	for i, table := range tables {
+		t.Logf("Running test %d of %d...", i+1, len(tables))
+
 		if out := gcd(table.a, table.b); out != table.expected {
 			t.Errorf("expected GCD of %d and %d to be %d, but got %d instead", table.a, table.b, table.expected, out)
 		}
@@ -63,7 +65,9 @@ func TestCoprime(t *testing.T) {
 		{3, 15, false},
 		{14, 28, false},
 	}
-	for _, table := range tables {
+	for i, table := range tables {
+		t.Logf("Running test %d of %d...", i+1, len(tables))
+
 		if out := Coprime(table.a, table.b); out != table.expected {
 			if table.expected {
 				t.Errorf("%d and %d were expected to be comprime, but were not", table.a, table.b)
@@ -97,7 +101,9 @@ func TestRegular(t *testing.T) {
 		{168, 132, false},
 		{1, 2, false},
 	}
-	for _, table := range tables {
+	for i, table := range tables {
+		t.Logf("Running test %d of %d...", i+1, len(tables))
+
 		if out := Regular(table.a, table.b); out != table.expected {
 			if table.expected {
 				t.Errorf("%d and %d were expected to be regular, but were not", table.a, table.b)
