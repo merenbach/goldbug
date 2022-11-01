@@ -19,6 +19,35 @@ import (
 	"testing"
 )
 
+func TestHullDobell(t *testing.T) {
+	tables := []struct {
+		expectSuccess bool
+		m             int
+		a             int
+		c             int
+	}{
+		{true, 1, 1, 0},
+		{true, 26, 1, 7},
+		{true, 26, 1, 3},
+		{true, 26, 1, 1},
+		{false, 0, 1, 0},
+		{false, 2, 1, 0},
+		{false, 26, 1, 13},
+		{false, 26, 2, 7},
+		{false, 28, 3, 7},
+	}
+
+	for i, table := range tables {
+		t.Logf("Running test %d of %d...", i+1, len(tables))
+		err := hullDobell(table.m, table.a, table.c)
+		if table.expectSuccess && err != nil {
+			t.Error("Expected success and got failure:", err)
+		} else if !table.expectSuccess && err == nil {
+			t.Error("Expected failure and got success")
+		}
+	}
+}
+
 func TestLCG(t *testing.T) {
 	// Some sequences for verification borrowed from: <https://www.mi.fu-berlin.de/inf/groups/ag-tech/teaching/2012_SS/L_19540_Modeling_and_Performance_Analysis_with_Simulation/06.pdf>
 	tables := []struct {

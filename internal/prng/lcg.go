@@ -16,9 +16,26 @@ package prng
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/merenbach/goldbug/internal/mathutil"
 )
+
+// HullDobell tests for compliance with the Hull-Dobell theorem.
+// The error parameter, if set, will contain the first-found failing constraint.
+// When c != 0, this test passing means that the cycle is equal to g.multiplier.
+func hullDobell(m int, a int, c int) error {
+	switch {
+	case !mathutil.Coprime(m, c):
+		return errors.New("modulus and increment should be relatively prime")
+	case !mathutil.Regular(a-1, m):
+		return errors.New("prime factors of modulus should also divide multiplier less one")
+	case m%4 == 0 && (a-1)%4 != 0:
+		return errors.New("if 4 divides modulus, 4 should divide multiplier less one")
+	default:
+		return nil
+	}
+}
 
 // An LCG is a linear congruential generator.
 // An LCG is a type of pseudo-random number generator (PRNG).
@@ -41,26 +58,6 @@ func (g *LCG) mixed() bool {
 	return g.Increment != 0
 }
 
-// HullDobell tests for compliance with the Hull-Dobell theorem.
-// The error parameter, if set, will contain the first-found failing constraint.
-// When c != 0, this test passing means that the cycle is equal to g.multiplier.
-func (g *LCG) hullDobell() error {
-	if !g.mixed() {
-		return nil
-	}
-
-	switch {
-	case !mathutil.Coprime(g.Modulus, g.Increment):
-		return errors.New("multiplier and increment should be coprime")
-	case !mathutil.Regular(g.Multiplier-1, g.Modulus):
-		return errors.New("prime factors of modulus should also divide multiplier-minus-one")
-	case g.Modulus%4 == 0 && (g.Multiplier-1)%4 != 0:
-		return errors.New("if 4 divides modulus, 4 should divide multiplier-minus-one")
-	default:
-		return nil
-	}
-}
-
 // Validate settings for this generator.
 func (g *LCG) validate() error {
 	if g.Modulus <= 0 {
@@ -69,13 +66,17 @@ func (g *LCG) validate() error {
 	if g.Multiplier <= 0 {
 		return errors.New("multiplier must be greater than zero")
 	}
-	return g.hullDobell()
+
+	if !g.mixed() {
+		return nil
+	}
+	return hullDobell(g.Modulus, g.Multiplier, g.Increment)
 }
 
 // Iterator across LCG values.
 func (g *LCG) iterator() (func() int, error) {
 	if err := g.validate(); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("could not validate LCG: %w", err)
 	}
 
 	state := g.Seed % g.Modulus

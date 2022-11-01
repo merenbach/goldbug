@@ -57,6 +57,7 @@ func TestCoprime(t *testing.T) {
 		{7, 20, true},
 		{14, 15, true},
 		{172, 17, true},
+		{2, 0, false},
 		{2, 4, false},
 		{2, 22, false},
 		{3, 15, false},
