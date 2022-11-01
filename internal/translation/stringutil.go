@@ -15,7 +15,9 @@
 package translation
 
 import (
-	"errors"
+	"fmt"
+
+	"github.com/merenbach/goldbug/internal/sliceutil"
 )
 
 // MakeMap maps source runes to destination runes.
@@ -24,15 +26,10 @@ import (
 func makeMap(a string, b string, c string) (map[rune]rune, error) {
 	src, dst, del := []rune(a), []rune(b), []rune(c)
 
-	if len(src) != len(dst) {
-		return nil, errors.New("The first two arguments must have equal length")
-	}
-
-	t := make(map[rune]rune, len(src))
-
 	// Translate from A to B
-	for i, r := range src {
-		t[r] = dst[i]
+	t, err := sliceutil.Zipmap(src, dst)
+	if err != nil {
+		return nil, fmt.Errorf("could not zip source with destination runes: %w", err)
 	}
 
 	// Mark C for deletion

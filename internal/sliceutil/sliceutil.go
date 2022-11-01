@@ -121,3 +121,18 @@ func Keyword[T comparable](xs []T, keyword []T) ([]T, error) {
 	filteredKeyword = append(filteredKeyword, xs...)
 	return Deduplicate(filteredKeyword), nil
 }
+
+// Zipmap creates a new map by zipping a key scalar with a slice of values.
+// Zipmap requires both parameters to have the same length.
+func Zipmap[T comparable, U any](xs []T, ys []U) (map[T]U, error) {
+	if len(xs) != len(ys) {
+		return nil, errors.New("both parameters must have the same length")
+	}
+
+	m := make(map[T]U)
+	for i, x := range xs {
+		m[x] = ys[i]
+	}
+
+	return m, nil
+}
