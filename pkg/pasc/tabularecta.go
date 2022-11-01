@@ -39,8 +39,6 @@ type TabulaRectaCipher struct {
 	*TabulaRecta
 }
 
-// adapted from: https://www.sohamkamani.com/golang/options-pattern/
-
 func NewTabulaRectaCipher(key string, ciphers []*masc.SimpleCipher, autokey autokeyOption, opts ...ConfigOption) (*TabulaRectaCipher, error) {
 	c := NewConfig(opts...)
 

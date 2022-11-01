@@ -24,6 +24,8 @@ import (
 	"github.com/merenbach/goldbug/pkg/masc"
 )
 
+type autokeyFunc func(rune, rune, rune) rune
+
 // TabulaRecta holds a tabula recta.
 type TabulaRecta struct {
 	// this is used here only for key lookups, hence no corresponding "strict" option at this time
@@ -35,12 +37,12 @@ type TabulaRecta struct {
 
 	key string
 
-	autokeyer func(rune, rune, rune) rune
+	autokeyer autokeyFunc
 
 	tableau map[rune]*masc.SimpleCipher
 }
 
-func NewTabulaRecta(ptAlphabet string, keyAlphabet string, key string, ciphers []*masc.SimpleCipher, autokeyer func(rune, rune, rune) rune, caseless bool) (*TabulaRecta, error) {
+func NewTabulaRecta(ptAlphabet string, keyAlphabet string, key string, ciphers []*masc.SimpleCipher, autokeyer autokeyFunc, caseless bool) (*TabulaRecta, error) {
 	t := &TabulaRecta{
 		ptAlphabet:  ptAlphabet,
 		keyAlphabet: keyAlphabet,
