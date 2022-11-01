@@ -14,6 +14,8 @@
 
 package lfg
 
+import "github.com/merenbach/goldbug/internal/iterutil"
+
 /*
 TODO: based on https://cboard.cprogramming.com/general-discussions/151582-lagged-fibonacci-generator.html
 can we simplify LFG?
@@ -51,12 +53,11 @@ func iterateLagTable(m int, seed []int, f func([]int) int) func() int {
 	copy(lagTable, seed)
 	last := len(lagTable) - 1
 
-	return func() int {
-		o := f(lagTable) % m
+	return iterutil.Successors(f(lagTable)%m, func(i int) int {
 		copy(lagTable, lagTable[1:])
-		lagTable[last] = o
-		return o
-	}
+		lagTable[last] = i
+		return f(lagTable) % m
+	})
 }
 
 // Take a slice of integers from a generating function.
