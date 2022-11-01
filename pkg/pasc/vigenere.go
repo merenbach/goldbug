@@ -51,7 +51,18 @@ func NewVigenereCipher(key string, autokey autokeyOption, opts ...ConfigOption) 
 		ciphers[i] = cipher
 	}
 
-	return NewTabulaRectaCipher(key, ciphers, autokey, opts...)
+	autokeyer := func() autokeyFunc {
+		switch autokey {
+		case KeyAutokey:
+			return keyAutokeyFunc
+		case TextAutokey:
+			return textAutokeyFunc
+		default:
+			return defaultAutokeyFunc
+		}
+	}()
+
+	return NewTabulaRectaCipher(key, ciphers, autokeyer, opts...)
 }
 
 // // NewVigenereTextAutokeyCipher creates and returns a new Vigenere cipher with text autokey.

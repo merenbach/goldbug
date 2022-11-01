@@ -43,5 +43,5 @@ func NewBeaufortCipher(key string, opts ...ConfigOption) (*TabulaRectaCipher, er
 		ciphers[i] = cipher
 	}
 
-	return NewTabulaRectaCipher(key, ciphers, NoAutokey, opts...)
+	return NewTabulaRectaCipher(key, ciphers, defaultAutokeyFunc, opts...)
 }

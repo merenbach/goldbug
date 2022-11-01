@@ -51,6 +51,7 @@ func makekey(k string) (func() rune, error) {
 func NewGromarkCipher(key string, primer string, opts ...ConfigOption) (*TabulaRectaCipher, error) {
 	const digits = "0123456789"
 
+	opts = append(opts, WithKeyAlphabet(digits))
 	c := NewConfig(opts...)
 
 	ctAlphabetInput, _ := sliceutil.Keyword([]rune(c.ptAlphabet), []rune(key))
@@ -96,16 +97,9 @@ func NewGromarkCipher(key string, primer string, opts ...ConfigOption) (*TabulaR
 		ciphers[i] = cipher
 	}
 
-	// return pasc.NewTabulaRectaCipher(primer, ciphers, specialautokey, opts...)
-
-	tr, err := newTabulaRecta(c.ptAlphabet, digits, primer, ciphers, func(_ rune, _ rune, _ rune) rune {
+	return NewTabulaRectaCipher(primer, ciphers, func(_ rune, _ rune, _ rune) rune {
 		return keygen()
-	}, c.caseless)
-	if err != nil {
-		return nil, fmt.Errorf("couldn't create tabula recta: %w", err)
-	}
-
-	return &TabulaRectaCipher{tr}, nil
+	}, opts...)
 }
 
 // // ALLOW COMPOUND CIPHER CHAINING:

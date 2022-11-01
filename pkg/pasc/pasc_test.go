@@ -14,69 +14,62 @@
 
 package pasc
 
-import (
-	"testing"
-	"unicode/utf8"
+// func TestTabulaRecta(t *testing.T) {
+// 	const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-	"github.com/merenbach/goldbug/pkg/masc"
-)
+// 	tables := []struct {
+// 		keyAlphabet string
+// 		ptAlphabet  string
+// 		ctAlphabet  string
+// 		keyRune     string
+// 		srcRune     string
+// 		dstRune     string
+// 	}{
+// 		{alphabet, alphabet, alphabet, "A", "A", "A"},
+// 		{alphabet, alphabet, alphabet, "B", "B", "C"},
+// 		{alphabet, alphabet, alphabet, "K", "V", "F"},
+// 		{alphabet, alphabet, alphabet, "O", "K", "Y"},
+// 		{alphabet, alphabet, alphabet, "Y", "Y", "W"},
+// 		{alphabet, alphabet, alphabet, "Z", "O", "N"},
+// 		{alphabet, alphabet, alphabet, "Z", "Z", "Y"},
+// 	}
 
-func TestTabulaRecta(t *testing.T) {
-	const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+// 	for _, table := range tables {
+// 		ciphers := make([]*masc.SimpleCipher, utf8.RuneCountInString(table.keyAlphabet))
+// 		for i := range table.keyAlphabet {
+// 			cipher, err := masc.NewCaesarCipher(i, masc.WithAlphabet(table.ctAlphabet))
+// 			if err != nil {
+// 				t.Error("Could not create ciphers:", err)
+// 			}
+// 			ciphers[i] = cipher
+// 		}
 
-	tables := []struct {
-		keyAlphabet string
-		ptAlphabet  string
-		ctAlphabet  string
-		keyRune     string
-		srcRune     string
-		dstRune     string
-	}{
-		{alphabet, alphabet, alphabet, "A", "A", "A"},
-		{alphabet, alphabet, alphabet, "B", "B", "C"},
-		{alphabet, alphabet, alphabet, "K", "V", "F"},
-		{alphabet, alphabet, alphabet, "O", "K", "Y"},
-		{alphabet, alphabet, alphabet, "Y", "Y", "W"},
-		{alphabet, alphabet, alphabet, "Z", "O", "N"},
-		{alphabet, alphabet, alphabet, "Z", "Z", "Y"},
-	}
+// 		tr, err := newTabulaRecta(
+// 			table.ptAlphabet,
+// 			table.keyAlphabet,
+// 			table.keyRune,
+// 			ciphers,
+// 			nil,
+// 			false,
+// 		)
+// 		if err != nil {
+// 			t.Error("Could not create tabula recta:", err)
+// 		}
 
-	for _, table := range tables {
-		ciphers := make([]*masc.SimpleCipher, utf8.RuneCountInString(table.keyAlphabet))
-		for i := range table.keyAlphabet {
-			cipher, err := masc.NewCaesarCipher(i, masc.WithAlphabet(table.ctAlphabet))
-			if err != nil {
-				t.Error("Could not create ciphers:", err)
-			}
-			ciphers[i] = cipher
-		}
+// 		dst, err := tr.Encipher(table.srcRune)
+// 		if err != nil {
+// 			t.Errorf("Expected encipherment key rune %s to be in key alphabet, but it was not", table.keyRune)
+// 		}
+// 		if dst != table.dstRune {
+// 			t.Errorf("Expected E(p=%s,k=%s)=%s but got %s instead", table.srcRune, table.keyRune, table.dstRune, dst)
+// 		}
 
-		tr, err := newTabulaRecta(
-			table.ptAlphabet,
-			table.keyAlphabet,
-			table.keyRune,
-			ciphers,
-			nil,
-			false,
-		)
-		if err != nil {
-			t.Error("Could not create tabula recta:", err)
-		}
-
-		dst, err := tr.Encipher(table.srcRune)
-		if err != nil {
-			t.Errorf("Expected encipherment key rune %s to be in key alphabet, but it was not", table.keyRune)
-		}
-		if dst != table.dstRune {
-			t.Errorf("Expected E(p=%s,k=%s)=%s but got %s instead", table.srcRune, table.keyRune, table.dstRune, dst)
-		}
-
-		src, err := tr.Decipher(dst)
-		if err != nil {
-			t.Errorf("Expected decipherment key rune %s to be in key alphabet, but it was not", table.keyRune)
-		}
-		if src != table.srcRune {
-			t.Errorf("Expected D(c=%s,k=%s)=%s but got %s instead", table.dstRune, table.keyRune, table.srcRune, src)
-		}
-	}
-}
+// 		src, err := tr.Decipher(dst)
+// 		if err != nil {
+// 			t.Errorf("Expected decipherment key rune %s to be in key alphabet, but it was not", table.keyRune)
+// 		}
+// 		if src != table.srcRune {
+// 			t.Errorf("Expected D(c=%s,k=%s)=%s but got %s instead", table.dstRune, table.keyRune, table.srcRune, src)
+// 		}
+// 	}
+// }
