@@ -60,15 +60,6 @@ func iterateLagTable(m int, seed []int, f func([]int) int) func() int {
 	})
 }
 
-// Take a slice of integers from a generating function.
-func take(n int, f func() int) []int {
-	out := make([]int, n)
-	for i := range out {
-		out[i] = f()
-	}
-	return out
-}
-
 // // An LFG is a lagged Fibonacci generator.
 // // An LFG is a type of pseudo-random number generator (PRNG).
 // // An LFG may not be cryptographically secure.

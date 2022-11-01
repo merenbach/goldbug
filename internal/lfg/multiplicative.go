@@ -14,7 +14,11 @@
 
 package lfg
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/merenbach/goldbug/internal/iterutil"
+)
 
 // A Multiplicative LFG is a lagged Fibonacci generator that uses multiplication for new elements.
 // A Multiplicative LFG is a type of pseudo-random number generator (PRNG).
@@ -55,5 +59,5 @@ func (g *Multiplicative) Slice(n int) ([]int, error) {
 	if err != nil {
 		return nil, err
 	}
-	return take(n, iter), nil
+	return iterutil.Take(n, iter), nil
 }
