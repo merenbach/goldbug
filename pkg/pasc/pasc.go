@@ -15,7 +15,6 @@
 package pasc
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 	"text/tabwriter"
@@ -44,12 +43,7 @@ type tabulaRecta struct {
 }
 
 func newTabulaRecta(ptAlphabet string, keyAlphabet string, key string, ciphers []*masc.SimpleCipher, autokeyer autokeyFunc, caseless bool) (*tabulaRecta, error) {
-	keyAlphabetRunes := []rune(keyAlphabet)
-	if len(keyAlphabetRunes) != len(ciphers) {
-		return nil, errors.New("row headers must have same rune length as rows slice")
-	}
-
-	tableau, err := sliceutil.Zipmap(keyAlphabetRunes, ciphers)
+	tableau, err := sliceutil.Zipmap([]rune(keyAlphabet), ciphers)
 	if err != nil {
 		return nil, fmt.Errorf("could not zip alphabet with ciphers: %w", err)
 	}
