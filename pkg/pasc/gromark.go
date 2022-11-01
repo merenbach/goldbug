@@ -56,9 +56,7 @@ func NewGromarkCipher(key string, primer string, opts ...ConfigOption) (*TabulaR
 
 	ctAlphabetInput, _ := sliceutil.Keyword([]rune(c.ptAlphabet), []rune(key))
 
-	tc := transposition.Cipher{
-		Keys: []string{key},
-	}
+	tc := transposition.NewCipher([]string{key})
 	transposedCtAlphabet, err := tc.Encipher(string(ctAlphabetInput))
 	if err != nil {
 		return nil, err

@@ -58,8 +58,9 @@ const (
 
 // TabulaRectaCipher implements a Vigenère cipher.
 type TabulaRectaCipher struct {
-	key string
 	*Config
+
+	key         string
 	tabulaRecta map[rune]*masc.SimpleCipher
 
 	autokeyer autokeyFunc
@@ -74,8 +75,8 @@ func NewTabulaRectaCipher(key string, ciphers []*masc.SimpleCipher, autokeyer au
 	}
 
 	return &TabulaRectaCipher{
-		key,
 		c,
+		key,
 		tabulaRecta,
 		autokeyer,
 	}, nil

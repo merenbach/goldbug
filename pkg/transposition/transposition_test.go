@@ -39,7 +39,8 @@ func TestLexicalKey(t *testing.T) {
 
 func TestCipher_Encipher(t *testing.T) {
 	var tables []struct {
-		Cipher
+		Myszkowski bool
+		Keys       []string
 
 		Input  string
 		Output string
@@ -47,7 +48,13 @@ func TestCipher_Encipher(t *testing.T) {
 
 	fixture.Load(t, &tables)
 	for _, table := range tables {
-		if out, err := table.Encipher(table.Input); err != nil {
+		var params []ConfigOption
+		if table.Myszkowski {
+			params = append(params, WithMyszkowski())
+		}
+
+		c := NewCipher(table.Keys, params...)
+		if out, err := c.Encipher(table.Input); err != nil {
 			t.Error("Could not encipher:", err)
 		} else if out != table.Output {
 			t.Errorf("Expected %q to encipher to %q, but instead got %q", table.Input, table.Output, out)
@@ -57,7 +64,8 @@ func TestCipher_Encipher(t *testing.T) {
 
 func TestCipher_Decipher(t *testing.T) {
 	var tables []struct {
-		Cipher
+		Myszkowski bool
+		Keys       []string
 
 		Input  string
 		Output string
@@ -65,7 +73,13 @@ func TestCipher_Decipher(t *testing.T) {
 
 	fixture.Load(t, &tables)
 	for _, table := range tables {
-		if out, err := table.Decipher(table.Input); err != nil {
+		var params []ConfigOption
+		if table.Myszkowski {
+			params = append(params, WithMyszkowski())
+		}
+
+		c := NewCipher(table.Keys, params...)
+		if out, err := c.Decipher(table.Input); err != nil {
 			t.Error("Could not decipher:", err)
 		} else if out != table.Output {
 			t.Errorf("Expected %q to decipher to %q, but instead got %q", table.Input, table.Output, out)

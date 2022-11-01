@@ -59,8 +59,17 @@ func lexicalKey(s string, repeats bool) []int {
 
 // Cipher implements a columnar transposition cipher.
 type Cipher struct {
-	Keys       []string
-	Myszkowski bool
+	*Config
+
+	Keys []string
+}
+
+func NewCipher(keys []string, opts ...ConfigOption) *Cipher {
+	c := NewConfig(opts...)
+	return &Cipher{
+		Config: c,
+		Keys:   keys,
+	}
 }
 
 // Makegrid creates a grid and numbers its cells.
@@ -80,7 +89,7 @@ func (c *Cipher) Encipher(s string) (string, error) {
 		g.SortByRow()
 		g.Fill(s)
 
-		keyNums := lexicalKey(k, c.Myszkowski)
+		keyNums := lexicalKey(k, c.myszkowski)
 		s = g.ReadCols(keyNums)
 	}
 
@@ -92,7 +101,7 @@ func (c *Cipher) Decipher(s string) (string, error) {
 	for i := len(c.Keys) - 1; i >= 0; i-- {
 		k := c.Keys[i]
 		g := c.makegrid(utf8.RuneCountInString(s), utf8.RuneCountInString(k))
-		keyNums := lexicalKey(k, c.Myszkowski)
+		keyNums := lexicalKey(k, c.myszkowski)
 
 		g.OrderByCol(keyNums)
 		g.Fill(s)
