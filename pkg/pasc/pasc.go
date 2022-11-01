@@ -35,12 +35,12 @@ type TabulaRecta struct {
 
 	key string
 
-	autokeyer func(rune, rune, *[]rune)
+	autokeyer func(rune, rune, rune) rune
 
 	tableau map[rune]*masc.SimpleCipher
 }
 
-func NewTabulaRecta(ptAlphabet string, keyAlphabet string, key string, ciphers []*masc.SimpleCipher, autokeyer func(rune, rune, *[]rune), caseless bool) (*TabulaRecta, error) {
+func NewTabulaRecta(ptAlphabet string, keyAlphabet string, key string, ciphers []*masc.SimpleCipher, autokeyer func(rune, rune, rune) rune, caseless bool) (*TabulaRecta, error) {
 	t := &TabulaRecta{
 		ptAlphabet:  ptAlphabet,
 		keyAlphabet: keyAlphabet,
@@ -182,7 +182,7 @@ func (tr *TabulaRecta) Encipher(s string) (string, error) {
 			// Transcoding successful
 			transcodedCharCount++
 			if tr.autokeyer != nil {
-				tr.autokeyer(r, o, &keyRunes)
+				keyRunes = append(keyRunes, tr.autokeyer(k, r, o))
 			}
 		}
 		return o
@@ -222,7 +222,7 @@ func (tr *TabulaRecta) Decipher(s string) (string, error) {
 			// Transcoding successful
 			transcodedCharCount++
 			if tr.autokeyer != nil {
-				tr.autokeyer(o, r, &keyRunes)
+				keyRunes = append(keyRunes, tr.autokeyer(k, o, r))
 			}
 		}
 		return o

@@ -107,8 +107,8 @@ func NewGromarkCipher(key string, primer string, opts ...ConfigOption) (*Cipher,
 
 	// return pasc.NewTabulaRectaCipher(primer, ciphers, specialautokey, opts...)
 
-	tr, err := pasc.NewTabulaRecta(c.ptAlphabet, digits, primer, ciphers, func(_ rune, _ rune, keystream *[]rune) {
-		*keystream = append(*keystream, keygen())
+	tr, err := pasc.NewTabulaRecta(c.ptAlphabet, digits, primer, ciphers, func(_ rune, _ rune, _ rune) rune {
+		return keygen()
 	}, c.caseless)
 	if err != nil {
 		return nil, fmt.Errorf("couldn't create tabula recta: %w", err)

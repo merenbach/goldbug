@@ -44,15 +44,16 @@ type TabulaRectaCipher struct {
 func NewTabulaRectaCipher(key string, ciphers []*masc.SimpleCipher, autokey autokeyOption, opts ...ConfigOption) (*TabulaRectaCipher, error) {
 	c := NewConfig(opts...)
 
-	tableau, err := NewTabulaRecta(c.ptAlphabet, c.keyAlphabet, key, ciphers, func(a rune, b rune, keystream *[]rune) {
+	tableau, err := NewTabulaRecta(c.ptAlphabet, c.keyAlphabet, key, ciphers, func(k rune, a rune, b rune) rune {
 		switch autokey {
 		case NoAutokey:
-			// do nothing
+			return k
 		case KeyAutokey:
-			*keystream = append(*keystream, b)
+			return b
 		case TextAutokey:
-			*keystream = append(*keystream, a)
+			return a
 		}
+		return (-1)
 	}, c.caseless)
 	if err != nil {
 		return nil, fmt.Errorf("could not create tableau: %w", err)
