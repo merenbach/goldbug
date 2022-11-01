@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"sort"
 
+	"github.com/merenbach/goldbug/internal/iterutil"
 	"github.com/merenbach/goldbug/internal/mathutil"
 	"github.com/merenbach/goldbug/internal/prng"
 	"golang.org/x/exp/constraints"
@@ -87,12 +88,12 @@ func Affine[T any](xs []T, slope int, intercept int) ([]T, error) {
 		Seed:       intercept,
 	}
 
-	positions, err := lcg.Slice(m)
+	g, err := lcg.Iterator()
 	if err != nil {
 		return nil, fmt.Errorf("couldn't initialize LCG: %w", err)
 	}
 
-	ys, err := Backpermute(xs, positions)
+	ys, err := Backpermute(xs, iterutil.Take(m, g))
 	if err != nil {
 		return nil, fmt.Errorf("couldn't backpermute input: %w", err)
 	}

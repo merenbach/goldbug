@@ -18,6 +18,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/merenbach/goldbug/internal/iterutil"
 	"github.com/merenbach/goldbug/internal/mathutil"
 )
 
@@ -74,24 +75,12 @@ func (g *LCG) validate() error {
 }
 
 // Iterator across LCG values.
-func (g *LCG) iterator() (func() int, error) {
+func (g *LCG) Iterator() (func() int, error) {
 	if err := g.validate(); err != nil {
 		return nil, fmt.Errorf("could not validate LCG: %w", err)
 	}
 
-	state := g.Seed % g.Modulus
-	return func() int {
-		prev := state
-		state = (state*g.Multiplier + g.Increment) % g.Modulus
-		return prev
-	}, nil
-}
-
-// Slice of LCG values.
-func (g *LCG) Slice(n int) ([]int, error) {
-	iter, err := g.iterator()
-	if err != nil {
-		return nil, err
-	}
-	return take(n, iter), nil
+	return iterutil.Successors(g.Seed%g.Modulus, func(state int) int {
+		return (state*g.Multiplier + g.Increment) % g.Modulus
+	}), nil
 }

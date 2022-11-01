@@ -17,6 +17,8 @@ package prng
 import (
 	"reflect"
 	"testing"
+
+	"github.com/merenbach/goldbug/internal/iterutil"
 )
 
 func TestHullDobell(t *testing.T) {
@@ -102,10 +104,13 @@ func TestLCG(t *testing.T) {
 		lcg.Increment = table.c
 		lcg.Seed = table.seed
 
-		if out, err := lcg.Slice(len(table.expected)); err != nil {
+		if g, err := lcg.Iterator(); err != nil {
 			t.Errorf("Error for LCG %+v: %+v", lcg, err)
-		} else if !reflect.DeepEqual(out, table.expected) {
-			t.Errorf("expected LCG %+v to produce values %+v, but got %+v instead", lcg, table.expected, out)
+		} else {
+			out := iterutil.Take(len(table.expected), g)
+			if !reflect.DeepEqual(out, table.expected) {
+				t.Errorf("expected LCG %+v to produce values %+v, but got %+v instead", lcg, table.expected, out)
+			}
 		}
 	}
 }
