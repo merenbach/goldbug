@@ -42,15 +42,28 @@ type tabulaRecta struct {
 	tableau map[rune]*masc.SimpleCipher
 }
 
+func zipmap[T comparable, U any](xs []T, ys []U) (map[T]U, error) {
+	if len(xs) != len(ys) {
+		return nil, errors.New("both parameters must have the same length")
+	}
+
+	m := make(map[T]U)
+	for i, x := range xs {
+		m[x] = ys[i]
+	}
+
+	return m, nil
+}
+
 func newTabulaRecta(ptAlphabet string, keyAlphabet string, key string, ciphers []*masc.SimpleCipher, autokeyer autokeyFunc, caseless bool) (*tabulaRecta, error) {
 	keyAlphabetRunes := []rune(keyAlphabet)
 	if len(keyAlphabetRunes) != len(ciphers) {
 		return nil, errors.New("row headers must have same rune length as rows slice")
 	}
 
-	tableau := make(map[rune]*masc.SimpleCipher)
-	for i, r := range keyAlphabetRunes {
-		tableau[r] = ciphers[i]
+	tableau, err := zipmap(keyAlphabetRunes, ciphers)
+	if err != nil {
+		return nil, fmt.Errorf("could not zip alphabet with ciphers: %w", err)
 	}
 
 	return &tabulaRecta{
