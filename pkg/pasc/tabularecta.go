@@ -36,13 +36,13 @@ const (
 
 // TabulaRectaCipher implements a Vigenère cipher.
 type TabulaRectaCipher struct {
-	*TabulaRecta
+	*tabulaRecta
 }
 
 func NewTabulaRectaCipher(key string, ciphers []*masc.SimpleCipher, autokey autokeyOption, opts ...ConfigOption) (*TabulaRectaCipher, error) {
 	c := NewConfig(opts...)
 
-	tableau, err := NewTabulaRecta(c.ptAlphabet, c.keyAlphabet, key, ciphers, func(k rune, a rune, b rune) rune {
+	tableau, err := newTabulaRecta(c.ptAlphabet, c.keyAlphabet, key, ciphers, func(k rune, a rune, b rune) rune {
 		switch autokey {
 		case NoAutokey:
 			return k

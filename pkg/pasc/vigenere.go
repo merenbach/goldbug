@@ -20,17 +20,6 @@ import (
 	"github.com/merenbach/goldbug/pkg/masc"
 )
 
-// Cipher implements a Vigenère cipher.
-type Cipher struct {
-	autokey  autokeyOption
-	alphabet string
-	caseless bool
-	key      string
-	strict   bool
-
-	*TabulaRecta
-}
-
 // adapted from: https://www.sohamkamani.com/golang/options-pattern/
 
 // func WithAutokey(v autokeyOption) CipherOption {

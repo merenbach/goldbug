@@ -26,8 +26,8 @@ import (
 
 type autokeyFunc func(rune, rune, rune) rune
 
-// TabulaRecta holds a tabula recta.
-type TabulaRecta struct {
+// A TabulaRecta holds a tabula recta.
+type tabulaRecta struct {
 	// this is used here only for key lookups, hence no corresponding "strict" option at this time
 	caseless bool
 
@@ -42,8 +42,8 @@ type TabulaRecta struct {
 	tableau map[rune]*masc.SimpleCipher
 }
 
-func NewTabulaRecta(ptAlphabet string, keyAlphabet string, key string, ciphers []*masc.SimpleCipher, autokeyer autokeyFunc, caseless bool) (*TabulaRecta, error) {
-	t := &TabulaRecta{
+func newTabulaRecta(ptAlphabet string, keyAlphabet string, key string, ciphers []*masc.SimpleCipher, autokeyer autokeyFunc, caseless bool) (*tabulaRecta, error) {
+	t := &tabulaRecta{
 		ptAlphabet:  ptAlphabet,
 		keyAlphabet: keyAlphabet,
 		key:         key,
@@ -61,7 +61,7 @@ func NewTabulaRecta(ptAlphabet string, keyAlphabet string, key string, ciphers [
 	return t, nil
 }
 
-func (tr *TabulaRecta) maketableau(ciphers []*masc.SimpleCipher) (map[rune]*masc.SimpleCipher, error) {
+func (tr *tabulaRecta) maketableau(ciphers []*masc.SimpleCipher) (map[rune]*masc.SimpleCipher, error) {
 	ptAlphabet, keyAlphabet := tr.ptAlphabet, tr.keyAlphabet
 
 	if keyAlphabet == "" {
@@ -84,7 +84,7 @@ func (tr *TabulaRecta) maketableau(ciphers []*masc.SimpleCipher) (map[rune]*masc
 }
 
 // Printable representation of this tabula recta.
-func (tr *TabulaRecta) Printable() (string, error) {
+func (tr *tabulaRecta) Printable() (string, error) {
 	ptAlphabet := tr.ptAlphabet
 
 	keyAlphabet := tr.keyAlphabet
@@ -122,7 +122,7 @@ func (tr *TabulaRecta) Printable() (string, error) {
 // // Encipher will return (-1, false) if the key rune is invalid.
 // // Encipher will return (-1, true) if the key rune is valid but the message rune is not.
 // // Encipher will otherwise return the transcoded rune as the first argument and true as the second.
-// func (tr *TabulaRecta) encipher(r rune, k rune) (rune, bool) {
+// func (tr *tabulaRecta) encipher(r rune, k rune) (rune, bool) {
 // 	c, ok := tr.pt2ct[k]
 // 	if !ok {
 // 		return (-1), false
@@ -138,7 +138,7 @@ func (tr *TabulaRecta) Printable() (string, error) {
 // // Decipher will return (-1, false) if the key rune is invalid.
 // // Decipher will return (-1, true) if the key rune is valid but the message rune is not.
 // // Decipher will otherwise return the transcoded rune as the first argument and true as the second.
-// func (tr *TabulaRecta) decipher(r rune, k rune) (rune, bool) {
+// func (tr *tabulaRecta) decipher(r rune, k rune) (rune, bool) {
 // 	c, ok := tr.ct2pt[k]
 // 	if !ok {
 // 		return (-1), false
@@ -152,7 +152,7 @@ func (tr *TabulaRecta) Printable() (string, error) {
 
 // Encipher a string.
 // Encipher will invoke the onSuccess function with before and after runes.
-func (tr *TabulaRecta) Encipher(s string) (string, error) {
+func (tr *tabulaRecta) Encipher(s string) (string, error) {
 	if len(tr.key) == 0 {
 		return s, nil
 	}
@@ -193,7 +193,7 @@ func (tr *TabulaRecta) Encipher(s string) (string, error) {
 
 // Decipher a string.
 // Decipher will invoke the onSuccess function with before and after runes.
-func (tr *TabulaRecta) Decipher(s string) (string, error) {
+func (tr *tabulaRecta) Decipher(s string) (string, error) {
 	if len(tr.key) == 0 {
 		return s, nil
 	}

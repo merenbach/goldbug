@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package gromark
+package pasc
 
 import (
 	"fmt"
@@ -21,7 +21,6 @@ import (
 	"github.com/merenbach/goldbug/internal/lfg"
 	"github.com/merenbach/goldbug/internal/sliceutil"
 	"github.com/merenbach/goldbug/pkg/masc"
-	"github.com/merenbach/goldbug/pkg/pasc"
 	"github.com/merenbach/goldbug/pkg/transposition"
 )
 
@@ -48,16 +47,8 @@ func makekey(k string) (func() rune, error) {
 	}, nil
 }
 
-// Cipher implements a GROMARK (GROnsfeld with Mixed Alphabet and Running Key) cipher.
-// Cipher key is simply the primer for a running key.
-type Cipher struct {
-	*pasc.TabulaRecta
-}
-
-// adapted from: https://www.sohamkamani.com/golang/options-pattern/
-
-// NewGromarkCipher creates and returns a new Gromark cipher.
-func NewGromarkCipher(key string, primer string, opts ...ConfigOption) (*Cipher, error) {
+// NewGromarkCipher creates and returns a new GROMARK (GROnsfeld with Mixed Alphabet and Running Key) cipher.
+func NewGromarkCipher(key string, primer string, opts ...ConfigOption) (*TabulaRectaCipher, error) {
 	const digits = "0123456789"
 
 	c := NewConfig(opts...)
@@ -107,14 +98,14 @@ func NewGromarkCipher(key string, primer string, opts ...ConfigOption) (*Cipher,
 
 	// return pasc.NewTabulaRectaCipher(primer, ciphers, specialautokey, opts...)
 
-	tr, err := pasc.NewTabulaRecta(c.ptAlphabet, digits, primer, ciphers, func(_ rune, _ rune, _ rune) rune {
+	tr, err := newTabulaRecta(c.ptAlphabet, digits, primer, ciphers, func(_ rune, _ rune, _ rune) rune {
 		return keygen()
 	}, c.caseless)
 	if err != nil {
 		return nil, fmt.Errorf("couldn't create tabula recta: %w", err)
 	}
 
-	return &Cipher{tr}, nil
+	return &TabulaRectaCipher{tr}, nil
 }
 
 // // ALLOW COMPOUND CIPHER CHAINING:

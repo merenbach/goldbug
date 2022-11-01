@@ -51,7 +51,7 @@ func TestTabulaRecta(t *testing.T) {
 			ciphers[i] = cipher
 		}
 
-		tr, err := NewTabulaRecta(
+		tr, err := newTabulaRecta(
 			table.ptAlphabet,
 			table.keyAlphabet,
 			table.keyRune,
