@@ -43,3 +43,30 @@ func TestSuccessors(t *testing.T) {
 
 	}
 }
+
+func TestTake(t *testing.T) {
+	tables := []struct {
+		expect []int
+		f      func() int
+	}{
+		{[]int{}, func() int { return 1 }},
+		{[]int{1}, func() int { return 1 }},
+		{[]int{1, 1}, func() int { return 1 }},
+		{[]int{1, 1, 1}, func() int { return 1 }},
+		{[]int{1, 2, 3, 4, 5}, func() func() int {
+			var x int
+			return func() int { x++; return x }
+		}()},
+	}
+
+	for i, table := range tables {
+		t.Logf("Running test %d of %d...", i+1, len(tables))
+
+		out := Take(len(table.expect), table.f)
+
+		if !reflect.DeepEqual(out, table.expect) {
+			t.Errorf("Expected %+v, got %+v", table.expect, out)
+		}
+
+	}
+}
