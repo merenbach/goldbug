@@ -43,44 +43,24 @@ type tabulaRecta struct {
 }
 
 func newTabulaRecta(ptAlphabet string, keyAlphabet string, key string, ciphers []*masc.SimpleCipher, autokeyer autokeyFunc, caseless bool) (*tabulaRecta, error) {
-	t := &tabulaRecta{
+	keyAlphabetRunes := []rune(keyAlphabet)
+	if len(keyAlphabetRunes) != len(ciphers) {
+		return nil, errors.New("row headers must have same rune length as rows slice")
+	}
+
+	tableau := make(map[rune]*masc.SimpleCipher)
+	for i, r := range keyAlphabetRunes {
+		tableau[r] = ciphers[i]
+	}
+
+	return &tabulaRecta{
 		ptAlphabet:  ptAlphabet,
 		keyAlphabet: keyAlphabet,
 		key:         key,
 		autokeyer:   autokeyer,
 		caseless:    caseless,
-	}
-
-	tableau, err := t.maketableau(ciphers)
-	if err != nil {
-		return nil, fmt.Errorf("could not create tableau: %w", err)
-	}
-
-	t.tableau = tableau
-
-	return t, nil
-}
-
-func (tr *tabulaRecta) maketableau(ciphers []*masc.SimpleCipher) (map[rune]*masc.SimpleCipher, error) {
-	ptAlphabet, keyAlphabet := tr.ptAlphabet, tr.keyAlphabet
-
-	if keyAlphabet == "" {
-		keyAlphabet = ptAlphabet
-	}
-
-	m := make(map[rune]*masc.SimpleCipher)
-
-	keyRunes := []rune(keyAlphabet)
-
-	if len(keyRunes) != len(keyAlphabet) {
-		return nil, errors.New("row headers must have same rune length as rows slice")
-	}
-
-	for i, r := range keyRunes {
-		m[r] = ciphers[i]
-	}
-
-	return m, nil
+		tableau:     tableau,
+	}, nil
 }
 
 // Printable representation of this tabula recta.
