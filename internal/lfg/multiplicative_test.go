@@ -19,6 +19,7 @@ import (
 	"testing"
 
 	"github.com/merenbach/goldbug/internal/fixture"
+	"github.com/merenbach/goldbug/internal/iterutil"
 )
 
 func TestMultiplicative_Slice(t *testing.T) {
@@ -30,10 +31,13 @@ func TestMultiplicative_Slice(t *testing.T) {
 
 	fixture.Load(t, &tables)
 	for _, table := range tables {
-		if out, err := table.Slice(len(table.Output)); err != nil {
+		if g, err := table.Iterate(); err != nil {
 			t.Error("Error:", err)
-		} else if !reflect.DeepEqual(out, table.Output) {
-			t.Errorf("Expected output %v but got %v", out, table.Output)
+		} else {
+			out := iterutil.Take(len(table.Output), g)
+			if !reflect.DeepEqual(out, table.Output) {
+				t.Errorf("Expected output %v but got %v", out, table.Output)
+			}
 		}
 	}
 }

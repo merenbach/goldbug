@@ -16,8 +16,6 @@ package lfg
 
 import (
 	"errors"
-
-	"github.com/merenbach/goldbug/internal/iterutil"
 )
 
 // A Multiplicative LFG is a lagged Fibonacci generator that uses multiplication for new elements.
@@ -50,14 +48,4 @@ func (g *Multiplicative) Iterate() (func() int, error) {
 		}
 		return e
 	}), nil
-}
-
-// Slice of LCG values.
-// TODO: is this method still necessary?
-func (g *Multiplicative) Slice(n int) ([]int, error) {
-	iter, err := g.Iterate()
-	if err != nil {
-		return nil, err
-	}
-	return iterutil.Take(n, iter), nil
 }
