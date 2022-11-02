@@ -18,32 +18,24 @@ import (
 	"errors"
 )
 
-// An Additive LFG is a lagged Fibonacci generator that uses addition for new elements.
-// An Additive LFG is a type of pseudo-random number generator (PRNG).
+// An Additive LFG (ALFG) is a lagged Fibonacci generator that uses addition for new elements.
 // An Additive LFG may not be cryptographically secure.
 // An Additive LFG uses 1-indexed taps.
-type Additive struct {
-	Modulus int
-	Seed    []int
-	Taps    []int
-}
-
-// Iterate across an additive lagged Fibonacci generator (ALFG) sequence.
-func (g *Additive) Iterate() (func() int, error) {
+func Additive(modulus int, seed []int, taps []int) (func() int, error) {
 	// if err := g.validate(); err != nil {
 	// 	return nil, err
 	// }
 
 	// Ensure at least one item in seed is odd.
-	if all(g.Seed, func(i int) bool {
+	if all(seed, func(i int) bool {
 		return i%2 == 0
 	}) {
 		return nil, errors.New("at least one ALFG seed value must be odd")
 	}
 
-	return iterateLagTable(g.Modulus, g.Seed, func(lagTable []int) int {
+	return iterateLagTable(modulus, seed, func(lagTable []int) int {
 		e := 0
-		for _, t := range g.Taps {
+		for _, t := range taps {
 			e += lagTable[t-1]
 		}
 		return e
