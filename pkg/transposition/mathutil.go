@@ -31,14 +31,17 @@ func min(a int, b int) int {
 	return b
 }
 
+func max(a int, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
+
 // TODO: use this to make rail fence a special case of columnar transposition with Myszkowski
 func zigzag(period int) []int {
 	if period < 0 {
 		panic(fmt.Sprintf("period must be nonnegative, but got: %d", period))
-	}
-
-	if period == 0 {
-		period = 1
 	}
 
 	out := make([]int, period)

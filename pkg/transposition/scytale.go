@@ -18,14 +18,6 @@ import "fmt"
 
 // NewScytaleCipher creates and returns a new scytale.
 func NewScytaleCipher(turns int) (*Cipher, error) {
-	// let ys = match rails {
-	//     1 => vec![0],
-	//     _ => {
-	//         let period = 2 * (rails - 1);
-	//         transform::zigzag(period)
-	//     }
-	// };
-
 	// Prepare a scytale cipher.
 	// N.b.: The scytale cipher is a special case of a columnar transposition cipher
 	//       with a key equal to an ascending consecutive integer sequence
