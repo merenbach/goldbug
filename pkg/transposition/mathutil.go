@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package railfence
+package transposition
+
+import "fmt"
 
 // Abs returns the absolute value for an integer.
 func abs(i int) int {
@@ -20,4 +22,29 @@ func abs(i int) int {
 		return -i
 	}
 	return i
+}
+
+func min(a int, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+// TODO: use this to make rail fence a special case of columnar transposition with Myszkowski
+func zigzag(period int) []int {
+	if period < 0 {
+		panic(fmt.Sprintf("period must be nonnegative, but got: %d", period))
+	}
+
+	if period == 0 {
+		period = 1
+	}
+
+	out := make([]int, period)
+	for i := range out {
+		n := i % period
+		out[i] = min(n, period-n)
+	}
+	return out
 }

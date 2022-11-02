@@ -2,31 +2,31 @@
     {
         "Input": "WEAREDISCOVEREDFLEEATONCE",
         "Output": "WECRLTEERDSOEEFEAOCAIVDEN",
-        "Rows": 3
+        "Rails": 3
     },
     {
         "Input": "I_REALLY_LIKE_PUZZLES",
         "Output": "IA_EZS_ELYLK_UZERLIPL",
-        "Rows": 3
+        "Rails": 3
     },
     {
         "Input": "MEETMETONIGHTQXZ",
         "Output": "MEMTNGTXETEOIHQZ",
-        "Rows": 2
+        "Rails": 2
     },
     {
         "Input": "MEETMETONIGHTQXZ",
         "Output": "MMNTETEOIHQZETGX",
-        "Rows": 3
+        "Rails": 3
     },
     {
         "Input": "AMANLAUGHINGHISHEADOFFYZ",
         "Output": "AALUHNHSEDFYMNAGIGIHAOFZ",
-        "Rows": 2
+        "Rails": 2
     },
     {
         "Input": "HELLO, WORLD!",
         "Output": "HELLO, WORLD!",
-        "Rows": 1
+        "Rails": 1
     }
 ]

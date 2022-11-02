@@ -17,7 +17,6 @@ package pkg
 import (
 	"github.com/merenbach/goldbug/pkg/masc"
 	"github.com/merenbach/goldbug/pkg/pasc"
-	"github.com/merenbach/goldbug/pkg/railfence"
 	"github.com/merenbach/goldbug/pkg/transposition"
 )
 
@@ -28,7 +27,6 @@ type cipher interface {
 }
 
 // Validate against this interface
-var _ cipher = &railfence.Cipher{}
 var _ cipher = &masc.SimpleCipher{}
 var _ cipher = &transposition.Cipher{}
 var _ cipher = &pasc.TabulaRectaCipher{}

@@ -12,34 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package railfence
+package transposition
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/merenbach/goldbug/internal/fixture"
 )
 
-func TestCipher_row(t *testing.T) {
+func TestRailFenceCipher_Encipher(t *testing.T) {
 	var tables []struct {
-		Cipher
-
-		Input  int
-		Output int
-	}
-
-	fixture.Load(t, &tables)
-	for _, table := range tables {
-		if out := table.row(table.Input); out != table.Output {
-			t.Errorf("Expected cipher %+v message character %d in row %d, but instead got row %d", table.Cipher, table.Input, table.Output, out)
-		}
-	}
-}
-
-func TestCipher_Encipher(t *testing.T) {
-	var tables []struct {
-		Cipher
+		Rails int
 
 		Input  string
 		Output string
@@ -47,7 +30,11 @@ func TestCipher_Encipher(t *testing.T) {
 
 	fixture.Load(t, &tables)
 	for _, table := range tables {
-		if out, err := table.Encipher(table.Input); err != nil {
+		c, err := NewRailFenceCipher(table.Rails)
+		if err != nil {
+			t.Fatal("Could not create cipher:", err)
+		}
+		if out, err := c.Encipher(table.Input); err != nil {
 			t.Error("Could not encipher:", err)
 		} else if out != table.Output {
 			t.Errorf("Expected %q to encipher to %q, but instead got %q", table.Input, table.Output, out)
@@ -55,9 +42,9 @@ func TestCipher_Encipher(t *testing.T) {
 	}
 }
 
-func TestCipher_Decipher(t *testing.T) {
+func TestRailFenceCipher_Decipher(t *testing.T) {
 	var tables []struct {
-		Cipher
+		Rails int
 
 		Input  string
 		Output string
@@ -65,7 +52,11 @@ func TestCipher_Decipher(t *testing.T) {
 
 	fixture.Load(t, &tables)
 	for _, table := range tables {
-		if out, err := table.Decipher(table.Input); err != nil {
+		c, err := NewRailFenceCipher(table.Rails)
+		if err != nil {
+			t.Fatal("Could not create cipher:", err)
+		}
+		if out, err := c.Decipher(table.Input); err != nil {
 			t.Error("Could not decipher:", err)
 		} else if out != table.Output {
 			t.Errorf("Expected %q to decipher to %q, but instead got %q", table.Input, table.Output, out)
@@ -73,7 +64,7 @@ func TestCipher_Decipher(t *testing.T) {
 	}
 }
 
-func TestCipherReversibility(t *testing.T) {
+func TestRailFenceCipherReversibility(t *testing.T) {
 	base := "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
 	baseRunes := []rune(base)
 
@@ -85,7 +76,10 @@ func TestCipherReversibility(t *testing.T) {
 			msg := string(baseRunes[:msglen])
 			t.Logf("Iteration %d (rows = %d, message length = %d, message = %s)", counter, rows, msglen, msg)
 
-			c := Cipher{Rows: rows}
+			c, err := NewRailFenceCipher(rows)
+			if err != nil {
+				t.Error("Could not create new cipher:", err)
+			}
 
 			enciphered1, err := c.Encipher(msg)
 			if err != nil {
@@ -114,30 +108,30 @@ func TestCipherReversibility(t *testing.T) {
 	}
 }
 
-func ExampleCipher_enciphermentGrid() {
-	c := Cipher{Rows: 3}
-	out, err := c.enciphermentGrid("WEAREDISCOVEREDFLEEATONCE")
-	if err != nil {
-		fmt.Println("Error:", err)
-	}
-	fmt.Println(out)
+// func ExampleCipher_enciphermentGrid() {
+// 	c := Cipher{Rows: 3}
+// 	out, err := c.enciphermentGrid("WEAREDISCOVEREDFLEEATONCE")
+// 	if err != nil {
+// 		fmt.Println("Error:", err)
+// 	}
+// 	fmt.Println(out)
 
-	// Output:
-	// W   E   C   R   L   T   E
-	//  E R D S O E E F E A O C
-	//   A   I   V   D   E   N
-}
+// 	// Output:
+// 	// W   E   C   R   L   T   E
+// 	//  E R D S O E E F E A O C
+// 	//   A   I   V   D   E   N
+// }
 
-func ExampleCipher_deciphermentGrid() {
-	c := Cipher{Rows: 3}
-	out, err := c.deciphermentGrid("WECRLTEERDSOEEFEAOCAIVDEN")
-	if err != nil {
-		fmt.Println("Error:", err)
-	}
-	fmt.Println(out)
+// func ExampleCipher_deciphermentGrid() {
+// 	c := Cipher{Rows: 3}
+// 	out, err := c.deciphermentGrid("WECRLTEERDSOEEFEAOCAIVDEN")
+// 	if err != nil {
+// 		fmt.Println("Error:", err)
+// 	}
+// 	fmt.Println(out)
 
-	// Output:
-	// W   E   C   R   L   T   E
-	//  E R D S O E E F E A O C
-	//   A   I   V   D   E   N
-}
+// 	// Output:
+// 	// W   E   C   R   L   T   E
+// 	//  E R D S O E E F E A O C
+// 	//   A   I   V   D   E   N
+// }

@@ -22,14 +22,13 @@ Instantiate your deployment pipeline as follows, adapting as necessary the param
 
 ## TODO
 
-* Can we reduce use of pointers, e.g., with PASC keyGenerator or returning cipher structs?
-* Explore making MASC String() into Printable()
+* Can we reduce use of pointers, e.g., with returning cipher structs?
 * Fix test names and filename conventions
 * Make comments and docs more consistent
 * Implement PASC transforms and tests
+* Reimplement nulls for transposition
 * Refactor testing methodology for MASC and PASC to reduce duplication
 * Explore alternative PASC with (slope, intercept) = (-1, -1)
-* Can we reduce inefficiency of creating multiple config objects when covering constructors?
 * Expand tests for custom ciphertext alphabets
 * Improve and enhance test cases overall
 * Expand tests for tabula recta to catch cases with reversed or alternate alphabets

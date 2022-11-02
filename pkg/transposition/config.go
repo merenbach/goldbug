@@ -17,6 +17,7 @@ package transposition
 // A Config struct for a cipher.
 type Config struct {
 	myszkowski bool
+	keys       [][]int
 }
 
 // adapted from: https://www.sohamkamani.com/golang/options-pattern/
@@ -26,6 +27,19 @@ type ConfigOption func(*Config)
 func WithMyszkowski() ConfigOption {
 	return func(c *Config) {
 		c.myszkowski = true
+	}
+}
+
+func WithStringKey(s string) ConfigOption {
+	return func(c *Config) {
+		ii := lexorder([]rune(s))
+		c.keys = append(c.keys, ii)
+	}
+}
+
+func WithIntegerKey(i []int) ConfigOption {
+	return func(c *Config) {
+		c.keys = append(c.keys, i)
 	}
 }
 
