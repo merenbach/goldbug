@@ -29,7 +29,9 @@ func TestRailFenceCipher_Encipher(t *testing.T) {
 	}
 
 	fixture.Load(t, &tables)
-	for _, table := range tables {
+	for i, table := range tables {
+		t.Logf("Running test %d of %d...", i+1, len(tables))
+
 		c, err := NewRailFenceCipher(table.Rails)
 		if err != nil {
 			t.Fatal("Could not create cipher:", err)
@@ -51,7 +53,9 @@ func TestRailFenceCipher_Decipher(t *testing.T) {
 	}
 
 	fixture.Load(t, &tables)
-	for _, table := range tables {
+	for i, table := range tables {
+		t.Logf("Running test %d of %d...", i+1, len(tables))
+
 		c, err := NewRailFenceCipher(table.Rails)
 		if err != nil {
 			t.Fatal("Could not create cipher:", err)

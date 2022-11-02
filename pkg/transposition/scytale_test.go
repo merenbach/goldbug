@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package scytale
+package transposition
 
 import (
 	"testing"
 )
 
-func TestCipher(t *testing.T) {
+func TestScytaleyyCipher(t *testing.T) {
 	tables := []struct {
 		ciphertext string
 		plaintext  string
@@ -56,13 +56,23 @@ func TestCipher(t *testing.T) {
 		// },
 	}
 
-	for _, table := range tables {
-		c := Cipher{Turns: table.turns}
-		if out := c.Decipher(table.ciphertext); out != table.plaintext {
+	for i, table := range tables {
+		t.Logf("Running test %d of %d...", i+1, len(tables))
+
+		c, err := NewScytaleCipher(table.turns)
+		if err != nil {
+			t.Fatal("Could not create cipher:", err)
+		}
+
+		if out, err := c.Decipher(table.ciphertext); err != nil {
+			t.Error("Could not decipher:", err)
+		} else if out != table.plaintext {
 			t.Errorf("Expected %q to decipher to %q, but instead got %q", table.ciphertext, table.plaintext, out)
 		}
 
-		if out := c.Encipher(table.plaintext); out != table.ciphertext {
+		if out, err := c.Encipher(table.plaintext); err != nil {
+			t.Error("Could not encipher:", err)
+		} else if out != table.ciphertext {
 			t.Errorf("Expected %q to encipher to %q, but instead got %q", table.plaintext, table.ciphertext, out)
 		}
 	}
