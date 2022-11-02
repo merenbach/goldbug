@@ -47,7 +47,9 @@ func TestCipher_Encipher(t *testing.T) {
 	}
 
 	fixture.Load(t, &tables)
-	for _, table := range tables {
+	for i, table := range tables {
+		t.Logf("Running test %d of %d...", i+1, len(tables))
+
 		var params []ConfigOption
 		if table.Myszkowski {
 			params = append(params, WithMyszkowski())
@@ -72,7 +74,9 @@ func TestCipher_Decipher(t *testing.T) {
 	}
 
 	fixture.Load(t, &tables)
-	for _, table := range tables {
+	for i, table := range tables {
+		t.Logf("Running test %d of %d...", i+1, len(tables))
+
 		var params []ConfigOption
 		if table.Myszkowski {
 			params = append(params, WithMyszkowski())

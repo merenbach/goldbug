@@ -48,6 +48,16 @@ func Backpermute[T any](xs []T, by []int) ([]T, error) {
 	return ys, nil
 }
 
+// Cycle through a slice.
+func Cycle[T any](xs []T) func() T {
+	var cursor int
+	return func() T {
+		out := xs[cursor%len(xs)]
+		cursor++
+		return out
+	}
+}
+
 // Deduplicate removes recurrences for elements from a sequence.
 // Deduplicate is stable in that it preserves the order of first appearance.
 func Deduplicate[T comparable](xs []T) []T {
@@ -122,6 +132,15 @@ func Keyword[T comparable](xs []T, keyword []T) ([]T, error) {
 	return Deduplicate(filteredKeyword), nil
 }
 
+// Map slice values through a function.
+func Map[T any, U any](xs []T, f func(T) U) []U {
+	out := make([]U, len(xs))
+	for i, o := range xs {
+		out[i] = f(o)
+	}
+	return out
+}
+
 // Zipmap creates a new map by zipping a key scalar with a slice of values.
 // Zipmap requires both parameters to have the same length.
 func Zipmap[T comparable, U any](xs []T, ys []U) (map[T]U, error) {
@@ -136,3 +155,10 @@ func Zipmap[T comparable, U any](xs []T, ys []U) (map[T]U, error) {
 
 	return m, nil
 }
+
+/// Zigzag sequence, of primary use in the rail fence cipher.
+/// The period is the length of the sequence before any repetition would occur.
+/// A single period will be returned.
+// pub fn zigzag(period: usize) -> Vec<usize> {
+//     (0..period).map(|n| cmp::min(n, period - n)).collect()
+// }

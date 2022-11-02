@@ -15,11 +15,13 @@
 package transposition
 
 import (
+	"fmt"
 	"sort"
 	"unicode/utf8"
 
-	"github.com/merenbach/goldbug/internal/grid"
+	"github.com/merenbach/goldbug/internal/iterutil"
 	"github.com/merenbach/goldbug/internal/sliceutil"
+	"golang.org/x/exp/constraints"
 )
 
 // LexicalKey returns a key based on the relative lexicographic ordering of runes in a string.
@@ -72,45 +74,137 @@ func NewCipher(keys []string, opts ...ConfigOption) *Cipher {
 	}
 }
 
-// Makegrid creates a grid and numbers its cells.
-func (c *Cipher) makegrid(n int, cols int) grid.Grid {
-	g := make(grid.Grid, n)
-	for i := range g {
-		g[i].Col = i % cols
-		g[i].Row = i / cols
+// Lexorder returns the relative lexical ordering of a sequence.
+// This is spiritually similar to a Schwartzian transform or decorate-sort-undecorate.
+func lexorder[T constraints.Integer](xs []T) ([]int, error) {
+	set := sliceutil.Deduplicate(xs)
+	sort.SliceStable(set, func(i int, j int) bool {
+		return set[i] < set[j]
+	})
+
+	nums := make([]int, len(set))
+	for i := range nums {
+		nums[i] = i
 	}
-	return g
+
+	// Assign cardinal positions to input characters based on sort order.
+	m, err := sliceutil.Zipmap(set, nums)
+	if err != nil {
+		return nil, fmt.Errorf("could not create map: %w", err)
+	}
+
+	// Map each input character to its first-seen position.
+	return sliceutil.Map(xs, func(e T) int {
+		return m[e]
+	}), nil
+}
+
+// TODO: add more tests to ensure that Myszkowski argument maybe always has an effect
+/// Generate transposition cipher indices based on a columnar key.
+func (c *Cipher) process(count int, key string) ([]int, error) {
+	// This lexical ordering transformation is technically needed only to support Myszkowski transposition.
+	// We don't know the message length before here, so we want to avoid doing any argsorts until now,
+	// as argsort will convert duplicate values into consecutive values.
+	// key := strings.Join(c.Keys, "")
+	// key := c.Keys[0]
+
+	lexkey, err := lexorder([]rune(key))
+	if err != nil {
+		return nil, fmt.Errorf("could not order lexicographically: %w", err)
+	}
+
+	if c.myszkowski {
+		xs := iterutil.Take(count, sliceutil.Cycle(lexkey))
+		return sliceutil.Argsort(sliceutil.Argsort(xs)), nil
+	} else {
+		xs := sliceutil.Argsort(sliceutil.Argsort(lexkey))
+		return iterutil.Take(count, sliceutil.Cycle(xs)), nil
+	}
 }
 
 // Encipher a message.
-func (c *Cipher) Encipher(s string) (string, error) {
-	for _, k := range c.Keys {
-		g := c.makegrid(utf8.RuneCountInString(s), utf8.RuneCountInString(k))
-		g.SortByRow()
-		g.Fill(s)
+func (c *Cipher) Encipher(xs string) (string, error) {
+	// let ys: Vec<_> = xs.iter().chain(self.nulls.iter()).copied().collect();
+	out := xs
+	for _, key := range c.Keys {
+		ys := []rune(out)
+		indices, err := c.process(len(ys), key)
+		if err != nil {
+			return "", fmt.Errorf("could not process indices: %w", err)
+		}
 
-		keyNums := lexicalKey(k, c.myszkowski)
-		s = g.ReadCols(keyNums)
+		out2, err := sliceutil.Backpermute(ys, sliceutil.Argsort(indices))
+		if err != nil {
+			return "", fmt.Errorf("could not backpermute: %w", err)
+		}
+
+		out = string(out2)
 	}
-
-	return s, nil
+	return out, nil
 }
 
 // Decipher a message.
-func (c *Cipher) Decipher(s string) (string, error) {
+func (c *Cipher) Decipher(xs string) (string, error) {
+	out := xs
 	for i := len(c.Keys) - 1; i >= 0; i-- {
-		k := c.Keys[i]
-		g := c.makegrid(utf8.RuneCountInString(s), utf8.RuneCountInString(k))
-		keyNums := lexicalKey(k, c.myszkowski)
+		key := c.Keys[i]
 
-		g.OrderByCol(keyNums)
-		g.Fill(s)
-		g.SortByCol()
-		s = g.ReadByRow()
+		ys := []rune(out)
+		indices, err := c.process(len(ys), key)
+		if err != nil {
+			return "", fmt.Errorf("could not process indices: %w", err)
+		}
+
+		// TODO: this doesn't verify that the nulls are again present at the end
+		out2, err := sliceutil.Backpermute(ys, sliceutil.Argsort(sliceutil.Argsort(indices)))
+		if err != nil {
+			return "", fmt.Errorf("could not backpermute: %w", err)
+		}
+
+		out = string(out2)
 	}
-
-	return s, nil
+	return out, nil // - len(self.nulls)
 }
+
+// Makegrid creates a grid and numbers its cells.
+// func (c *Cipher) makegrid(n int, cols int) grid.Grid {
+// 	g := make(grid.Grid, n)
+// 	for i := range g {
+// 		g[i].Col = i % cols
+// 		g[i].Row = i / cols
+// 	}
+// 	return g
+// }
+
+// // Encipher a message.
+// func (c *Cipher) Encipher(s string) (string, error) {
+// 	for _, k := range c.Keys {
+// 		g := c.makegrid(utf8.RuneCountInString(s), utf8.RuneCountInString(k))
+// 		g.SortByRow()
+// 		g.Fill(s)
+
+// 		keyNums := lexicalKey(k, c.myszkowski)
+// 		s = g.ReadCols(keyNums)
+// 	}
+
+// 	return s, nil
+// }
+
+// // Decipher a message.
+// func (c *Cipher) Decipher(s string) (string, error) {
+// 	for i := len(c.Keys) - 1; i >= 0; i-- {
+// 		k := c.Keys[i]
+// 		g := c.makegrid(utf8.RuneCountInString(s), utf8.RuneCountInString(k))
+// 		keyNums := lexicalKey(k, c.myszkowski)
+
+// 		g.OrderByCol(keyNums)
+// 		g.Fill(s)
+// 		g.SortByCol()
+// 		s = g.ReadByRow()
+// 	}
+
+// 	return s, nil
+// }
 
 // // EnciphermentGrid returns the output tableau upon encipherment.
 // func (c *Cipher) enciphermentGrid(s string) (string, error) {
