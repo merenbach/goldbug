@@ -24,18 +24,14 @@ import (
 
 func TestAdditive_Slice(t *testing.T) {
 	var tables []struct {
-		Modulus int
-		Seed    []int
-		Taps    []int
+		Additive
 
 		Output []int
 	}
 
 	fixture.Load(t, &tables)
-	for i, table := range tables {
-		t.Logf("Running test %d of %d...", i+1, len(tables))
-
-		if g, err := Additive(table.Modulus, table.Seed, table.Taps); err != nil {
+	for _, table := range tables {
+		if g, err := table.Iterate(); err != nil {
 			t.Error("Error:", err)
 		} else {
 			out := iterutil.Take(len(table.Output), g)

@@ -18,24 +18,32 @@ import (
 	"errors"
 )
 
-// A Multiplicative LFG (MLFG) is a lagged Fibonacci generator that uses multiplication for new elements.
+// A Multiplicative LFG is a lagged Fibonacci generator that uses multiplication for new elements.
+// A Multiplicative LFG is a type of pseudo-random number generator (PRNG).
 // A Multiplicative LFG may not be cryptographically secure.
 // A Multiplicative LFG uses 1-indexed taps.
-func Multiplicative(modulus int, seed []int, taps []int) (func() int, error) {
+type Multiplicative struct {
+	Modulus int
+	Seed    []int
+	Taps    []int
+}
+
+// Iterate across a multiplicative lagged Fibonacci generator (MLFG) sequence.
+func (g *Multiplicative) Iterate() (func() int, error) {
 	// if err := g.validate(); err != nil {
 	// 	return nil, err
 	// }
 
 	// Ensure at least one item in seed is odd.
-	if !all(seed, func(i int) bool {
+	if !all(g.Seed, func(i int) bool {
 		return i%2 != 0
 	}) {
 		return nil, errors.New("all MLFG seed values must be odd")
 	}
 
-	return iterateLagTable(modulus, seed, func(lagTable []int) int {
+	return iterateLagTable(g.Modulus, g.Seed, func(lagTable []int) int {
 		e := 1
-		for _, t := range taps {
+		for _, t := range g.Taps {
 			e *= lagTable[t-1]
 		}
 		return e
