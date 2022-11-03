@@ -80,13 +80,11 @@ func lexorder[T constraints.Ordered](xs []T) []int {
 		return set[i] < set[j]
 	})
 
-	nums := make([]int, len(set))
-	for i := range nums {
-		nums[i] = i
-	}
-
 	// Assign cardinal positions to input characters based on sort order.
-	m, _ := sliceutil.Zipmap(set, nums)
+	m := make(map[T]int, len(set))
+	for i, v := range set {
+		m[v] = i
+	}
 
 	// Map each input character to its first-seen position.
 	return sliceutil.Map(xs, func(e T) int {
