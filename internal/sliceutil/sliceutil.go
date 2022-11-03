@@ -112,7 +112,7 @@ func Affine[T any](xs []T, slope int, intercept int) ([]T, error) {
 }
 
 // Keyword transform a slice.
-func Keyword[T comparable](xs []T, keyword []T) ([]T, error) {
+func Keyword[T comparable](xs []T, keyword []T) []T {
 	set := make(map[T]struct{})
 	for _, x := range xs {
 		if _, ok := set[x]; !ok {
@@ -129,7 +129,7 @@ func Keyword[T comparable](xs []T, keyword []T) ([]T, error) {
 	}
 
 	filteredKeyword = append(filteredKeyword, xs...)
-	return Deduplicate(filteredKeyword), nil
+	return Deduplicate(filteredKeyword)
 }
 
 // Map slice values through a function.

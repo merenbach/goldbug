@@ -19,7 +19,6 @@ import "github.com/merenbach/goldbug/internal/sliceutil"
 // NewKeywordCipher creates and returns a new keyword cipher.
 func NewKeywordCipher(keyword string, opts ...ConfigOption) (*SimpleCipher, error) {
 	c := NewConfig(opts...)
-	ctAlphabet, _ := sliceutil.Keyword([]rune(c.alphabet), []rune(keyword))
-
+	ctAlphabet := sliceutil.Keyword([]rune(c.alphabet), []rune(keyword))
 	return NewSimpleCipher(string(ctAlphabet), opts...)
 }
