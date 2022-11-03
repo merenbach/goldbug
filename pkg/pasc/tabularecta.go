@@ -163,35 +163,25 @@ func (c *TabulaRectaCipher) Decipher(s string) (string, error) {
 
 // Printable representation of the tabula recta for this cipher.
 func (c *TabulaRectaCipher) Printable() (string, error) {
-	ptAlphabet := c.ptAlphabet
-
-	keyAlphabet := c.keyAlphabet
-	if keyAlphabet == "" {
-		keyAlphabet = ptAlphabet
-	}
-
-	rt := c.tabulaRecta
-
 	var b strings.Builder
-
-	w := tabwriter.NewWriter(&b, 4, 1, 3, ' ', 0)
 
 	formatForPrinting := func(s string) string {
 		spl := strings.Split(s, "")
 		return strings.Join(spl, " ")
 	}
 
-	fmt.Fprintf(w, "\t%s\n", formatForPrinting(ptAlphabet))
-	for _, r := range keyAlphabet {
-		if tableau, ok := rt[r]; ok {
-			out, err := tableau.Encipher(ptAlphabet)
+	w := tabwriter.NewWriter(&b, 4, 1, 3, ' ', 0)
+	fmt.Fprintf(w, "\t%s\n", formatForPrinting(c.ptAlphabet))
+	for _, r := range c.keyAlphabet {
+		if tableau, ok := c.tabulaRecta[r]; ok {
+			out, err := tableau.Encipher(c.ptAlphabet)
 			if err != nil {
-				return "", err
+				return "", fmt.Errorf("could not encipher: %w", err)
 			}
 			fmt.Fprintf(w, "\n%c\t%s", r, formatForPrinting(out))
 		}
 	}
-
 	w.Flush()
+
 	return b.String(), nil
 }
