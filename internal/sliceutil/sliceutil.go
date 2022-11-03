@@ -111,6 +111,17 @@ func Affine[T any](xs []T, slope int, intercept int) ([]T, error) {
 	return ys, nil
 }
 
+// Filter slice values through a function.
+func Filter[T any](xs []T, f func(T) bool) []T {
+	out := make([]T, 0)
+	for _, o := range xs {
+		if f(o) {
+			out = append(out, o)
+		}
+	}
+	return out
+}
+
 // Keyword transform a slice.
 func Keyword[T comparable](xs []T, keyword []T) []T {
 	set := make(map[T]struct{})
@@ -120,13 +131,11 @@ func Keyword[T comparable](xs []T, keyword []T) []T {
 		}
 	}
 
-	// Filter out anything from the keyword that isn't in the primary slice
-	filteredKeyword := make([]T, 0)
-	for _, k := range keyword {
-		if _, ok := set[k]; ok {
-			filteredKeyword = append(filteredKeyword, k)
-		}
-	}
+	// Retain in keyword only elements shared with xs
+	filteredKeyword := Filter(keyword, func(o T) bool {
+		_, ok := set[o]
+		return ok
+	})
 
 	filteredKeyword = append(filteredKeyword, xs...)
 	return Deduplicate(filteredKeyword)
