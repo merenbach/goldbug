@@ -48,11 +48,16 @@ func Backpermute[T any](xs []T, by []int) ([]T, error) {
 	return ys, nil
 }
 
-// Cycle through a slice.
+// Cycle through a slice. Returns nil if the slice is empty.
 func Cycle[T any](xs []T) func() T {
+	if len(xs) == 0 {
+		return nil
+	}
+
 	var cursor int
 	return func() T {
-		out := xs[cursor%len(xs)]
+		cursor %= len(xs)
+		out := xs[cursor]
 		cursor++
 		return out
 	}
