@@ -50,6 +50,16 @@ func owrapString(s string, i int) (string, error) {
 func NewDellaPortaCipher(key string, opts ...ConfigOption) (*TabulaRectaCipher, error) {
 	c := NewConfig(opts...)
 
+	params := []masc.ConfigOption{
+		masc.WithAlphabet(c.ptAlphabet),
+	}
+	if c.caseless {
+		params = append(params, masc.WithCaseless())
+	}
+	if c.strict {
+		params = append(params, masc.WithStrict())
+	}
+
 	ciphers := make([]*masc.SimpleCipher, utf8.RuneCountInString(c.keyAlphabet))
 	for i := range ciphers {
 		s := c.ptAlphabet
@@ -57,16 +67,6 @@ func NewDellaPortaCipher(key string, opts ...ConfigOption) (*TabulaRectaCipher, 
 		ctAlphabet2, err := owrapString(s, i/2)
 		if err != nil {
 			return nil, err
-		}
-
-		params := []masc.ConfigOption{
-			masc.WithAlphabet(s),
-		}
-		if c.caseless {
-			params = append(params, masc.WithCaseless())
-		}
-		if c.strict {
-			params = append(params, masc.WithStrict())
 		}
 
 		cipher, err := masc.NewSimpleCipher(ctAlphabet2, params...)

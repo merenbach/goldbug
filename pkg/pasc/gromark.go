@@ -54,6 +54,16 @@ func NewGromarkCipher(key string, primer string, opts ...ConfigOption) (*TabulaR
 	opts = append(opts, WithKeyAlphabet(digits))
 	c := NewConfig(opts...)
 
+	params := []masc.ConfigOption{
+		masc.WithAlphabet(c.ptAlphabet),
+	}
+	if c.caseless {
+		params = append(params, masc.WithCaseless())
+	}
+	if c.strict {
+		params = append(params, masc.WithStrict())
+	}
+
 	ctAlphabetInput, _ := sliceutil.Keyword([]rune(c.ptAlphabet), []rune(key))
 
 	tc, err := transposition.NewCipher(transposition.WithStringKey(key))
@@ -81,17 +91,6 @@ func NewGromarkCipher(key string, primer string, opts ...ConfigOption) (*TabulaR
 			return nil, fmt.Errorf("could not transform alphabet: %w", err)
 		}
 
-		s := c.ptAlphabet
-
-		params := []masc.ConfigOption{
-			masc.WithAlphabet(s),
-		}
-		if c.caseless {
-			params = append(params, masc.WithCaseless())
-		}
-		if c.strict {
-			params = append(params, masc.WithStrict())
-		}
 		cipher, err := masc.NewSimpleCipher(string(ctAlphabetTransformed), params...)
 		if err != nil {
 			return nil, fmt.Errorf("could not create cipher: %w", err)
